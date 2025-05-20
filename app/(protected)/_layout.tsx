@@ -8,12 +8,6 @@ export const unsetable_settings = {
 
 export default function ProtectedLayout() {
 
-  const authState = useContext(AuthContext);
-
-  if (!authState.isLoggedIn) {
-    return <Redirect href="/login"/>
-  }
-
   return (
     <>
       <Stack screenOptions={{ headerShown: false }}>

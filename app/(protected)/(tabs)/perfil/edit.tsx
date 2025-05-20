@@ -5,7 +5,6 @@ import { SafeAreaView } from 'react-native-safe-area-context';
 import Colors from '@/constants/Colors';
 import useColorScheme from '@/hooks/useColorScheme';
 import Layout from '@/constants/Layout';
-import { mockUser } from '@/assets/data/mockUser';
 import ProfileHeader from '@/components/ProfileHeader';
 import FormInput from '@/components/FormInput';
 import SelectInput from '@/components/SelectInput';
@@ -14,13 +13,6 @@ import Animated, { FadeInDown } from 'react-native-reanimated';
 import { User } from '@/types/user';
 import { AuthContext } from '@/context/AuthContext';
 
-const relationshipOptions = [
-  { label: 'Padre/Madre', value: 'parent' },
-  { label: 'Hermano/a', value: 'sibling' },
-  { label: 'Cónyuge', value: 'spouse' },
-  { label: 'Amigo/a', value: 'friend' },
-  { label: 'Otro', value: 'other' },
-];
 
 const stateOptions = [
   { label: 'Ciudad de México', value: 'cdmx' },
@@ -36,32 +28,37 @@ const cityOptions = [
   { label: 'Puebla', value: 'puebla' },
 ];
 
+type UserField = keyof User; // This ensures only valid User properties can be used
+
 export default function EditProfileScreen() {
   const colorScheme = useColorScheme();
   const router = useRouter();
-
   const { user } = useContext(AuthContext);
-  console.log(user)
+  const [userData, setUserData] = useState<User | null>(null); // Initialize as null
+
+  // Move the conditional after all hooks are called
+  if (!user) return null;
+
+  // Initialize userData only when user is available and userData is null
+  if (user && userData === null) {
+    setUserData(user);
+  }
+
+  if (userData === null) return null;
   
-  const [userData, setUserData] = useState<User>({...mockUser});
-  
-  const handleChange = (field: string, value: string) => {
-    setUserData(prev => ({
-      ...prev,
-      [field]: value,
-    }));
-  };
-  
-  const handleAddressChange = (field: string, value: string) => {
-    setUserData(prev => ({
-      ...prev,
-      address: {
-        ...prev.address,
+  const handleChange = (field: UserField, value: string) => {
+    setUserData(prev => {
+      if (!prev) return null;
+      return {
+        ...prev,
         [field]: value,
-      },
-    }));
+      };
+    });
   };
   
+  
+  
+  {/*
   const handleEmergencyContactChange = (field: string, value: string) => {
     setUserData(prev => ({
       ...prev,
@@ -71,6 +68,8 @@ export default function EditProfileScreen() {
       },
     }));
   };
+
+  */}
   
   const handleCancel = () => {
     router.back();
@@ -95,9 +94,9 @@ export default function EditProfileScreen() {
           showsVerticalScrollIndicator={false}
         >
           <ProfileHeader
-            name={userData.name}
+            name={userData.nombre}
             email={userData.email}
-            imageUrl={userData.profileImage}
+            imageUrl={userData.foto || ''}
             showCheckmark
           />
           
@@ -111,8 +110,8 @@ export default function EditProfileScreen() {
             
             <FormInput
               label="Nombre"
-              value={userData.name}
-              onChangeText={(text) => handleChange('name', text)}
+              value={userData.nombre}
+              onChangeText={(text) => handleChange('nombre', text)}
               placeholder="Nombre completo"
               isRequired
             />
@@ -138,32 +137,32 @@ export default function EditProfileScreen() {
             
             <SelectInput
               label="Estado"
-              value={userData.address.state}
-              onSelect={(value) => handleAddressChange('state', value)}
+              value={userData.estadoMx}
+              onSelect={(value) => handleChange('estadoMx', value)}
               options={stateOptions}
               isRequired
             />
             
             <FormInput
               label="Alcaldía o Municipio"
-              value={userData.address.municipality}
-              onChangeText={(text) => handleAddressChange('municipality', text)}
+              value={userData.delegacionMunicipio}
+              onChangeText={(text) => handleChange('delegacionMunicipio', text)}
               placeholder="Alcaldía o Municipio"
               isRequired
             />
             
             <SelectInput
               label="Ciudad"
-              value={userData.address.city}
-              onSelect={(value) => handleAddressChange('city', value)}
+              value={userData.ciudad}
+              onSelect={(value) => handleChange('ciudad', value)}
               options={cityOptions}
               isRequired
             />
             
             <FormInput
               label="Colonia"
-              value={userData.address.neighborhood}
-              onChangeText={(text) => handleAddressChange('neighborhood', text)}
+              value={userData.colonia}
+              onChangeText={(text) => handleChange('colonia', text)}
               placeholder="Colonia"
               isRequired
             />
@@ -171,8 +170,8 @@ export default function EditProfileScreen() {
             <View style={styles.rowContainer}>
               <FormInput
                 label="Número"
-                value={userData.address.number}
-                onChangeText={(text) => handleAddressChange('number', text)}
+                value={userData.cel}
+                onChangeText={(text) => handleChange('cel', text)}
                 placeholder="Número"
                 keyboardType="numeric"
                 isRequired
@@ -181,8 +180,8 @@ export default function EditProfileScreen() {
               
               <FormInput
                 label="Código postal"
-                value={userData.address.postalCode}
-                onChangeText={(text) => handleAddressChange('postalCode', text)}
+                value={userData.cp}
+                onChangeText={(text) => handleChange('cp', text)}
                 placeholder="Código postal"
                 keyboardType="numeric"
                 isRequired
@@ -191,6 +190,7 @@ export default function EditProfileScreen() {
             </View>
           </Animated.View>
           
+          {/*
           <Animated.View
             entering={FadeInDown.duration(600).delay(300)}
             style={styles.formSection}
@@ -201,7 +201,7 @@ export default function EditProfileScreen() {
             
             <FormInput
               label="Nombre"
-              value={userData.emergencyContact.name}
+              value={userData}
               onChangeText={(text) => handleEmergencyContactChange('name', text)}
               placeholder="Nombre completo"
               isRequired
@@ -232,6 +232,8 @@ export default function EditProfileScreen() {
               isRequired
             />
           </Animated.View>
+
+           */}
           
           <Animated.View
             entering={FadeInDown.duration(600).delay(400)}

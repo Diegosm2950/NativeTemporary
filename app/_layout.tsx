@@ -6,6 +6,7 @@ import { useFonts, Inter_400Regular, Inter_500Medium, Inter_600SemiBold, Inter_7
 import { Poppins_500Medium, Poppins_600SemiBold, Poppins_700Bold } from '@expo-google-fonts/poppins';
 import { SplashScreen } from 'expo-router';
 import { AuthProvider } from "@/context/AuthContext";
+import Toast from "react-native-toast-message";
 
 SplashScreen.preventAutoHideAsync();
 
@@ -40,6 +41,7 @@ export default function RootLayout() {
                         headerShown: false
                     }}/>
                 </Stack>
+                <Toast/>
             </React.Fragment>
         </AuthProvider>
     )

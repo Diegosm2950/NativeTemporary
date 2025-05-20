@@ -1,19 +1,16 @@
-import AsyncStorage from "@react-native-async-storage/async-storage";
+import { AuthService } from "@/services/auth";
+import { User } from "@/types/user";
 import { SplashScreen, useRouter } from "expo-router";
-import { createContext, PropsWithChildren, use, useEffect, useState } from "react";
-import { Alert } from "react-native";
-import Constants from 'expo-constants';
+import { createContext, PropsWithChildren, useEffect, useState } from "react";
 import Toast from "react-native-toast-message";
 
 SplashScreen.preventAutoHideAsync();
 
 type AuthState = {
-  isLoggedIn: boolean;
-  isReady: boolean;
-  user: UserData | null;
-  logIn: (credentials: LoginProps) => void;
+  logIn: (credentials: LoginProps) => Promise<void>;
   logOut: () => void;
-  fetchUserData: () => Promise<void>;
+  user: User | null;
+  isLoading: boolean;
 };
 
 type LoginProps = {
@@ -21,162 +18,98 @@ type LoginProps = {
   password: string
 }
 
-type UserData = {
-  id: number;
-  nombreCompleto: string;
-  foto: string | null;
-  tipoRegistro: string[];
-  rol: string | null;
-};
-
-const authStorageKey = "auth-key";
-
 export const AuthContext = createContext<AuthState>({
-  isLoggedIn: false,
-  isReady: false,
-  user: null,
   logIn: async () => {},
   logOut: () => {},
-  fetchUserData: async () => {},
+  user: null,
+  isLoading: true
 });
 
 export function AuthProvider({ children }: PropsWithChildren) {
-  const [isReady, setIsReady] = useState(false);
-  const [isLoggedIn, setIsLoggedIn] = useState(false);
   const router = useRouter();
-  const [user, setUser] = useState<UserData | null>(null);
+  const authService = new AuthService();
+  const [user, setUser] = useState<User | null>(null);
+  const [isLoading, setIsLoading] = useState(true);
 
-
-  const storeAuthState = async (newState: { isLoggedIn: boolean }) => {
-    try {
-      const jsonValue = JSON.stringify(newState);
-      await AsyncStorage.setItem(authStorageKey, jsonValue);
-    } catch (error) {
-      console.log("Error saving", error);
-    }
-  };
-
-  const fetchUserData = async () => {
-    try {
-      const id = await AsyncStorage.getItem("admin-id");
-      if (!id) return;
-
-      const API_BASE_URL = "https://fmru-next-js.vercel.app";
-      const url = `${API_BASE_URL}/api/app-native-api/usuario/me?id=${id}`;
-
-      const response = await fetch(url, {
-        headers: {
-          'Authorization': `Bearer ${await AsyncStorage.getItem("admin-token")}`
+  useEffect(() => {
+    const checkAuth = async () => {
+      try {
+        const storedUser = await authService.getUser();
+        if (storedUser) {
+          setUser(storedUser);
+          router.push("/(protected)/(tabs)");
+        } else {
+          router.push("/login");
         }
-      });
+      } catch (error) {
+        console.error("Auth check error:", error);
+        router.push("/login");
+      } finally {
+        setIsLoading(false);
+        SplashScreen.hideAsync();
+      }
+    };
 
-      if (!response.ok) throw new Error('Failed to fetch user data');
+    checkAuth();
+  }, []);
 
-      const userData = await response.json();
-      setUser(userData);
-    } catch (error) {
-      console.error("Error fetching user data:", error);
-    }
-  };
-  
-
-  const logIn = async ({username, password}: LoginProps ) => {
+  const logIn = async ({ username, password }: LoginProps) => {
     if (!username || !password) {
-      Alert.alert("Campos requeridos", "Ingresa usuario y contraseña.");
+      Toast.show({
+        type: 'error',
+        text1: 'Error al iniciar sesión',
+        text2: 'Faltan credenciales',
+      });
       return;
     }
+  
     try {
-      const API_BASE_URL = "https://fmru-next-js.vercel.app";
-      const url = `${API_BASE_URL}/api/auth/login`;
-
-      console.log(username, password, url)
-      const response = await fetch(url, {
-        method: 'POST',
-        headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({ email: username, contrasenia: password }),
-      });
-
-      const contentType = response.headers.get("content-type");
-      const rawText = await response.text();
-
-      console.log(rawText)
-
-      if (!response.ok) {
-        const mensaje = contentType?.includes("application/json")
-          ? JSON.parse(rawText).mensaje || JSON.parse(rawText).error || "Error desconocido"
-          : "Error inesperado del servidor";
-        throw new Error(mensaje);
-      }
-
-      const data = contentType?.includes("application/json") ? JSON.parse(rawText) : null;
-
-      if (!data || !data.token) {
-        throw new Error("Respuesta inválida del servidor");
-      }
-
-      Toast.show({
-        type: 'success',
-        text1: 'Bienvenido 👋',
-        text2: 'Inicio de sesión exitoso',
-      });
-
-      await AsyncStorage.setItem("admin-token", data.token);
-      if (data.id) await AsyncStorage.setItem("admin-id", String(data.id));
+      setIsLoading(true);
+      const response = await authService.handleLogin(username, password);
       
-      setIsLoggedIn(true);
-      await storeAuthState({ isLoggedIn: true });
-      await fetchUserData();
-      
+      if (response.id !== undefined) {
+        const userData = await authService.getUser(); // Get the newly stored user
+        setUser(userData); // Update state with the user
+        
+        Toast.show({
+          type: 'success',
+          text1: 'Bienvenido 👋',
+          text2: 'Inicio de sesión exitoso',
+        });
+        router.replace("/(protected)/(tabs)/perfil");
+      } else {
+        throw new Error('Login failed - no user ID returned');
+      }
     } catch (error: any) {
-      console.log(error)
+      console.log(error);    
       Toast.show({
         type: 'error',
         text1: 'Error al iniciar sesión',
         text2: error.message || 'Por favor verifica tus credenciales',
       });
+    } finally {
+      setIsLoading(false);
     }
-    router.replace("/(protected)/(tabs)/perfil");
-    console.log(isLoggedIn)
   };
 
-  const logOut = () => {
-    setIsLoggedIn(false);
-    storeAuthState({ isLoggedIn: false });
-    router.replace("/login");
-  };
-
-  useEffect(() => {
-    const getAuthFromStorage = async () => {
-      await new Promise((res) => setTimeout(() => res(null), 1000));
-      try {
-        const value = await AsyncStorage.getItem(authStorageKey);
-        if (value !== null) {
-          const auth = JSON.parse(value);
-          setIsLoggedIn(auth.isLoggedIn);
-        }
-      } catch (error) {
-        console.log("Error fetching from storage", error);
-      }
-      setIsReady(true);
-    };
-    getAuthFromStorage();
-  }, []);
-
-  useEffect(() => {
-    if (isReady) {
-      SplashScreen.hideAsync();
+  const logOut = async () => {
+    try {
+      setIsLoading(true);
+      await authService.logOut();
+      setUser(null);
+      router.push("/login");
+    } finally {
+      setIsLoading(false);
     }
-  }, [isReady]);
+  };
 
   return (
     <AuthContext.Provider
       value={{
-        isReady,
-        isLoggedIn,
-        user,
         logIn,
         logOut,
-        fetchUserData,
+        user,
+        isLoading
       }}
     >
       {children}

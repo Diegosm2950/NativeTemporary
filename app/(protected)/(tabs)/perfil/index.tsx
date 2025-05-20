@@ -4,7 +4,6 @@ import { SafeAreaView } from 'react-native-safe-area-context';
 import Colors from '@/constants/Colors';
 import useColorScheme from '@/hooks/useColorScheme';
 import Layout from '@/constants/Layout';
-import { mockUser } from '@/assets/data/mockUser';
 import { ChevronRight } from 'lucide-react-native';
 import Button from '@/components/Button';
 import { AuthContext } from '@/context/AuthContext';
@@ -13,8 +12,7 @@ import { useContext } from 'react';
 export default function ProfileScreen() {
   const colorScheme = useColorScheme();
   const router = useRouter();
-  const { user } = useContext(AuthContext);
-  console.log(user)
+  const { user, logOut } = useContext(AuthContext);
 
   const handleEditProfile = () => {
     router.push('/(protected)/(tabs)/perfil/edit');
@@ -32,22 +30,22 @@ export default function ProfileScreen() {
       <View style={[styles.profileCard, { backgroundColor: Colors[colorScheme].cardBackground }]}>
         <View style={styles.profileImageContainer}>
           <Image
-            source={{ uri: mockUser.profileImage }}
+            source={{ uri: user?.foto || undefined }}
             style={styles.profileImage}
           />
         </View>
 
         <Text style={[styles.name, { color: Colors[colorScheme].text }]}>
-          {mockUser.name}
+          {user?.nombre} {user?.apellido1}
         </Text>
         <Text style={[styles.email, { color: Colors[colorScheme].textSecondary }]}>
-          {mockUser.email}
+          {user?.email}
         </Text>
       </View>
 
       <View style={[styles.idSection, { backgroundColor: Colors[colorScheme].cardBackground }]}>
         <Text style={[styles.idTitle, { color: Colors[colorScheme].text }]}>
-          Tu ID único: {mockUser.id}
+          Tu ID único: {user?.id}
         </Text>
       </View>
 
@@ -64,7 +62,7 @@ export default function ProfileScreen() {
           </TouchableOpacity>
         </View>
         <Text style={[styles.teamName, { color: Colors[colorScheme].textSecondary }]}>
-          {mockUser.team.name}
+          {user?.club}
         </Text>
       </View>
 
@@ -77,6 +75,12 @@ export default function ProfileScreen() {
         <Button
           title="Editar Perfil"
           onPress={handleEditProfile}
+          variant="secondary"
+          style={styles.editButton}
+        />
+         <Button
+          title="Salir"
+          onPress={logOut}
           variant="secondary"
           style={styles.editButton}
         />
