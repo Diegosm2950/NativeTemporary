@@ -78,12 +78,6 @@ export default function ProfileScreen() {
           variant="secondary"
           style={styles.editButton}
         />
-         <Button
-          title="Salir"
-          onPress={logOut}
-          variant="secondary"
-          style={styles.editButton}
-        />
       </View>
     </SafeAreaView>
   );
