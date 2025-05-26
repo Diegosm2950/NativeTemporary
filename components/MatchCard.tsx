@@ -83,7 +83,7 @@ export default function MatchCard({ match, variant = 'small' }: MatchCardProps) 
       <TouchableOpacity
         onPress={() =>
           router.push({
-            pathname: '/cedulas/qr-scanner',
+            pathname: '/(protected)/(cedulas)/qr-scanner',
             params: { matchId: String(match.id) },
           })
         }
