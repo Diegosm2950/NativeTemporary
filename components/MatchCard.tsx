@@ -4,6 +4,9 @@ import { Match } from '@/types/match';
 import Colors from '@/constants/Colors';
 import useColorScheme from '@/hooks/useColorScheme';
 import Layout from '@/constants/Layout';
+import { TouchableOpacity } from 'react-native';
+import { useRouter } from 'expo-router';
+
 
 type MatchCardProps = {
   match: Match;
@@ -13,6 +16,7 @@ type MatchCardProps = {
 export default function MatchCard({ match, variant = 'small' }: MatchCardProps) {
   const colorScheme = useColorScheme();
   const isLarge = variant === 'large';
+  const router = useRouter();
   
   return (
     <View style={[
@@ -75,6 +79,25 @@ export default function MatchCard({ match, variant = 'small' }: MatchCardProps) 
           </Text>
         </View>
       </View>
+      {isLarge && (
+      <TouchableOpacity
+        onPress={() =>
+          router.push({
+            pathname: '/cedulas/qr-scanner',
+            params: { matchId: String(match.id) },
+          })
+        }
+        style={{
+          marginTop: Layout.spacing.m,
+          backgroundColor: Colors[colorScheme].tint,
+          paddingVertical: 12,
+          borderRadius: 8,
+          alignItems: 'center',
+        }}
+      >
+        <Text style={{ color: '#fff', fontWeight: 'bold' }}>Comenzar</Text>
+      </TouchableOpacity>
+    )}
     </View>
   );
 }
