@@ -78,6 +78,12 @@ export default function ProfileScreen() {
           variant="secondary"
           style={styles.editButton}
         />
+        <Button
+          title="Cerrar Sesión"
+          onPress={logOut}
+          variant="secondary"
+          style={{ marginTop: 16 }}
+        />
       </View>
     </SafeAreaView>
   );
