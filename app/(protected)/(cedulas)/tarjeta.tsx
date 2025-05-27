@@ -42,7 +42,7 @@ export default function RegistrarTarjeta() {
       tarjetas: [...prev.tarjetas, nuevaTarjeta],
     }));
 
-    router.replace('/(protected)/cedulas/juego' as any);
+    router.replace('/(protected)/(cedulas)/juego' as any);
   };
 
   return (
@@ -121,7 +121,7 @@ export default function RegistrarTarjeta() {
 
       <TouchableOpacity
         style={styles.backButton}
-        onPress={() => router.replace('/(protected)/cedulas/juego' as any)}
+        onPress={() => router.replace('/(protected)/(cedulas)/juego' as any)}
       >
         <Text style={styles.backText}>Volver</Text>
       </TouchableOpacity>
