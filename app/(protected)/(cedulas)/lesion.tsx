@@ -47,7 +47,7 @@ export default function RegistrarLesion() {
       lesiones: [...prev.lesiones, nuevaLesion],
     }));
 
-    router.replace('/(protected)/cedulas/juego' as any);
+    router.replace('/(protected)/(cedulas)/juego' as any);
   };
 
   return (
@@ -120,7 +120,7 @@ export default function RegistrarLesion() {
         <Text style={styles.submitText}>Registrar Lesión</Text>
       </TouchableOpacity>
 
-      <TouchableOpacity style={styles.backButton} onPress={() => router.replace('/(protected)/cedulas/juego' as any)}>
+      <TouchableOpacity style={styles.backButton} onPress={() => router.replace('/(protected)/(cedulas)/juego' as any)}>
         <Text style={styles.backText}>Volver</Text>
       </TouchableOpacity>
     </ScrollView>
