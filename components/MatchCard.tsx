@@ -1,9 +1,11 @@
 import React from 'react';
-import { StyleSheet, Text, View, Image } from 'react-native';
+import { StyleSheet, Text, View, Image, ImageBackground } from 'react-native';
 import { Match } from '@/types/match';
 import Colors from '@/constants/Colors';
 import useColorScheme from '@/hooks/useColorScheme';
 import Layout from '@/constants/Layout';
+
+const backgroundImage = require('@/assets/images/rugbyvg.png');
 
 type MatchCardProps = {
   match: Match;
@@ -14,22 +16,42 @@ export default function MatchCard({ match, variant = 'small' }: MatchCardProps) 
   const colorScheme = useColorScheme();
   const isLarge = variant === 'large';
   
+  const ContainerComponent = isLarge ? ImageBackground : View;
+  
   return (
-    <View style={[
-      styles.container,
-      isLarge ? styles.largeShadow : styles.smallShadow,
-      { backgroundColor: Colors[colorScheme].cardBackground }
-    ]}>
-      {isLarge && (
-        <View style={styles.leagueContainer}>
-          <Text style={[styles.leagueText, { color: Colors[colorScheme].text }]}>
-            {match.league}
-          </Text>
-          <View style={[styles.badge, { backgroundColor: Colors[colorScheme].tint }]}>
-            <Text style={styles.badgeText}>Próximo Partido</Text>
-          </View>
+    <ContainerComponent 
+      source={isLarge ? backgroundImage : undefined}
+      blurRadius={isLarge ? 50 : 0} 
+      style={[
+        styles.container,
+        isLarge ? styles.largeContainer : styles.smallContainer,
+      ]}
+      imageStyle={isLarge ? styles.backgroundImageStyle : {}}
+    >
+    {isLarge && (
+      <View style={styles.leagueContainer}>
+        <View style={styles.badgeContainer}>
+          <ImageBackground
+            source={require('@/assets/images/rugbyvg.png')}
+            blurRadius={50}
+            style={styles.badge}
+            imageStyle={styles.badgeImageStyle}
+          >
+            <Text style={styles.badgeText}>{match.league}</Text>
+          </ImageBackground>
         </View>
-      )}
+        <View style={styles.badgeContainer}>
+          <ImageBackground
+            source={require('@/assets/images/rugbyvg.png')}
+            blurRadius={50}
+            style={styles.badge}
+            imageStyle={styles.badgeImageStyle}
+          >
+            <Text style={styles.badgeText}>Próximo Partido</Text>
+          </ImageBackground>
+        </View>
+      </View>
+    )}
       
       <View style={styles.teamsContainer}>
         <View style={styles.teamContainer}>
@@ -37,12 +59,16 @@ export default function MatchCard({ match, variant = 'small' }: MatchCardProps) 
             source={{ uri: match.homeTeam.logo }}
             style={isLarge ? styles.largeTeamLogo : styles.smallTeamLogo}
           />
-          <Text style={[
-            isLarge ? styles.largeTeamName : styles.smallTeamName,
-            { color: Colors[colorScheme].text }
-          ]}>
-            {match.homeTeam.name}
-          </Text>
+            <Text 
+              style={[
+                isLarge ? styles.largeTeamName : styles.smallTeamName,
+                { color: Colors[colorScheme].text }
+              ]}
+              numberOfLines={1}
+              ellipsizeMode="tail"
+            >
+              {match.homeTeam.name}
+            </Text>
         </View>
         
         <View style={styles.scoreContainer}>
@@ -51,9 +77,6 @@ export default function MatchCard({ match, variant = 'small' }: MatchCardProps) 
               <Text style={[styles.scoreText, { color: Colors[colorScheme].text }]}>
                 {match.homeScore} : {match.awayScore}
               </Text>
-              <View style={[styles.liveBadge, { backgroundColor: Colors[colorScheme].error }]}>
-                <Text style={styles.liveBadgeText}>LIVE</Text>
-              </View>
             </View>
           ) : (
             <Text style={[styles.dateText, { color: Colors[colorScheme].textSecondary }]}>
@@ -67,15 +90,19 @@ export default function MatchCard({ match, variant = 'small' }: MatchCardProps) 
             source={{ uri: match.awayTeam.logo }}
             style={isLarge ? styles.largeTeamLogo : styles.smallTeamLogo}
           />
-          <Text style={[
-            isLarge ? styles.largeTeamName : styles.smallTeamName,
-            { color: Colors[colorScheme].text }
-          ]}>
-            {match.awayTeam.name}
-          </Text>
+            <Text 
+              style={[
+                isLarge ? styles.largeTeamName : styles.smallTeamName,
+                { color: Colors[colorScheme].text }
+              ]}
+              numberOfLines={1}
+              ellipsizeMode="tail"
+            >
+              {match.awayTeam.name}
+            </Text>
         </View>
       </View>
-    </View>
+    </ContainerComponent>
   );
 }
 
@@ -84,26 +111,17 @@ const styles = StyleSheet.create({
     borderRadius: Layout.borderRadius.large,
     padding: Layout.spacing.l,
     marginBottom: Layout.spacing.m,
+    overflow: 'hidden', 
   },
-  largeShadow: {
-    shadowColor: '#000',
-    shadowOffset: {
-      width: 0,
-      height: 2,
-    },
-    shadowOpacity: 0.25,
-    shadowRadius: 3.84,
-    elevation: 5,
+  largeContainer: {
+    backgroundColor: "#FAFFFC01" 
   },
-  smallShadow: {
-    shadowColor: '#000',
-    shadowOffset: {
-      width: 0,
-      height: 1,
-    },
-    shadowOpacity: 0.18,
-    shadowRadius: 1.00,
-    elevation: 1,
+  smallContainer: {
+    backgroundColor: "#257E4217",
+  },
+  backgroundImageStyle: {
+    resizeMode: 'cover',
+    opacity: 0.7, 
   },
   leagueContainer: {
     flexDirection: 'row',
@@ -115,15 +133,26 @@ const styles = StyleSheet.create({
     fontSize: 14,
     fontFamily: 'Inter-Medium',
   },
+  badgeContainer: {
+    borderRadius: 20,
+    overflow: 'hidden', 
+  },
   badge: {
     paddingHorizontal: Layout.spacing.s,
     paddingVertical: Layout.spacing.xs,
-    borderRadius: Layout.borderRadius.small,
+    borderRadius: 20, 
+    backgroundColor: '#020D0626', 
+  },
+  badgeImageStyle: {
+    borderRadius: 20,
+    width: "100%",
+    height: "100%"
   },
   badgeText: {
     color: '#FFFFFF',
-    fontSize: 12,
+    fontSize: 12, 
     fontFamily: 'Inter-Medium',
+    textAlign: 'center',
   },
   teamsContainer: {
     flexDirection: 'row',

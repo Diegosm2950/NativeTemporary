@@ -7,6 +7,9 @@ import Layout from '@/constants/Layout';
 import MatchCard from '@/components/MatchCard';
 import { Match } from '@/types/match';
 import { AuthContext } from '@/context/AuthContext';
+import MatchTabs from '@/components/MatchTabs';
+import Button from '@/components/Button';
+import { router } from 'expo-router';
 
 const mockMatches: Match[] = [
   {
@@ -52,16 +55,12 @@ const mockMatches: Match[] = [
 ];
 
 type TabType = 'upcoming' | 'past';
-
 export default function HomeScreen() {
   const colorScheme = useColorScheme();
-  const [activeTab, setActiveTab] = useState<TabType>('upcoming');
   const { user } = useContext(AuthContext);
 
-  
   const upcomingMatches = mockMatches.filter(match => match.status !== 'finished');
   const pastMatches = mockMatches.filter(match => match.status === 'finished');
-  
   const nextMatch = upcomingMatches[0];
   
   return (
@@ -78,7 +77,7 @@ export default function HomeScreen() {
             />
           </View>
         </View>
-        
+       
         <Text style={[styles.greeting, { color: Colors[colorScheme].text }]}>
           ¡Hola, {user?.nombre}!
         </Text>
@@ -92,51 +91,10 @@ export default function HomeScreen() {
           </View>
         )}
         
-        <View style={styles.tabsContainer}>
-          <TouchableOpacity
-            style={[
-              styles.tab,
-              activeTab === 'upcoming' && styles.activeTab,
-              { borderBottomColor: Colors[colorScheme].tint }
-            ]}
-            onPress={() => setActiveTab('upcoming')}
-          >
-            <Text style={[
-              styles.tabText,
-              activeTab === 'upcoming' && { color: Colors[colorScheme].tint }
-            ]}>
-              Próximos Partidos
-            </Text>
-          </TouchableOpacity>
-          
-          <TouchableOpacity
-            style={[
-              styles.tab,
-              activeTab === 'past' && styles.activeTab,
-              { borderBottomColor: Colors[colorScheme].tint }
-            ]}
-            onPress={() => setActiveTab('past')}
-          >
-            <Text style={[
-              styles.tabText,
-              activeTab === 'past' && { color: Colors[colorScheme].tint }
-            ]}>
-              Partidos Pasados
-            </Text>
-          </TouchableOpacity>
-        </View>
-        
-        <View style={styles.matchesContainer}>
-          {activeTab === 'upcoming' ? (
-            upcomingMatches.slice(1).map(match => (
-              <MatchCard key={match.id} match={match} />
-            ))
-          ) : (
-            pastMatches.map(match => (
-              <MatchCard key={match.id} match={match} />
-            ))
-          )}
-        </View>
+        <MatchTabs 
+          upcomingMatches={upcomingMatches.slice(1)}
+          pastMatches={pastMatches}
+        />
       </ScrollView>
     </SafeAreaView>
   );
@@ -161,8 +119,8 @@ const styles = StyleSheet.create({
     height: 36,
   },
   profileContainer: {
-    width: 80,
-    height: 80,
+    width: 60,
+    height: 60,
     borderRadius: 50,
     overflow: 'hidden',
   },
@@ -186,29 +144,5 @@ const styles = StyleSheet.create({
   nextMatchContainer: {
     paddingHorizontal: Layout.spacing.l,
     marginBottom: Layout.spacing.l,
-  },
-  tabsContainer: {
-    flexDirection: 'row',
-    paddingHorizontal: Layout.spacing.l,
-    marginBottom: Layout.spacing.l,
-  },
-  tab: {
-    flex: 1,
-    paddingVertical: Layout.spacing.m,
-    borderBottomWidth: 2,
-    borderBottomColor: 'transparent',
-  },
-  activeTab: {
-    borderBottomWidth: 2,
-  },
-  tabText: {
-    fontSize: 14,
-    fontFamily: 'Inter-Medium',
-    textAlign: 'center',
-    color: Colors.light.textSecondary,
-  },
-  matchesContainer: {
-    paddingHorizontal: Layout.spacing.l,
-    paddingBottom: Layout.spacing.xxl,
-  },
+  }
 });

@@ -33,16 +33,16 @@ export default function RootLayout() {
       return null;
     }
     return (
-        <AuthProvider>
-            <React.Fragment>
-                <StatusBar style="auto" />
-                <Stack>
-                    <Stack.Screen name="(protected)" options={{
-                        headerShown: false
-                    }}/>
-                </Stack>
-                <Toast/>
-            </React.Fragment>
-        </AuthProvider>
+      <AuthProvider>
+          <React.Fragment>
+              <StatusBar style="auto" />
+              <Stack>
+                  <Stack.Screen name="(protected)" options={{
+                      headerShown: false
+                  }}/>
+              </Stack>
+              <Toast/>
+          </React.Fragment>
+      </AuthProvider>
     )
 }
