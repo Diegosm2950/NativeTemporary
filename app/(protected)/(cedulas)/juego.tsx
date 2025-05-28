@@ -67,17 +67,17 @@ export default function JuegoScreen() {
       {/* Botones */}
       <TouchableOpacity
         style={styles.mainButton}
-        onPress={() => router.push('/(protected)/cedulas/puntos' as any)}
+        onPress={() => router.push('/(protected)/(cedulas)/puntos' as any)}
       >
         <Text style={styles.mainButtonText}>Agregar punto</Text>
       </TouchableOpacity>
 
       <View style={styles.actionGrid}>
         {[
-          { label: 'Tarjetas', icon: <Flag size={28} color="#111" />, route: '/(protected)/(tabs)/cedulas/tarjeta' },
-          { label: 'Cambios', icon: <Repeat size={28} color="#111" />, route: '/(protected)/(tabs)/cedulas/cambio' },
-          { label: 'Observaciones', icon: <Pencil size={28} color="#111" />, route: '/(protected)/(tabs)/cedulas/observacion' },
-          { label: 'Lesiones', icon: <Bandage size={28} color="#111" />, route: '/(protected)/(tabs)/cedulas/lesion' }
+          { label: 'Tarjetas', icon: <Flag size={28} color="#111" />, route: '/(protected)/(cedulas)/tarjeta' },
+          { label: 'Cambios', icon: <Repeat size={28} color="#111" />, route: '/(protected)/(cedulas)/cambio' },
+          { label: 'Observaciones', icon: <Pencil size={28} color="#111" />, route: '/(protected)/(cedulas)/observacion' },
+          { label: 'Lesiones', icon: <Bandage size={28} color="#111" />, route: '/(protected)/(cedulas)/lesion' }
         ].map(({ label, icon, route }, index) => (
           <TouchableOpacity
             key={index}
@@ -92,7 +92,7 @@ export default function JuegoScreen() {
 
       <TouchableOpacity
         style={styles.digitalSignButton}
-        onPress={() => router.push('/(protected)/cedulas/firmas' as any)}
+        onPress={() => router.push('/(protected)/(cedulas)/firmas' as any)}
       >
         <Text style={styles.secondaryText}>Firmas Digitales</Text>
       </TouchableOpacity>
