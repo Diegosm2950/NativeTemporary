@@ -5,6 +5,7 @@ import useColorScheme from '@/hooks/useColorScheme';
 import Layout from '@/constants/Layout';
 import { AuthContext } from '@/context/AuthContext';
 import { useRouter } from 'expo-router';
+import { TournamentMatch } from '@/types/convocatiorias';
 
 const backgroundImage = require('@/assets/images/rugbyvg.png');
 const defaultTeamLogo = require('@/assets/images/default-team-logo.png');
