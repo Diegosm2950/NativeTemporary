@@ -12,7 +12,7 @@ import { useContext } from 'react';
 export default function ProfileScreen() {
   const colorScheme = useColorScheme();
   const router = useRouter();
-  const { user } = useContext(AuthContext);
+  const { user, logOut } = useContext(AuthContext);
   console.log(user)
 
   const handleEditProfile = () => {
@@ -78,6 +78,12 @@ export default function ProfileScreen() {
           onPress={handleEditProfile}
           variant="secondary"
           style={styles.editButton}
+        />
+        <Button
+          title="Cerrar Sesión"
+          onPress={logOut}
+          variant="secondary"
+          style={{ marginTop: 16 }}
         />
       </View>
     </SafeAreaView>

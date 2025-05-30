@@ -5,64 +5,21 @@ import Colors from '@/constants/Colors';
 import useColorScheme from '@/hooks/useColorScheme';
 import Layout from '@/constants/Layout';
 import MatchCard from '@/components/MatchCard';
-import { Match } from '@/types/match';
 import { AuthContext } from '@/context/AuthContext';
 import MatchTabs from '@/components/MatchTabs';
-import Button from '@/components/Button';
-import { router } from 'expo-router';
+import { useConvocatorias } from '@/hooks/useFetchMatches';
 
-const mockMatches: Match[] = [
-  {
-    id: '1',
-    homeTeam: {
-      id: 'warriors',
-      name: 'Rugby Club Warriors',
-      shortName: 'Warriors',
-      logo: 'https://images.pexels.com/photos/1618269/pexels-photo-1618269.jpeg'
-    },
-    awayTeam: {
-      id: 'rivals',
-      name: 'Rugby Rivals',
-      shortName: 'Rivals',
-      logo: 'https://images.pexels.com/photos/1618200/pexels-photo-1618200.jpeg'
-    },
-    date: '2024-02-10T15:00:00Z',
-    league: 'Liga Nacional',
-    status: 'live',
-    homeScore: 0,
-    awayScore: 0,
-    matchDay: 5
-  },
-  {
-    id: '2',
-    homeTeam: {
-      id: 'warriors',
-      name: 'Rugby Club Warriors',
-      shortName: 'Warriors',
-      logo: 'https://images.pexels.com/photos/1618269/pexels-photo-1618269.jpeg'
-    },
-    awayTeam: {
-      id: 'rivals',
-      name: 'Rugby Rivals',
-      shortName: 'Rivals',
-      logo: 'https://images.pexels.com/photos/1618200/pexels-photo-1618200.jpeg'
-    },
-    date: '2024-02-17T15:00:00Z',
-    league: 'Liga Nacional',
-    status: 'scheduled',
-    matchDay: 6
-  }
-];
-
-type TabType = 'upcoming' | 'past';
 export default function HomeScreen() {
   const colorScheme = useColorScheme();
   const { user } = useContext(AuthContext);
 
-  const upcomingMatches = mockMatches.filter(match => match.status !== 'finished');
-  const pastMatches = mockMatches.filter(match => match.status === 'finished');
-  const nextMatch = upcomingMatches[0];
-  
+  const { data } = useConvocatorias(user?.clubId ?? undefined);
+
+  console.log(data.torneos)
+
+  const nextMatch = data.nextMatch;
+
+
   return (
     <SafeAreaView
       style={[styles.container, { backgroundColor: Colors[colorScheme].background }]}
@@ -92,8 +49,8 @@ export default function HomeScreen() {
         )}
         
         <MatchTabs 
-          upcomingMatches={upcomingMatches.slice(1)}
-          pastMatches={pastMatches}
+          upcomingMatches={data.torneos.slice(1)}
+          pastMatches={data.torneos.slice(2, 4)}
         />
       </ScrollView>
     </SafeAreaView>

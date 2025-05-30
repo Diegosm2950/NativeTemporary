@@ -68,8 +68,8 @@ export function AuthProvider({ children }: PropsWithChildren) {
       const response = await authService.handleLogin(username, password);
       
       if (response.id !== undefined) {
-        const userData = await authService.getUser(); // Get the newly stored user
-        setUser(userData); // Update state with the user
+        const userData = await authService.getUser(); 
+        setUser(userData);
         
         Toast.show({
           type: 'success',

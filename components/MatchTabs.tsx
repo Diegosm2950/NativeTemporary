@@ -2,15 +2,14 @@ import React from 'react';
 import { View, Text, TouchableOpacity, StyleSheet } from 'react-native';
 import Colors from '@/constants/Colors';
 import Layout from '@/constants/Layout';
-import { Match } from '@/types/match';
 import MatchCard from '@/components/MatchCard';
 import useColorScheme from '@/hooks/useColorScheme';
 
 type TabType = 'upcoming' | 'past';
 
 interface MatchTabsProps {
-  upcomingMatches: Match[];
-  pastMatches: Match[];
+  upcomingMatches: TournamentMatch[];
+  pastMatches: TournamentMatch[];
   initialTab?: TabType;
 }
 
