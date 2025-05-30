@@ -29,6 +29,7 @@ export default function MatchCard({ match, variant = 'small' }: MatchCardProps) 
   const handleArbitroPress = () => {
     router.push(`/(protected)/(cedulas)`);
   };
+
   
   return (
     <ContainerComponent 
@@ -117,7 +118,6 @@ export default function MatchCard({ match, variant = 'small' }: MatchCardProps) 
         </View>
       </View>
 
-      {/* Role-based buttons - only show on large cards */}
       {isLarge && (
         <>
           {user?.tipoRegistro_2 === 1 && (
