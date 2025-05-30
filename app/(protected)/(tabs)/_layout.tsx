@@ -2,7 +2,7 @@ import { Tabs } from 'expo-router';
 import { StyleSheet } from 'react-native';
 import Colors from '@/constants/Colors';
 import useColorScheme from '@/hooks/useColorScheme';
-import { Chrome as Home, Trophy, ChartBar as BarChart3, Menu } from 'lucide-react-native';
+import { Chrome as Home, Trophy, ChartBar as BarChart3 } from 'lucide-react-native';
 
 export default function TabLayout() {
   const colorScheme = useColorScheme();
@@ -11,8 +11,10 @@ export default function TabLayout() {
     <Tabs
       screenOptions={{
         tabBarActiveTintColor: Colors[colorScheme].tint,
+        tabBarInactiveTintColor: Colors[colorScheme].tabIconDefault,
         tabBarStyle: styles.tabBar,
         tabBarLabelStyle: styles.tabBarLabel,
+        tabBarItemStyle: styles.tabBarItem,
         headerShown: false,
       }}>
       <Tabs.Screen
@@ -42,12 +44,19 @@ export default function TabLayout() {
 
 const styles = StyleSheet.create({
   tabBar: {
-    height: 70,
+    height: 80,
     paddingBottom: 8,
     paddingTop: 8,
   },
   tabBarLabel: {
     fontFamily: 'Inter-Regular',
     fontSize: 12,
+    marginTop: 4, 
+  },
+  tabBarItem: {
+    flexDirection: 'column', 
+    justifyContent: 'center',
+    alignItems: 'center',
+    gap: 4, 
   },
 });

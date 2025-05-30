@@ -1,36 +1,67 @@
-import React from 'react';
-import { StyleSheet, Text, View, Image } from 'react-native';
-import { Match } from '@/types/match';
+import React, { useContext } from 'react';
+import { StyleSheet, Text, View, Image, ImageBackground, TouchableOpacity } from 'react-native';
 import Colors from '@/constants/Colors';
 import useColorScheme from '@/hooks/useColorScheme';
 import Layout from '@/constants/Layout';
-import { TouchableOpacity } from 'react-native';
+import { AuthContext } from '@/context/AuthContext';
 import { useRouter } from 'expo-router';
 
+const backgroundImage = require('@/assets/images/rugbyvg.png');
+const defaultTeamLogo = require('@/assets/images/default-team-logo.png');
 
 type MatchCardProps = {
-  match: Match;
+  match: TournamentMatch;
   variant?: 'large' | 'small';
 };
 
 export default function MatchCard({ match, variant = 'small' }: MatchCardProps) {
   const colorScheme = useColorScheme();
   const isLarge = variant === 'large';
+  const { user } = useContext(AuthContext);
   const router = useRouter();
   
+  const ContainerComponent = isLarge ? ImageBackground : View;
+  
+  const handleCapitanPress = () => {
+    console.log('Escoger jugadores pressed');
+  };
+  
+  const handleArbitroPress = () => {
+    router.push(`/(protected)/(cedulas)`);
+  };
+
+  
   return (
-    <View style={[
-      styles.container,
-      isLarge ? styles.largeShadow : styles.smallShadow,
-      { backgroundColor: Colors[colorScheme].cardBackground }
-    ]}>
+    <ContainerComponent 
+      source={isLarge ? backgroundImage : undefined}
+      blurRadius={isLarge ? 50 : 0} 
+      style={[
+        styles.container,
+        isLarge ? styles.largeContainer : styles.smallContainer,
+      ]}
+      imageStyle={isLarge ? styles.backgroundImageStyle : {}}
+    >
       {isLarge && (
         <View style={styles.leagueContainer}>
-          <Text style={[styles.leagueText, { color: Colors[colorScheme].text }]}>
-            {match.league}
-          </Text>
-          <View style={[styles.badge, { backgroundColor: Colors[colorScheme].tint }]}>
-            <Text style={styles.badgeText}>Próximo Partido</Text>
+          <View style={styles.badgeContainer}>
+            <ImageBackground
+              source={require('@/assets/images/rugbyvg.png')}
+              blurRadius={50}
+              style={styles.badge}
+              imageStyle={styles.badgeImageStyle}
+            >
+              <Text style={styles.badgeText}>{match.torneo}</Text>
+            </ImageBackground>
+          </View>
+          <View style={styles.badgeContainer}>
+            <ImageBackground
+              source={require('@/assets/images/rugbyvg.png')}
+              blurRadius={50}
+              style={styles.badge}
+              imageStyle={styles.badgeImageStyle}
+            >
+              <Text style={styles.badgeText}>Próximo Partido</Text>
+            </ImageBackground>
           </View>
         </View>
       )}
@@ -38,67 +69,77 @@ export default function MatchCard({ match, variant = 'small' }: MatchCardProps) 
       <View style={styles.teamsContainer}>
         <View style={styles.teamContainer}>
           <Image
-            source={{ uri: match.homeTeam.logo }}
+            source={match.equipoLocal.logo ? { uri: match.equipoLocal.logo } : defaultTeamLogo}
             style={isLarge ? styles.largeTeamLogo : styles.smallTeamLogo}
+            defaultSource={defaultTeamLogo}
           />
-          <Text style={[
-            isLarge ? styles.largeTeamName : styles.smallTeamName,
-            { color: Colors[colorScheme].text }
-          ]}>
-            {match.homeTeam.name}
-          </Text>
+            <Text 
+              style={[
+                isLarge ? styles.largeTeamName : styles.smallTeamName,
+                { color: Colors[colorScheme].text }
+              ]}
+              numberOfLines={1}
+              ellipsizeMode="tail"
+            >
+              {match.equipoLocal.nombre}
+            </Text>
         </View>
         
         <View style={styles.scoreContainer}>
-          {match.status === 'live' ? (
+          {match.estatus === 'live' ? (
             <View style={styles.liveScoreContainer}>
               <Text style={[styles.scoreText, { color: Colors[colorScheme].text }]}>
-                {match.homeScore} : {match.awayScore}
+                {match.id} : {match.id}
               </Text>
-              <View style={[styles.liveBadge, { backgroundColor: Colors[colorScheme].error }]}>
-                <Text style={styles.liveBadgeText}>LIVE</Text>
-              </View>
             </View>
           ) : (
             <Text style={[styles.dateText, { color: Colors[colorScheme].textSecondary }]}>
-              {isLarge ? 'Fecha ' + match.matchDay : ' - : - '}
+              {isLarge ? "0 : 0" : ' - : - '}
             </Text>
           )}
         </View>
         
         <View style={[styles.teamContainer, styles.awayTeam]}>
           <Image
-            source={{ uri: match.awayTeam.logo }}
+            source={match.equipoVisitante.logo ? { uri: match.equipoVisitante.logo } : defaultTeamLogo}
             style={isLarge ? styles.largeTeamLogo : styles.smallTeamLogo}
+            defaultSource={defaultTeamLogo}
           />
-          <Text style={[
-            isLarge ? styles.largeTeamName : styles.smallTeamName,
-            { color: Colors[colorScheme].text }
-          ]}>
-            {match.awayTeam.name}
-          </Text>
+            <Text 
+              style={[
+                isLarge ? styles.largeTeamName : styles.smallTeamName,
+                { color: Colors[colorScheme].text }
+              ]}
+              numberOfLines={1}
+              ellipsizeMode="tail"
+            >
+              {match.equipoVisitante.nombre}
+            </Text>
         </View>
       </View>
+
       {isLarge && (
-      <TouchableOpacity
-        onPress={() =>
-          router.push({
-            pathname: '/(protected)/(cedulas)/qr-scanner',
-            params: { matchId: String(match.id) },
-          })
-        }
-        style={{
-          marginTop: Layout.spacing.m,
-          backgroundColor: Colors[colorScheme].tint,
-          paddingVertical: 12,
-          borderRadius: 8,
-          alignItems: 'center',
-        }}
-      >
-        <Text style={{ color: '#fff', fontWeight: 'bold' }}>Comenzar</Text>
-      </TouchableOpacity>
-    )}
-    </View>
+        <>
+          {user?.tipoRegistro_2 === 1 && (
+            <TouchableOpacity 
+              style={[styles.actionButton, { backgroundColor: "#000000" }]}
+              onPress={handleCapitanPress}
+            >
+              <Text style={styles.actionButtonText}>Escoger jugadores</Text>
+            </TouchableOpacity>
+          )}
+          
+          {user?.tipoRegistro_3 === 1 && (
+            <TouchableOpacity 
+              style={[styles.actionButton, { backgroundColor: "#000000" }]}
+              onPress={handleArbitroPress}
+            >
+              <Text style={styles.actionButtonText}>Iniciar partido</Text>
+            </TouchableOpacity>
+          )}
+        </>
+      )}
+    </ContainerComponent>
   );
 }
 
@@ -107,26 +148,17 @@ const styles = StyleSheet.create({
     borderRadius: Layout.borderRadius.large,
     padding: Layout.spacing.l,
     marginBottom: Layout.spacing.m,
+    overflow: 'hidden', 
   },
-  largeShadow: {
-    shadowColor: '#000',
-    shadowOffset: {
-      width: 0,
-      height: 2,
-    },
-    shadowOpacity: 0.25,
-    shadowRadius: 3.84,
-    elevation: 5,
+  largeContainer: {
+    backgroundColor: "#FAFFFC01" 
   },
-  smallShadow: {
-    shadowColor: '#000',
-    shadowOffset: {
-      width: 0,
-      height: 1,
-    },
-    shadowOpacity: 0.18,
-    shadowRadius: 1.00,
-    elevation: 1,
+  smallContainer: {
+    backgroundColor: "#257E4217",
+  },
+  backgroundImageStyle: {
+    resizeMode: 'cover',
+    opacity: 0.7, 
   },
   leagueContainer: {
     flexDirection: 'row',
@@ -138,15 +170,26 @@ const styles = StyleSheet.create({
     fontSize: 14,
     fontFamily: 'Inter-Medium',
   },
+  badgeContainer: {
+    borderRadius: 20,
+    overflow: 'hidden', 
+  },
   badge: {
     paddingHorizontal: Layout.spacing.s,
     paddingVertical: Layout.spacing.xs,
-    borderRadius: Layout.borderRadius.small,
+    borderRadius: 20, 
+    backgroundColor: '#020D0626', 
+  },
+  badgeImageStyle: {
+    borderRadius: 20,
+    width: "100%",
+    height: "100%"
   },
   badgeText: {
     color: '#FFFFFF',
-    fontSize: 12,
+    fontSize: 12, 
     fontFamily: 'Inter-Medium',
+    textAlign: 'center',
   },
   teamsContainer: {
     flexDirection: 'row',
@@ -205,5 +248,16 @@ const styles = StyleSheet.create({
   dateText: {
     fontSize: 14,
     fontFamily: 'Inter-Regular',
+  },
+  actionButton: {
+    marginTop: Layout.spacing.m,
+    padding: Layout.spacing.m,
+    borderRadius: Layout.borderRadius.large,
+    alignItems: 'center',
+  },
+  actionButtonText: {
+    color: '#FFFFFF',
+    fontSize: 14,
+    fontFamily: 'Inter-SemiBold',
   },
 });

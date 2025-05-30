@@ -13,6 +13,7 @@ export default function ProfileScreen() {
   const colorScheme = useColorScheme();
   const router = useRouter();
   const { user, logOut } = useContext(AuthContext);
+  console.log(user)
 
   const handleEditProfile = () => {
     router.push('/(protected)/(tabs)/perfil/edit');
