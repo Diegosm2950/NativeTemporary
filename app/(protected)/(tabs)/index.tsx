@@ -15,8 +15,6 @@ export default function HomeScreen() {
 
   const { data } = useConvocatorias(user?.clubId ?? undefined);
 
-  console.log(data.torneos)
-
   const nextMatch = data.nextMatch;
 
 

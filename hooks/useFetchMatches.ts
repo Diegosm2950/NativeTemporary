@@ -7,14 +7,19 @@ interface ResponseObject {
     torneos: TournamentMatch[];
     amistosos: TournamentMatch[];
     nextMatch?: TournamentMatch | null;
+}
+
+interface ExtendedResponseObject extends ResponseObject {
+    filteredTournaments: TournamentMatch[];
 }  
 
 export const useConvocatorias = (clubId?: number) => {
-    const [convocatorias, setConvocatorias] = useState<ResponseObject>({
+    const [convocatorias, setConvocatorias] = useState<ExtendedResponseObject>({
       convocado: false,
       torneos: [],
       amistosos: [],
-      nextMatch: null
+      nextMatch: null,
+      filteredTournaments: []
     });
     const [loading, setLoading] = useState<boolean>(true);
     const [error, setError] = useState<string | null>(null);
@@ -36,6 +41,18 @@ export const useConvocatorias = (clubId?: number) => {
         return currentDate < nearestDate ? current : nearest;
       });
     };
+
+    // Function to filter out duplicate tournaments by name
+    const getUniqueTournaments = (matches: TournamentMatch[]): TournamentMatch[] => {
+      const uniqueNames = new Set<string>();
+      return matches.filter(match => {
+        if (!match.torneo || uniqueNames.has(match.torneo)) {
+          return false;
+        }
+        uniqueNames.add(match.torneo);
+        return true;
+      });
+    };
   
     useEffect(() => {
       const fetchData = async () => {
@@ -44,7 +61,8 @@ export const useConvocatorias = (clubId?: number) => {
             convocado: false,
             torneos: [],
             amistosos: [],
-            nextMatch: null
+            nextMatch: null,
+            filteredTournaments: []
           });
           setLoading(false);
           return;
@@ -63,12 +81,17 @@ export const useConvocatorias = (clubId?: number) => {
           // Combine all matches and find the nearest one
           const allMatches = [...(data.torneos || []), ...(data.amistosos || [])];
           const nearestMatch = getNearestMatch(allMatches);
+
+          // Create filtered version without modifying original arrays
+          const allTournaments = [...(data.torneos || []), ...(data.amistosos || [])];
+          const filteredTournaments = getUniqueTournaments(allTournaments);
   
           setConvocatorias({
             convocado: data.convocado,
             torneos: data.torneos || [],
             amistosos: data.amistosos || [],
-            nextMatch: nearestMatch
+            nextMatch: nearestMatch,
+            filteredTournaments: filteredTournaments
           });
           setError(null);
         } catch (error) {
@@ -77,7 +100,8 @@ export const useConvocatorias = (clubId?: number) => {
             convocado: false,
             torneos: [],
             amistosos: [],
-            nextMatch: null
+            nextMatch: null,
+            filteredTournaments: []
           });
         } finally {
           setLoading(false);

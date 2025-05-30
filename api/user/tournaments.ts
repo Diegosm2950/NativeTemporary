@@ -1,3 +1,4 @@
+import { HistoricoTorneoResponse } from "@/types/convocatiorias";
 
 const API_BASE_URL = "https://fmru-next-js.vercel.app"
 
@@ -30,6 +31,20 @@ export const fetchConvocatorias = async (id: number, token: string): Promise<Con
     return await response.json();
   } catch (error) {
     console.error('Error in fetchConvocatorias:', error);
+    throw error;
+  }
+};
+
+export const fetchTournamentReport = async (torneoId: string): Promise<HistoricoTorneoResponse> => {
+  try {
+    const response = await fetch(`${API_BASE_URL}/api/app-native-api/historicos/torneos/${torneoId}`);
+    if (!response.ok) {
+      throw new Error(`HTTP error! status: ${response.status}`);
+    }
+    const data = await response.json();
+    return data;
+  } catch (error) {
+    console.error('Error fetching tournament report:', error);
     throw error;
   }
 };

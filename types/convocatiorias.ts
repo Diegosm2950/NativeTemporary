@@ -10,7 +10,7 @@ interface Referee {
   tipoRegistro_3: number;
 }
 
-interface TournamentMatch {
+export interface TournamentMatch {
   equipoLocal: Team;
   equipoVisitante: Team;
   arbitro: Referee;
@@ -28,8 +28,24 @@ interface TournamentMatch {
 }
 
 
-interface ResponseObject {
-  convocado: boolean;
-  torneos: TournamentMatch[];
-  amistosos: TournamentMatch[];
+export interface HistoricoTorneoResponse {
+  torneoId: number;
+  nombre: string;
+  totalPartidos: number;
+  totalLesiones: number;
+  totalTarjetas: number;
+  partidos: Partido[];
+}
+
+interface Partido {
+  partidoId: number;
+  fecha: string;
+  tipoPartido: string;
+  equipoLocal: string;
+  equipoVisitante: string;
+  marcador: string;
+  acciones?: {
+    lesiones?: number;
+    tarjetas?: number;
+  };
 }
