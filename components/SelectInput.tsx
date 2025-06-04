@@ -20,16 +20,11 @@ import Animated, {
   interpolateColor
 } from 'react-native-reanimated';
 
-type Option = {
-  label: string;
-  value: string;
-};
-
 type SelectInputProps = {
   label?: string;
   value: string;
   onSelect: (value: string) => void;
-  options: Option[];
+  options: string[];
   placeholder?: string;
   isRequired?: boolean;
   error?: string;
@@ -48,7 +43,7 @@ export default function SelectInput({
 }: SelectInputProps) {
   const colorScheme = useColorScheme();
   const [modalVisible, setModalVisible] = useState(false);
-  const selectedOption = options.find(option => option.value === value);
+  const selectedOption = options.find(option => option === value);
   
   const borderColorValue = useSharedValue(0);
   
@@ -107,7 +102,7 @@ export default function SelectInput({
               }
             ]}
           >
-            {selectedOption ? selectedOption.label : placeholder}
+            {selectedOption ? selectedOption : placeholder}
           </Text>
           <ChevronDown size={20} color={Colors[colorScheme].textSecondary} />
         </Animated.View>
@@ -145,20 +140,20 @@ export default function SelectInput({
               
               <FlatList
                 data={options}
-                keyExtractor={(item) => item.value}
+                keyExtractor={(item) => item}
                 renderItem={({ item }) => (
                   <TouchableOpacity
                     style={styles.optionItem}
-                    onPress={() => handleSelect(item.value)}
+                    onPress={() => handleSelect(item)}
                   >
                     <Text style={[
                       styles.optionText,
                       { color: Colors[colorScheme].text }
                     ]}>
-                      {item.label}
+                      {item}
                     </Text>
                     
-                    {item.value === value && (
+                    {item === value && (
                       <Check size={20} color={Colors[colorScheme].tint} />
                     )}
                   </TouchableOpacity>

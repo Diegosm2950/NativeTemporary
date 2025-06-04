@@ -4,6 +4,7 @@ import Colors from '@/constants/Colors';
 import Layout from '@/constants/Layout';
 import MatchCard from '@/components/MatchCard';
 import useColorScheme from '@/hooks/useColorScheme';
+import { TournamentMatch } from '@/types/convocatiorias';
 
 type TabType = 'upcoming' | 'past';
 

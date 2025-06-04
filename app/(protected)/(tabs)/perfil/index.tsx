@@ -1,4 +1,4 @@
-import { StyleSheet, Text, View, TouchableOpacity, Image } from 'react-native';
+import { StyleSheet, Text, View, TouchableOpacity, Image, ScrollView } from 'react-native';
 import { useRouter } from 'expo-router';
 import { SafeAreaView } from 'react-native-safe-area-context';
 import Colors from '@/constants/Colors';
@@ -24,68 +24,67 @@ export default function ProfileScreen() {
       style={[styles.container, { backgroundColor: Colors[colorScheme].background }]}
       edges={['top', 'right', 'left']}
     >
-      <View style={styles.header}>
+      <ScrollView style={styles.scrollView}>
+        <View style={[styles.profileCard, { backgroundColor: Colors[colorScheme].cardBackground }]}>
+          <View style={styles.profileImageContainer}>
+            <Image
+              source={{ uri: user?.foto || undefined }}
+              style={styles.profileImage}
+            />
+          </View>
 
-      </View>
+          <Text style={[styles.name, { color: Colors[colorScheme].text }]}>
+            {user?.nombre} {user?.apellido1}
+          </Text>
+          <Text style={[styles.email, { color: Colors[colorScheme].textSecondary }]}>
+            {user?.email}
+          </Text>
+        </View>
 
-      <View style={[styles.profileCard, { backgroundColor: Colors[colorScheme].cardBackground }]}>
-        <View style={styles.profileImageContainer}>
-          <Image
-            source={{ uri: user?.foto || undefined }}
-            style={styles.profileImage}
+        <View style={[styles.idSection, { backgroundColor: Colors[colorScheme].cardBackground }]}>
+          <Text style={[styles.idTitle, { color: Colors[colorScheme].text }]}>
+            Tu ID único: {user?.id}
+          </Text>
+        </View>
+
+        <View style={[styles.teamSection, { backgroundColor: Colors[colorScheme].cardBackground }]}>
+          <View style={styles.teamHeader}>
+            <Text style={[styles.sectionTitle, { color: Colors[colorScheme].text }]}>
+              Mi Equipo
+            </Text>
+            <TouchableOpacity style={styles.seeAllButton}>
+              <Text style={[styles.seeAllText, { color: Colors[colorScheme].tint }]}>
+                See All
+              </Text>
+              <ChevronRight size={20} color={Colors[colorScheme].tint} />
+            </TouchableOpacity>
+          </View>
+          <Text style={[styles.teamName, { color: Colors[colorScheme].textSecondary }]}>
+            {user?.club}
+          </Text>
+        </View>
+
+        <View style={styles.buttonContainer}>
+          <Button
+            title="Descargar ID"
+            onPress={() => {}}
+            style={styles.downloadButton}
+          />
+          <Button
+            title="Editar Perfil"
+            onPress={handleEditProfile}
+            variant="secondary"
+            style={styles.editButton}
+          />
+          <Button
+            title="Cerrar Sesión"
+            onPress={logOut}
+            variant="secondary"
+            style={{ marginTop: 16 }}
           />
         </View>
 
-        <Text style={[styles.name, { color: Colors[colorScheme].text }]}>
-          {user?.nombre} {user?.apellido1}
-        </Text>
-        <Text style={[styles.email, { color: Colors[colorScheme].textSecondary }]}>
-          {user?.email}
-        </Text>
-      </View>
-
-      <View style={[styles.idSection, { backgroundColor: Colors[colorScheme].cardBackground }]}>
-        <Text style={[styles.idTitle, { color: Colors[colorScheme].text }]}>
-          Tu ID único: {user?.id}
-        </Text>
-      </View>
-
-      <View style={[styles.teamSection, { backgroundColor: Colors[colorScheme].cardBackground }]}>
-        <View style={styles.teamHeader}>
-          <Text style={[styles.sectionTitle, { color: Colors[colorScheme].text }]}>
-            Mi Equipo
-          </Text>
-          <TouchableOpacity style={styles.seeAllButton}>
-            <Text style={[styles.seeAllText, { color: Colors[colorScheme].tint }]}>
-              See All
-            </Text>
-            <ChevronRight size={20} color={Colors[colorScheme].tint} />
-          </TouchableOpacity>
-        </View>
-        <Text style={[styles.teamName, { color: Colors[colorScheme].textSecondary }]}>
-          {user?.club}
-        </Text>
-      </View>
-
-      <View style={styles.buttonContainer}>
-        <Button
-          title="Descargar ID"
-          onPress={() => {}}
-          style={styles.downloadButton}
-        />
-        <Button
-          title="Editar Perfil"
-          onPress={handleEditProfile}
-          variant="secondary"
-          style={styles.editButton}
-        />
-        <Button
-          title="Cerrar Sesión"
-          onPress={logOut}
-          variant="secondary"
-          style={{ marginTop: 16 }}
-        />
-      </View>
+      </ScrollView>
     </SafeAreaView>
   );
 }
@@ -94,12 +93,8 @@ const styles = StyleSheet.create({
   container: {
     flex: 1,
   },
-  header: {
-    flexDirection: 'row',
-    alignItems: 'center',
-    justifyContent: 'center',
-    paddingVertical: Layout.spacing.l,
-    paddingHorizontal: Layout.spacing.l,
+  scrollView: {
+    flex: 1,
   },
   logo: {
     width: 36,
@@ -116,6 +111,7 @@ const styles = StyleSheet.create({
     marginHorizontal: Layout.spacing.l,
     borderRadius: Layout.borderRadius.large,
     marginBottom: Layout.spacing.l,
+    marginTop: Layout.spacing.l
   },
   profileImageContainer: {
     position: 'relative',

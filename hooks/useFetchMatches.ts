@@ -1,5 +1,6 @@
 import { fetchConvocatorias } from '@/api/user/tournaments';
 import { getAdminToken } from '@/services/helpers';
+import { TournamentMatch } from '@/types/convocatiorias';
 import { useState, useEffect } from 'react';
 
 interface ResponseObject {

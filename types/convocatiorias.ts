@@ -26,26 +26,3 @@ export interface TournamentMatch {
   id: number;
   __v: number;
 }
-
-
-export interface HistoricoTorneoResponse {
-  torneoId: number;
-  nombre: string;
-  totalPartidos: number;
-  totalLesiones: number;
-  totalTarjetas: number;
-  partidos: Partido[];
-}
-
-interface Partido {
-  partidoId: number;
-  fecha: string;
-  tipoPartido: string;
-  equipoLocal: string;
-  equipoVisitante: string;
-  marcador: string;
-  acciones?: {
-    lesiones?: number;
-    tarjetas?: number;
-  };
-}

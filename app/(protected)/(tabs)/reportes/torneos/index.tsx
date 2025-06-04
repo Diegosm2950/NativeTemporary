@@ -17,7 +17,8 @@ export default function TorneosReportes() {
 
   const { data } = useConvocatorias(user?.clubId ?? undefined);
 
-  console.log(data.filteredTournaments)
+  const finalizedTournaments = data.filteredTournaments.filter(tournament => tournament.estatus === "finalizado")
+  console.log(finalizedTournaments)
 
   return (
     <SafeAreaView
@@ -26,11 +27,11 @@ export default function TorneosReportes() {
     >
 
       <View style={styles.content}>
-        {data.filteredTournaments.map((tournament) => (
+        {finalizedTournaments.map((tournament) => (
           <ReportCard
             title={tournament.torneo}
-            onPress={() => router.push(`/(protected)/(tabs)/reportes/torneos/${tournament.id}`)}
-            icon="stats"
+            onPress={() => router.push(`/(protected)/(tabs)/reportes/torneos/${tournament.idTorneo}`)}
+            icon="general"
             key={tournament.id}
           />
         ))}
