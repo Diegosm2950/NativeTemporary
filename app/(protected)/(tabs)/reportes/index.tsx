@@ -20,7 +20,7 @@ export default function ReportesScreen() {
         <ReportCard
           title="Estadísticas Globales"
           onPress={() => router.push('/reportes/globales')}
-          icon="stats"
+          icon="global"
         />
         <ReportCard
           title="Estadísticas por Partidos"

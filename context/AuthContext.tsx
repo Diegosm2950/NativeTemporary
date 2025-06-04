@@ -11,6 +11,7 @@ type AuthState = {
   logOut: () => void;
   user: User | null;
   isLoading: boolean;
+  token: string | null
 };
 
 type LoginProps = {
@@ -22,21 +23,29 @@ export const AuthContext = createContext<AuthState>({
   logIn: async () => {},
   logOut: () => {},
   user: null,
-  isLoading: true
+  isLoading: true,
+  token: null
 });
 
 export function AuthProvider({ children }: PropsWithChildren) {
   const router = useRouter();
   const authService = new AuthService();
   const [user, setUser] = useState<User | null>(null);
+  const [token, setToken] = useState<string | null>(null);
   const [isLoading, setIsLoading] = useState(true);
 
   useEffect(() => {
     const checkAuth = async () => {
       try {
-        const storedUser = await authService.getUser();
-        if (storedUser) {
+        // Get both user and token from storage
+        const [storedUser, storedToken] = await Promise.all([
+          authService.getUser(),
+          authService.getToken()
+        ]);
+        
+        if (storedUser && storedToken) {
           setUser(storedUser);
+          setToken(storedToken);
           router.push("/(protected)/(tabs)");
         } else {
           router.push("/login");
@@ -67,9 +76,10 @@ export function AuthProvider({ children }: PropsWithChildren) {
       setIsLoading(true);
       const response = await authService.handleLogin(username, password);
       
-      if (response.id !== undefined) {
-        const userData = await authService.getUser(); 
+      if (response.id !== undefined && response.token) {
+        const userData = await authService.getUser();
         setUser(userData);
+        setToken(response.token); 
         
         Toast.show({
           type: 'success',
@@ -78,7 +88,7 @@ export function AuthProvider({ children }: PropsWithChildren) {
         });
         router.replace("/(protected)/(tabs)/perfil");
       } else {
-        throw new Error('Login failed - no user ID returned');
+        throw new Error('Login failed - no user ID or token returned');
       }
     } catch (error: any) {
       console.log(error);    
@@ -97,6 +107,7 @@ export function AuthProvider({ children }: PropsWithChildren) {
       setIsLoading(true);
       await authService.logOut();
       setUser(null);
+      setToken(null); // Clear the token from state
       router.push("/login");
     } finally {
       setIsLoading(false);
@@ -109,7 +120,8 @@ export function AuthProvider({ children }: PropsWithChildren) {
         logIn,
         logOut,
         user,
-        isLoading
+        isLoading,
+        token
       }}
     >
       {children}

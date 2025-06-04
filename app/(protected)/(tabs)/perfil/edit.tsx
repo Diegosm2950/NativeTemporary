@@ -12,34 +12,42 @@ import Button from '@/components/Button';
 import Animated, { FadeInDown } from 'react-native-reanimated';
 import { User } from '@/types/user';
 import { AuthContext } from '@/context/AuthContext';
+import Toast from 'react-native-toast-message';
+import { updateUserProfile } from '@/api/user/update';
 
 
-const stateOptions = [
-  { label: 'Ciudad de México', value: 'cdmx' },
-  { label: 'Estado de México', value: 'edomex' },
-  { label: 'Jalisco', value: 'jalisco' },
-  { label: 'Nuevo León', value: 'nuevoleon' },
+const estados = [
+  'Aguascalientes', 'Baja California', 'Baja California Sur', 'Campeche',
+  'CDMX', 'Chiapas', 'Chihuahua', 'Coahuila', 'Colima', 'Durango',
+  'Estado de México', 'Guanajuato', 'Guerrero', 'Hidalgo', 'Jalisco',
+  'Michoacán', 'Morelos', 'Nayarit', 'Nuevo León', 'Oaxaca',
+  'Puebla', 'Querétaro', 'Quintana Roo', 'San Luis Potosí', 'Sinaloa',
+  'Sonora', 'Tabasco', 'Tamaulipas', 'Tlaxcala', 'Veracruz',
+  'Yucatán', 'Zacatecas'
 ];
 
-const cityOptions = [
-  { label: 'Ciudad de México', value: 'cdmx' },
-  { label: 'Guadalajara', value: 'guadalajara' },
-  { label: 'Monterrey', value: 'monterrey' },
-  { label: 'Puebla', value: 'puebla' },
+const parentescoOptions = [
+  'Padre',
+  'Madre',
+  'Hermano(a)',
+  'Tío(a)',
+  'Abuelo(a)',
+  'Tutor',
+  'Otro',
 ];
 
-type UserField = keyof User; // This ensures only valid User properties can be used
+type UserField = keyof User;
 
 export default function EditProfileScreen() {
   const colorScheme = useColorScheme();
   const router = useRouter();
-  const { user } = useContext(AuthContext);
-  const [userData, setUserData] = useState<User | null>(null); // Initialize as null
+  const { user, token } = useContext(AuthContext);
+  const [userData, setUserData] = useState<User | null>(user); 
 
-  // Move the conditional after all hooks are called
+  console.log(userData)
+
   if (!user) return null;
 
-  // Initialize userData only when user is available and userData is null
   if (user && userData === null) {
     setUserData(user);
   }
@@ -56,28 +64,31 @@ export default function EditProfileScreen() {
     });
   };
   
-  
-  
-  {/*
-  const handleEmergencyContactChange = (field: string, value: string) => {
-    setUserData(prev => ({
-      ...prev,
-      emergencyContact: {
-        ...prev.emergencyContact,
-        [field]: value,
-      },
-    }));
-  };
-
-  */}
-  
   const handleCancel = () => {
-    router.back();
+    router.push("/(protected)/(tabs)/perfil");
   };
   
-  const handleSave = () => {
-    console.log('Saving user data:', userData);
-    router.back();
+  const handleSave = async () => {
+    if (!userData || !token) return;    
+    try {
+      console.log(token)
+      const updatedUser = await updateUserProfile(userData, token);
+
+      console.log(updatedUser)
+      Toast.show({
+        type: 'success',
+        text1: '¡Éxito!',
+        text2: 'Perfil actualizado correctamente',
+      });
+      
+      router.push("/(protected)/(tabs)/perfil");
+    } catch (error) {
+      Toast.show({
+        type: 'error',
+        text1: 'Error',
+        text2: 'Ocurrió un error al guardar los cambios',
+      });
+    }
   };
 
   return (
@@ -139,7 +150,7 @@ export default function EditProfileScreen() {
               label="Estado"
               value={userData.estadoMx}
               onSelect={(value) => handleChange('estadoMx', value)}
-              options={stateOptions}
+              options={estados}
               isRequired
             />
             
@@ -151,11 +162,11 @@ export default function EditProfileScreen() {
               isRequired
             />
             
-            <SelectInput
+            <FormInput
               label="Ciudad"
               value={userData.ciudad}
-              onSelect={(value) => handleChange('ciudad', value)}
-              options={cityOptions}
+              onChangeText={(text) => handleChange('ciudad', text)}
+              placeholder="Ciudad"
               isRequired
             />
             
@@ -190,7 +201,6 @@ export default function EditProfileScreen() {
             </View>
           </Animated.View>
           
-          {/*
           <Animated.View
             entering={FadeInDown.duration(600).delay(300)}
             style={styles.formSection}
@@ -201,16 +211,16 @@ export default function EditProfileScreen() {
             
             <FormInput
               label="Nombre"
-              value={userData}
-              onChangeText={(text) => handleEmergencyContactChange('name', text)}
+              value={userData.ceNombre}
+              onChangeText={(text) => handleChange('ceNombre', text)}
               placeholder="Nombre completo"
               isRequired
             />
             
             <FormInput
               label="Celular"
-              value={userData.emergencyContact.mobile}
-              onChangeText={(text) => handleEmergencyContactChange('mobile', text)}
+              value={userData.ceCel}
+              onChangeText={(text) => handleChange('ceCel', text)}
               placeholder="Número de celular"
               keyboardType="phone-pad"
               isRequired
@@ -218,22 +228,21 @@ export default function EditProfileScreen() {
             
             <FormInput
               label="Teléfono"
-              value={userData.emergencyContact.phone}
-              onChangeText={(text) => handleEmergencyContactChange('phone', text)}
+              value={userData.ceTel}
+              onChangeText={(text) => handleChange('ceTel', text)}
               placeholder="Número de teléfono"
               keyboardType="phone-pad"
             />
             
             <SelectInput
               label="Parentesco"
-              value={userData.emergencyContact.relationship}
-              onSelect={(value) => handleEmergencyContactChange('relationship', value)}
-              options={relationshipOptions}
+              value={userData.ceParentesco}
+              onSelect={(value) => handleChange('ceParentesco', value)}
+              options={parentescoOptions}
               isRequired
             />
           </Animated.View>
 
-           */}
           
           <Animated.View
             entering={FadeInDown.duration(600).delay(400)}

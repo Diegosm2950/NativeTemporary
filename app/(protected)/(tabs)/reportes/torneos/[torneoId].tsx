@@ -2,50 +2,24 @@ import { View, Text, StyleSheet } from 'react-native';
 import { useLocalSearchParams } from 'expo-router';
 import { useEffect, useState } from 'react';
 import { fetchTournamentReport } from '@/api/user/tournaments';
-import { HistoricoTorneoResponse } from '@/types/convocatiorias';
 import Colors from '@/constants/Colors';
 import useColorScheme from '@/hooks/useColorScheme';
 import StatsCard, { StatItem } from '@/components/StatsCard';
 import { SafeAreaView } from 'react-native-safe-area-context';
 import MatchCard from '@/components/MatchCard';
 
-// Mock data for when API is down
-const MOCK_TOURNAMENT_DATA = {
-  nombre: 'Torneo de Ejemplo',
-  totalPartidos: 5,
-  totalLesiones: 2,
-  totalTarjetas: 3,
-  partidos: [
-    {
-      partidoId: '1',
-      equipoLocal: 'Equipo A',
-      equipoVisitante: 'Equipo B',
-      marcador: '3-2',
-      fecha: '2023-05-15'
-    },
-    {
-      partidoId: '2',
-      equipoLocal: 'Equipo C',
-      equipoVisitante: 'Equipo D',
-      marcador: '1-1',
-      fecha: '2023-05-20'
-    }
-  ]
-};
-
 export default function TournamentReport() {
   const { torneoId } = useLocalSearchParams<{ torneoId: string }>();
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
   const [tournamentStats, setTournamentStats] = useState<StatItem[]>([]);
-  const [matchStats, setMatchStats] = useState<StatItem[]>([]);
   const [usingMockData, setUsingMockData] = useState(false);
   const colorScheme = useColorScheme();
 
 
   useEffect(() => {
     if (!torneoId) return;
-
+  
     const loadReport = async () => {
       try {
         setLoading(true);
@@ -55,33 +29,30 @@ export default function TournamentReport() {
           data = await fetchTournamentReport(torneoId);
           setUsingMockData(false);
         } catch (err) {
-          // If API fails, use mock data
           console.warn('API failed, using mock data');
-          data = MOCK_TOURNAMENT_DATA;
           setUsingMockData(true);
         }
-        
-        // Format tournament stats
+  
+        // Calculate totals from cedulas array
+        let totalLesiones = 0;
+        let totalTarjetas = 0;
+        let totalPartidos = 0;
+  
+        if (data?.cedulas) {
+          totalPartidos = data.cedulas.length;
+          data.cedulas.forEach(cedula => {
+            totalLesiones += cedula.lesiones?.length || 0;
+            totalTarjetas += cedula.tarjetas?.length || 0;
+          });
+        }
+  
         const formattedTournamentStats: StatItem[] = [
-          { label: 'Total Partidos', value: data.totalPartidos || 0 },
-          { label: 'Total Lesiones', value: data.totalLesiones || 0 },
-          { label: 'Total Tarjetas', value: data.totalTarjetas || 0 },
+          { label: 'Total Partidos', value: totalPartidos },
+          { label: 'Total Lesiones', value: totalLesiones },
+          { label: 'Total Tarjetas', value: totalTarjetas },
         ];
         setTournamentStats(formattedTournamentStats);
-
-        // Format match stats
-        if (data.partidos && data.partidos.length > 0) {
-          const formattedMatchStats = data.partidos.map(partido => ({
-            label: `${partido.equipoLocal} vs ${partido.equipoVisitante}`,
-            value: `Resultado: ${partido.marcador} | Fecha: ${partido.fecha}`
-          }));
-          setMatchStats(formattedMatchStats);
-        } else {
-          setMatchStats([
-            { label: 'No hay partidos registrados', value: 'Próximamente' }
-          ]);
-        }
-
+  
       } catch (err) {
         setError(err instanceof Error ? err.message : 'Unknown error');
         console.error('Error loading tournament report:', err);
@@ -89,7 +60,7 @@ export default function TournamentReport() {
         setLoading(false);
       }
     };
-
+  
     loadReport();
   }, [torneoId]);
 
@@ -136,8 +107,6 @@ export default function TournamentReport() {
       style={[styles.container, { backgroundColor: Colors[colorScheme].background }]}
       edges={['top', 'right', 'left']}
     >
-      <Text style={styles.title}>Reporte de torneo</Text>
-
       <MatchCard match={match} />
       
       {error && (
@@ -151,13 +120,6 @@ export default function TournamentReport() {
         <StatsCard
           title="Estadísticas del Torneo"
           stats={tournamentStats}
-        />
-      )}
-
-      {matchStats.length > 0 && (
-        <StatsCard
-          title="Partidos del Torneo"
-          stats={matchStats}
         />
       )}
     </SafeAreaView>

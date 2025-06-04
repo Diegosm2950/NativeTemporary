@@ -16,7 +16,7 @@ export default function PartidosScreen() {
 
   const { data } = useConvocatorias(user?.clubId ?? undefined);
 
-  console.log(data.torneos)
+  const finishedMatches = data.torneos.filter(match => match.estatus === "finalizado");
 
   return (
     <SafeAreaView
@@ -29,7 +29,7 @@ export default function PartidosScreen() {
         showsVerticalScrollIndicator={false}
       >
         <View style={styles.scrollContent}>
-          {data.torneos.map((match) => (
+          {finishedMatches.map((match) => (
             <TouchableOpacity 
               key={match.id} 
               onPress={() => router.push(`/(protected)/(tabs)/reportes/partidos/${match.id}`)}
