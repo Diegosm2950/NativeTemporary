@@ -11,7 +11,8 @@ type AuthState = {
   logOut: () => void;
   user: User | null;
   isLoading: boolean;
-  token: string | null
+  token: string | null,
+  refreshUser: () => Promise<void>;
 };
 
 type LoginProps = {
@@ -24,7 +25,8 @@ export const AuthContext = createContext<AuthState>({
   logOut: () => {},
   user: null,
   isLoading: true,
-  token: null
+  token: null, 
+  refreshUser: async () => {}
 });
 
 export function AuthProvider({ children }: PropsWithChildren) {
@@ -37,7 +39,6 @@ export function AuthProvider({ children }: PropsWithChildren) {
   useEffect(() => {
     const checkAuth = async () => {
       try {
-        // Get both user and token from storage
         const [storedUser, storedToken] = await Promise.all([
           authService.getUser(),
           authService.getToken()
@@ -61,6 +62,20 @@ export function AuthProvider({ children }: PropsWithChildren) {
 
     checkAuth();
   }, []);
+
+  const refreshUser = async () => {
+    try {
+      setIsLoading(true);
+      const updatedUser = await authService.refreshUser();
+      if (updatedUser) {
+        setUser(updatedUser);
+      }
+    } catch (error) {
+      console.error("Failed to refresh user:", error);
+    } finally {
+      setIsLoading(false);
+    }
+  };
 
   const logIn = async ({ username, password }: LoginProps) => {
     if (!username || !password) {
@@ -107,7 +122,7 @@ export function AuthProvider({ children }: PropsWithChildren) {
       setIsLoading(true);
       await authService.logOut();
       setUser(null);
-      setToken(null); // Clear the token from state
+      setToken(null);
       router.push("/login");
     } finally {
       setIsLoading(false);
@@ -121,7 +136,8 @@ export function AuthProvider({ children }: PropsWithChildren) {
         logOut,
         user,
         isLoading,
-        token
+        token,
+        refreshUser
       }}
     >
       {children}

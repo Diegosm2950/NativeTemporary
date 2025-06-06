@@ -18,7 +18,6 @@ export default function TorneosReportes() {
   const { data } = useConvocatorias(user?.clubId ?? undefined);
 
   const finalizedTournaments = data.filteredTournaments.filter(tournament => tournament.estatus === "finalizado")
-  console.log(finalizedTournaments)
 
   return (
     <SafeAreaView

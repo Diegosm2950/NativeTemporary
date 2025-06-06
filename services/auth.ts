@@ -12,7 +12,7 @@ export class AuthService {
         const response = await login(username, password);
 
         if (response.id !== undefined) {
-            const user = await fetchUserData(response.id);
+            const user = await fetchUserData(String(response.id));
             await this.setUser(user.user);
             console.log(JSON.stringify(user));
         }
@@ -50,5 +50,14 @@ export class AuthService {
 
     async setUser(user: User) {
         await AsyncStorage.setItem(this.AUTH, JSON.stringify(user));
+    }
+    
+    async refreshUser() {
+        const userId = await AsyncStorage.getItem(this.ADMIN_ID);
+        if (!userId) return null;
+        
+        const user = await fetchUserData(userId);
+        await this.setUser(user.user);
+        return user.user;
     }
 }

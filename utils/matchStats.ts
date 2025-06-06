@@ -1,13 +1,10 @@
-// utils/matchStatsFormatter.ts
+import { CedulaResponse } from "@/types/cedulas";
 
-import { CedulaPartidoResponse } from "@/types/cedulas";
-
-export const formatMatchStats = (matchData: CedulaPartidoResponse) => {
-  if (!matchData.cedulas || matchData.cedulas.length === 0) return [];
+export const formatMatchStats = (matchData: CedulaResponse) => {
+  if (!matchData.resultados || matchData.resultados.length === 0) return [];
   
-  const cedula = matchData.cedulas[0];
+  const cedula = matchData.resultados[0];
   
-  // Count different types of events
   const tries = cedula.marcador?.filter(m => m.accion === 'T').length || 0;
   const conversions = cedula.marcador?.filter(m => m.accion === 'C').length || 0;
   const dropGoals = cedula.marcador?.filter(m => m.accion === 'D').length || 0;
@@ -29,10 +26,10 @@ export const formatMatchStats = (matchData: CedulaPartidoResponse) => {
   ];
 };
 
-export const formatTeamStats = (matchData: CedulaPartidoResponse, teamId: number) => {
-  if (!matchData.cedulas || matchData.cedulas.length === 0) return [];
+export const formatTeamStats = (matchData: CedulaResponse, teamId: number) => {
+  if (!matchData.resultados || matchData.resultados.length === 0) return [];
   
-  const cedula = matchData.cedulas[0];
+  const cedula = matchData.resultados[0];
   const isLocalTeam = cedula.datosPartido.equipoLocal.id === teamId;
   const teamName = isLocalTeam 
     ? cedula.datosPartido.equipoLocal.nombre 

@@ -43,7 +43,6 @@ export const useConvocatorias = (clubId?: number) => {
       });
     };
 
-    // Function to filter out duplicate tournaments by name
     const getUniqueTournaments = (matches: TournamentMatch[]): TournamentMatch[] => {
       const uniqueNames = new Set<string>();
       return matches.filter(match => {
@@ -79,11 +78,9 @@ export const useConvocatorias = (clubId?: number) => {
   
           const data = await fetchConvocatorias(clubId, token);
           
-          // Combine all matches and find the nearest one
           const allMatches = [...(data.torneos || []), ...(data.amistosos || [])];
           const nearestMatch = getNearestMatch(allMatches);
 
-          // Create filtered version without modifying original arrays
           const allTournaments = [...(data.torneos || []), ...(data.amistosos || [])];
           const filteredTournaments = getUniqueTournaments(allTournaments);
   
