@@ -1,21 +1,25 @@
-import { View, Text, StyleSheet } from 'react-native';
-import { useLocalSearchParams } from 'expo-router';
-import { useEffect, useState } from 'react';
-import { fetchTournamentReport } from '@/api/user/tournaments';
+import { View, Text, StyleSheet, ScrollView, TouchableOpacity } from 'react-native';
+import { router, useLocalSearchParams } from 'expo-router';
+import { useContext, useEffect, useState } from 'react';
+import { fetchPartidosTorneo, fetchTorneosByEquipo, fetchTournamentReport } from '@/api/user/tournaments';
 import Colors from '@/constants/Colors';
 import useColorScheme from '@/hooks/useColorScheme';
 import StatsCard, { StatItem } from '@/components/StatsCard';
 import { SafeAreaView } from 'react-native-safe-area-context';
+import { AuthContext } from '@/context/AuthContext';
+import WinnerTeamCard from '@/components/WinnerTeamCard';
 import MatchCard from '@/components/MatchCard';
+import { MatchResults, ResponseTorneoInfo } from '@/types/convocatiorias';
 
 export default function TournamentReport() {
   const { torneoId } = useLocalSearchParams<{ torneoId: string }>();
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
   const [tournamentStats, setTournamentStats] = useState<StatItem[]>([]);
-  const [usingMockData, setUsingMockData] = useState(false);
+  const [tournamentMatches, setTournamentMatches] = useState<MatchResults[]>([]);
+  const [torneoInfo, setTorneoInfo] = useState<ResponseTorneoInfo>()
   const colorScheme = useColorScheme();
-
+  const { user, token } = useContext(AuthContext)
 
   useEffect(() => {
     if (!torneoId) return;
@@ -27,20 +31,28 @@ export default function TournamentReport() {
         
         try {
           data = await fetchTournamentReport(torneoId);
-          setUsingMockData(false);
+          if (!token) {
+            throw new Error('No admin token found');
+          }
+          if (typeof user?.clubId !== 'number') {
+            throw new Error('Invalid clubId');
+          }
+  
+          const torneoInfo = await fetchTorneosByEquipo(user.clubId, token);
+          setTorneoInfo(torneoInfo)
+          const partidosTorneos = await fetchPartidosTorneo(torneoId, token)
+          setTournamentMatches(partidosTorneos.partidos || [])
         } catch (err) {
           console.warn('API failed, using mock data');
-          setUsingMockData(true);
         }
   
-        // Calculate totals from cedulas array
         let totalLesiones = 0;
         let totalTarjetas = 0;
         let totalPartidos = 0;
   
-        if (data?.cedulas) {
-          totalPartidos = data.cedulas.length;
-          data.cedulas.forEach(cedula => {
+        if (data?.resultados) {
+          totalPartidos = data.resultados.length;
+          data.resultados.forEach(cedula => {
             totalLesiones += cedula.lesiones?.length || 0;
             totalTarjetas += cedula.tarjetas?.length || 0;
           });
@@ -72,56 +84,48 @@ export default function TournamentReport() {
     );
   }
 
-  const match = {
-    equipoLocal: {
-      id: 468,
-      nombre: "Lola Sux",
-    },
-    equipoVisitante: {
-      id: 132,
-      nombre: "Leopardos Rugby Club",
-    },
-    arbitro: {
-      id: 97,
-      nombre: "Luis Martínez",
-      tipoRegistro_3: 1,
-      avatar: "https://example.com/avatars/arbitro97.jpg" 
-    },
-    _id: "681ba78f9b0884d84fd6632a",
-    idTorneo: 10,
-    torneo: "Torneo Lola",
-    categoria: "Varonil",
-    tipoPartido: "amistoso",
-    fecha: "2025-05-01",
-    horario: "08:00-09:30",
-    campo: "Lola",
-    estatus: "programado",
-    id: 11,
-    __v: 0,
-    descripcion: "Partido amistoso de preparación para el torneo regional",
-    asientosDisponibles: 320,
-  };
+  if (error) {
+    return (
+      <View style={styles.container}>
+        <Text>{error}</Text>
+      </View>
+    );
+  }
 
+  if (!torneoInfo) {
+    return (
+      <View style={styles.container}>
+        <Text>No hay torneo...</Text>
+      </View>
+    );
+  }
+
+  const thisTournament = torneoInfo.torneos.filter(t => String(t.id) == torneoId)
+  
   return (
     <SafeAreaView
       style={[styles.container, { backgroundColor: Colors[colorScheme].background }]}
       edges={['top', 'right', 'left']}
     >
-      <MatchCard match={match} />
-      
-      {error && (
-        <Text style={styles.error}>
-          {error} {usingMockData && '(Mostrando datos de ejemplo)'}
-        </Text>
-      )}
-      
+      <ScrollView style={styles.scrollView}>
+        <WinnerTeamCard name={thisTournament[0].nombre} team={thisTournament[0].equipoCampeon} />
+              
+        {tournamentStats.length > 0 && (
+          <StatsCard
+            title="Estadísticas del Torneo"
+            stats={tournamentStats}
+          />
+        )}
 
-      {tournamentStats.length > 0 && (
-        <StatsCard
-          title="Estadísticas del Torneo"
-          stats={tournamentStats}
-        />
-      )}
+        {tournamentMatches.map(match => (
+          <TouchableOpacity 
+            key={match.id} 
+            onPress={() => router.push(`/(protected)/(tabs)/reportes/partidos/${match.id}`)}
+          >
+            <MatchCard match={match}/>
+          </TouchableOpacity>
+        ))}
+      </ScrollView>
     </SafeAreaView>
   );
 }
@@ -130,6 +134,9 @@ const styles = StyleSheet.create({
   container: {
     flex: 1,
     padding: 20,
+  },
+  scrollView: {
+    flex: 1,
   },
   title: {
     fontSize: 24,

@@ -13,8 +13,9 @@ export default function MatchesScreen() {
   const { data } = useConvocatorias(user?.clubId ?? undefined);
 
   const colorScheme = useColorScheme();
+  const pastMatches = data.torneos.filter(match => match.estatus == "finalizado");
   const upcomingMatches = data.torneos;
-  const pastMatches = data.torneos.slice(1,2);
+  console.log(upcomingMatches)
 
   return (
     <View style={[styles.container, { backgroundColor: Colors[colorScheme].background }]}>

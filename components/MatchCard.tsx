@@ -5,13 +5,13 @@ import useColorScheme from '@/hooks/useColorScheme';
 import Layout from '@/constants/Layout';
 import { AuthContext } from '@/context/AuthContext';
 import { useRouter } from 'expo-router';
-import { TournamentMatch } from '@/types/convocatiorias';
+import { MatchResults } from '@/types/convocatiorias';
 
 const backgroundImage = require('@/assets/images/rugbyvg.png');
 const defaultTeamLogo = require('@/assets/images/default-team-logo.png');
 
 type MatchCardProps = {
-  match: TournamentMatch;
+  match: MatchResults;
   variant?: 'large' | 'small';
 };
 
@@ -31,6 +31,25 @@ export default function MatchCard({ match, variant = 'small' }: MatchCardProps) 
     router.push(`/(protected)/(cedulas)`);
   };
 
+  // Determine if the match is finished
+  const isFinished = match.estatus === 'finalizado';
+  
+  // Extract scores from resultadoResumen if available
+  const getScores = () => {
+    if (!match.resultadoResumen) return { localScore: '0', awayScore: '0' };
+    
+    const matchResult = match.resultadoResumen.match(/(\d+).*vs.*(\d+)/);
+    if (matchResult && matchResult.length >= 3) {
+      return { localScore: matchResult[1], awayScore: matchResult[2] };
+    }
+    return { localScore: '0', awayScore: '0' };
+  };
+  
+  const { localScore, awayScore } = getScores();
+  
+  // Determine winning team for styling
+  const isLocalWinner = match.equipoGanador === match.equipoLocal.nombre;
+  const isAwayWinner = match.equipoGanador === match.equipoVisitante.nombre;
   
   return (
     <ContainerComponent 
@@ -61,7 +80,9 @@ export default function MatchCard({ match, variant = 'small' }: MatchCardProps) 
               style={styles.badge}
               imageStyle={styles.badgeImageStyle}
             >
-              <Text style={styles.badgeText}>Próximo Partido</Text>
+              <Text style={styles.badgeText}>
+                {isFinished ? 'Partido Finalizado' : 'Próximo Partido'}
+              </Text>
             </ImageBackground>
           </View>
         </View>
@@ -71,19 +92,23 @@ export default function MatchCard({ match, variant = 'small' }: MatchCardProps) 
         <View style={styles.teamContainer}>
           <Image
             source={match.equipoLocal.logo ? { uri: match.equipoLocal.logo } : defaultTeamLogo}
-            style={isLarge ? styles.largeTeamLogo : styles.smallTeamLogo}
+            style={[
+              isLarge ? styles.largeTeamLogo : styles.smallTeamLogo,
+              isFinished && isLocalWinner && styles.winningTeamLogo
+            ]}
             defaultSource={defaultTeamLogo}
           />
-            <Text 
-              style={[
-                isLarge ? styles.largeTeamName : styles.smallTeamName,
-                { color: Colors[colorScheme].text }
-              ]}
-              numberOfLines={1}
-              ellipsizeMode="tail"
-            >
-              {match.equipoLocal.nombre}
-            </Text>
+          <Text 
+            style={[
+              isLarge ? styles.largeTeamName : styles.smallTeamName,
+              { color: Colors[colorScheme].text },
+              isFinished && isLocalWinner && styles.winningTeamName
+            ]}
+            numberOfLines={1}
+            ellipsizeMode="tail"
+          >
+            {match.equipoLocal.nombre}
+          </Text>
         </View>
         
         <View style={styles.scoreContainer}>
@@ -94,32 +119,58 @@ export default function MatchCard({ match, variant = 'small' }: MatchCardProps) 
               </Text>
             </View>
           ) : (
-            <Text style={[styles.dateText, { color: Colors[colorScheme].textSecondary }]}>
-              {isLarge ? "0 : 0" : ' - : - '}
-            </Text>
+            <View style={styles.scoreWrapper}>
+              <Text style={[
+                styles.scoreText, 
+                { color: Colors[colorScheme].text },
+                isFinished && isLocalWinner && styles.winningScore
+              ]}>
+                {isFinished ? localScore : (isLarge ? "0" : "-")}
+              </Text>
+              <Text style={[styles.scoreSeparator, { color: Colors[colorScheme].text }]}>:</Text>
+              <Text style={[
+                styles.scoreText, 
+                { color: Colors[colorScheme].text },
+                isFinished && isAwayWinner && styles.winningScore
+              ]}>
+                {isFinished ? awayScore : (isLarge ? "0" : "-")}
+              </Text>
+            </View>
           )}
         </View>
         
         <View style={[styles.teamContainer, styles.awayTeam]}>
           <Image
             source={match.equipoVisitante.logo ? { uri: match.equipoVisitante.logo } : defaultTeamLogo}
-            style={isLarge ? styles.largeTeamLogo : styles.smallTeamLogo}
+            style={[
+              isLarge ? styles.largeTeamLogo : styles.smallTeamLogo,
+              isFinished && isAwayWinner && styles.winningTeamLogo
+            ]}
             defaultSource={defaultTeamLogo}
           />
-            <Text 
-              style={[
-                isLarge ? styles.largeTeamName : styles.smallTeamName,
-                { color: Colors[colorScheme].text }
-              ]}
-              numberOfLines={1}
-              ellipsizeMode="tail"
-            >
-              {match.equipoVisitante.nombre}
-            </Text>
+          <Text 
+            style={[
+              isLarge ? styles.largeTeamName : styles.smallTeamName,
+              { color: Colors[colorScheme].text },
+              isFinished && isAwayWinner && styles.winningTeamName
+            ]}
+            numberOfLines={1}
+            ellipsizeMode="tail"
+          >
+            {match.equipoVisitante.nombre}
+          </Text>
         </View>
       </View>
 
-      {isLarge && (
+      {isLarge && isFinished && (
+        <View style={styles.resultSummaryContainer}>
+          <Text style={[styles.resultSummaryText, { color: Colors[colorScheme].text }]}>
+            {match.resultadoResumen}
+          </Text>
+        </View>
+      )}
+
+      {isLarge && !isFinished && (
         <>
           {user?.tipoRegistro_2 === 1 && (
             <TouchableOpacity 
@@ -160,6 +211,37 @@ const styles = StyleSheet.create({
   backgroundImageStyle: {
     resizeMode: 'cover',
     opacity: 0.7, 
+  },
+    scoreWrapper: {
+    flexDirection: 'row',
+    alignItems: 'center',
+  },
+  scoreSeparator: {
+    fontSize: 24,
+    fontFamily: 'Inter-Bold',
+    marginHorizontal: Layout.spacing.xs,
+  },
+  winningTeamLogo: {
+    borderWidth: 2,
+    borderColor: '#FFD700', 
+    borderRadius: 30,
+  },
+  winningTeamName: {
+    fontWeight: 'bold',
+  },
+  winningScore: {
+    fontWeight: 'bold',
+  },
+  resultSummaryContainer: {
+    marginTop: Layout.spacing.m,
+    padding: Layout.spacing.s,
+    backgroundColor: '#020D0626',
+    borderRadius: Layout.borderRadius.small,
+  },
+  resultSummaryText: {
+    fontSize: 12,
+    fontFamily: 'Inter-Regular',
+    textAlign: 'center',
   },
   leagueContainer: {
     flexDirection: 'row',

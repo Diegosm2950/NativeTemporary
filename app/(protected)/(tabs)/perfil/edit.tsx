@@ -41,7 +41,7 @@ type UserField = keyof User;
 export default function EditProfileScreen() {
   const colorScheme = useColorScheme();
   const router = useRouter();
-  const { user, token } = useContext(AuthContext);
+  const { user, token, refreshUser } = useContext(AuthContext);
   const [userData, setUserData] = useState<User | null>(user); 
 
   console.log(userData)
@@ -72,7 +72,7 @@ export default function EditProfileScreen() {
     if (!userData || !token) return;    
     try {
       console.log(token)
-      const updatedUser = await updateUserProfile(userData, token);
+      const updatedUser = await updateUserProfile(userData, token, refreshUser);
 
       console.log(updatedUser)
       Toast.show({

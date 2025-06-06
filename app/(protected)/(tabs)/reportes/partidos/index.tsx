@@ -17,7 +17,7 @@ export default function PartidosScreen() {
   const { data } = useConvocatorias(user?.clubId ?? undefined);
 
   const finishedMatches = data.torneos.filter(match => match.estatus === "finalizado");
-
+  console.log(finishedMatches)
   return (
     <SafeAreaView
       style={[styles.container, { backgroundColor: Colors[colorScheme].background }]}

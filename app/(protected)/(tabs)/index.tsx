@@ -16,7 +16,7 @@ export default function HomeScreen() {
   const { data } = useConvocatorias(user?.clubId ?? undefined);
 
   const nextMatch = data.nextMatch;
-
+  const pastMatches = data.torneos.filter(match => match.estatus == "finalizado");
 
   return (
     <SafeAreaView
@@ -48,7 +48,7 @@ export default function HomeScreen() {
         
         <MatchTabs 
           upcomingMatches={data.torneos.slice(1)}
-          pastMatches={data.torneos.slice(2, 4)}
+          pastMatches={pastMatches}
         />
       </ScrollView>
     </SafeAreaView>

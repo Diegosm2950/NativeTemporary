@@ -1,4 +1,4 @@
-interface Team {
+export interface Team {
   id: number;
   nombre: string;
   logo?: string;
@@ -8,6 +8,36 @@ interface Referee {
   id: number;
   nombre: string;
   tipoRegistro_3: number;
+}
+
+interface TorneoInfo {
+  id: number;
+  nombre: string;
+  categoria: string;
+  fechaInicio: string;
+  fechaFin: string; 
+  equipoCampeon: Team | null; 
+  mensaje: string;
+}
+
+export interface ConvocatoriaResponse {
+  convocado: boolean;
+  torneos: TournamentMatch[];
+  amistosos: TournamentMatch[];
+  error?: string;
+}
+
+export interface PartidosTorneoResponse {
+  page: TournamentMatch;
+  perPage: string;
+  partidos: MatchResults[];
+  total: number;
+  totalPages: number;
+}
+
+export interface ResponseTorneoInfo {
+  convocado: boolean
+  torneos: TorneoInfo[]
 }
 
 export interface TournamentMatch {
@@ -25,4 +55,9 @@ export interface TournamentMatch {
   estatus: string;
   id: number;
   __v: number;
+}
+
+export interface MatchResults extends TournamentMatch {
+  resultadoResumen?: string;
+  equipoGanador?: string;
 }

@@ -37,7 +37,7 @@ export const login = async (email: string, password: string): Promise<LoginRespo
   };
 };
 
-export const fetchUserData = async (id: number) => {
+export const fetchUserData = async (id: string) => {
   try {
     if (!id) return;
 
