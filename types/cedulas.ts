@@ -80,4 +80,6 @@ export interface Cedula {
     asistioArbitro: boolean;
     asistioParamedico: boolean;
     __v: number;
+    equipoGanador?: string;
+    resultadoResumen: string;
 }

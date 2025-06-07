@@ -1,12 +1,9 @@
 import React, { useContext, useState } from 'react';
 import { Text, TextInput, TouchableOpacity, StyleSheet, Image, Alert, useColorScheme, ScrollView } from 'react-native';
-import { useNavigation } from '@react-navigation/native';
-import type { NativeStackNavigationProp } from '@react-navigation/native-stack';
-import type { RootStackParamList } from '@/types/navigation';
 import { AuthContext } from '@/context/AuthContext';
+import { router } from 'expo-router';
 
 const LoginScreen = () => {
-  const navigation = useNavigation<NativeStackNavigationProp<RootStackParamList>>();
   const [username, setUsername] = useState('');
   const [password, setPassword] = useState('');
 
@@ -45,14 +42,14 @@ const LoginScreen = () => {
 
       <TouchableOpacity
         style={styles.linkButton}
-        onPress={() => navigation.navigate('RecoverPasswordScreen')}
+        onPress={() => router.push("/(auth)/login")}
       >
         <Text style={styles.linkText}>Olvidé mi contraseña</Text>
       </TouchableOpacity>
 
       <TouchableOpacity
         style={styles.createButton}
-        onPress={() => navigation.navigate('Register')}
+        onPress={() => router.push("/(auth)/RegisterContainer")}
       >
         <Text style={styles.createText}>Crear cuenta</Text>
       </TouchableOpacity>

@@ -1,6 +1,4 @@
-import { AuthContext } from '@/context/AuthContext';
-import { Redirect, Stack } from 'expo-router';
-import { useContext } from 'react';
+import { Stack } from 'expo-router';
 
 export const unsetable_settings = {
   initialRouteName: "(tabs)",

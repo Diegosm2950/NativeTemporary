@@ -1,4 +1,4 @@
-const API_BASE_URL = "https://fmru-next-js.vercel.app"
+const API_BASE_URL = process.env.EXPO_PUBLIC_API_BASE_URL
 
 export async function fetchTeamSummary(id?: number) {
     try {

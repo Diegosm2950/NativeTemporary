@@ -2,8 +2,7 @@ import { View, Text, StyleSheet, ScrollView } from 'react-native';
 import { useLocalSearchParams } from 'expo-router';
 import { useEffect, useState } from 'react';
 import { fetchMatchReports } from '@/api/user/tournaments';
-import { formatMatchStats, formatTeamStats } from '@/utils/matchStats';
-import { CedulaResponse, StatItem } from '@/types/cedulas';
+import { CedulaResponse } from '@/types/cedulas';
 import { SafeAreaView } from 'react-native-safe-area-context';
 import Colors from '@/constants/Colors';
 import useColorScheme from '@/hooks/useColorScheme';
@@ -53,7 +52,11 @@ export default function MatchReportScreen() {
           
           {matchData?.resultados?.[0] && (
             <>
-              <MatchCard match={matchData.resultados[0].datosPartido} />
+              <MatchCard match={{
+                ...matchData.resultados[0].datosPartido,
+                equipoGanador: matchData.resultados[0].equipoGanador,
+                resultadoResumen: matchData.resultados[0].resultadoResumen
+              }}  />
               
               <MatchStatsCard matchData={matchData.resultados[0]} />
             </>

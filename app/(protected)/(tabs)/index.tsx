@@ -17,6 +17,8 @@ export default function HomeScreen() {
 
   const nextMatch = data.nextMatch;
   const pastMatches = data.torneos.filter(match => match.estatus == "finalizado");
+  const nextMatches = data.torneos.filter(match => match.estatus == "programado");
+
 
   return (
     <SafeAreaView
@@ -47,7 +49,7 @@ export default function HomeScreen() {
         )}
         
         <MatchTabs 
-          upcomingMatches={data.torneos.slice(1)}
+          upcomingMatches={nextMatches}
           pastMatches={pastMatches}
         />
       </ScrollView>

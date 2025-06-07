@@ -35,11 +35,9 @@ export default function RootLayout() {
     return (
       <AuthProvider>
           <React.Fragment>
-              <StatusBar style="auto" />
-              <Stack>
-                  <Stack.Screen name="(protected)" options={{
-                      headerShown: false
-                  }}/>
+              <Stack screenOptions={{ headerShown: false }}>
+                <Stack.Screen name="(auth)" options={{ headerShown: false }} />
+                <Stack.Screen name="(tabs)" options={{ headerShown: false }} />
               </Stack>
               <Toast/>
           </React.Fragment>

@@ -16,6 +16,7 @@ type MatchCardProps = {
 };
 
 export default function MatchCard({ match, variant = 'small' }: MatchCardProps) {
+
   const colorScheme = useColorScheme();
   const isLarge = variant === 'large';
   const { user } = useContext(AuthContext);
@@ -31,10 +32,8 @@ export default function MatchCard({ match, variant = 'small' }: MatchCardProps) 
     router.push(`/(protected)/(cedulas)`);
   };
 
-  // Determine if the match is finished
   const isFinished = match.estatus === 'finalizado';
   
-  // Extract scores from resultadoResumen if available
   const getScores = () => {
     if (!match.resultadoResumen) return { localScore: '0', awayScore: '0' };
     
@@ -47,7 +46,6 @@ export default function MatchCard({ match, variant = 'small' }: MatchCardProps) 
   
   const { localScore, awayScore } = getScores();
   
-  // Determine winning team for styling
   const isLocalWinner = match.equipoGanador === match.equipoLocal.nombre;
   const isAwayWinner = match.equipoGanador === match.equipoVisitante.nombre;
   

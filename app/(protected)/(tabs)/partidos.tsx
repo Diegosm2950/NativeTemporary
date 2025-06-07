@@ -14,8 +14,7 @@ export default function MatchesScreen() {
 
   const colorScheme = useColorScheme();
   const pastMatches = data.torneos.filter(match => match.estatus == "finalizado");
-  const upcomingMatches = data.torneos;
-  console.log(upcomingMatches)
+  const nextMatches = data.torneos.filter(match => match.estatus == "programado");
 
   return (
     <View style={[styles.container, { backgroundColor: Colors[colorScheme].background }]}>
@@ -27,7 +26,7 @@ export default function MatchesScreen() {
         </View>
         
         <MatchTabs 
-          upcomingMatches={upcomingMatches}
+          upcomingMatches={nextMatches}
           pastMatches={pastMatches}
         />
       </ScrollView>

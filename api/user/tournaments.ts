@@ -1,7 +1,7 @@
 import { CedulaResponse } from "@/types/cedulas";
 import { ConvocatoriaResponse, PartidosTorneoResponse, ResponseTorneoInfo } from "@/types/convocatiorias";
 
-const API_BASE_URL = "https://fmru-next-js.vercel.app"
+const API_BASE_URL = process.env.EXPO_PUBLIC_API_BASE_URL
 
 export const fetchConvocatorias = async (id: number, token: string): Promise<ConvocatoriaResponse> => {
   try {

@@ -1,6 +1,6 @@
 import { User } from "@/types/user";
 
-const API_BASE_URL = "https://fmru-next-js.vercel.app"
+const API_BASE_URL = process.env.EXPO_PUBLIC_API_BASE_URL
 
 export const updateUserProfile = async (userData: Partial<User>, token: string, refreshUser: () => Promise<void>) => {
   try {
