@@ -67,6 +67,13 @@ export default function CedulasLayout() {
             title: 'Observación arbitral',
           }}
         />
+        <Stack.Screen
+          name="SeleccionarJugadores"
+          options={{
+            headerShown: false,
+            title: 'Seleccionar jugadores',
+          }}
+        />
       </Stack>
     </CedulaProvider>
   );

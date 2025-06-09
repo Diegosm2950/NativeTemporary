@@ -79,7 +79,15 @@ export interface User {
   club?: string;
   equipoUniversitario?: string;
   equipoEstatal?: string;
-  rol?: 'usuario' | 'capitán' | 'representante';
+  rol?: 'usuario' | 'Capitán' | 'representante';
   createdAt?: Date;
   updatedAt?: Date;
+}
+
+export interface Player {
+  id: string;
+  name: string;
+  clubId: string;
+  club: string;
+  foto?: string;
 }

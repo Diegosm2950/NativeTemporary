@@ -25,11 +25,11 @@ export default function MatchCard({ match, variant = 'small' }: MatchCardProps) 
   const ContainerComponent = isLarge ? ImageBackground : View;
   
   const handleCapitanPress = () => {
-    console.log('Escoger jugadores pressed');
+    router.push('/(protected)/(cedulas)/SeleccionarJugadores');
   };
   
   const handleArbitroPress = () => {
-    router.push(`/(protected)/(cedulas)`);
+    router.push(`/(protected)/(cedulas)/qr-scanner?matchId=14`);
   };
 
   const isFinished = match.estatus === 'finalizado';
@@ -170,7 +170,7 @@ export default function MatchCard({ match, variant = 'small' }: MatchCardProps) 
 
       {isLarge && !isFinished && (
         <>
-          {user?.tipoRegistro_2 === 1 && (
+          {user?.rol === "Capitán" && (
             <TouchableOpacity 
               style={[styles.actionButton, { backgroundColor: "#000000" }]}
               onPress={handleCapitanPress}

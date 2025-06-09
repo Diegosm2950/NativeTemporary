@@ -1,0 +1,11 @@
+{
+    "cli": {
+      "version": "~16.9.0"
+    },
+    "build": {
+      "preview": {
+        "channel": "beta",
+        "distribution": "internal"
+      }
+    }
+  }
