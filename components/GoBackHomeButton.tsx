@@ -14,7 +14,7 @@ const GoBackHomeButton = () => {
     <View style={styles.wrapper}>
       <TouchableOpacity
         style={styles.button}
-        onPress={() => navigation.navigate('Login')}
+        onPress={() => navigation.navigate('login')}
       >
         <Text style={styles.text}>Volver al inicio</Text>
       </TouchableOpacity>
