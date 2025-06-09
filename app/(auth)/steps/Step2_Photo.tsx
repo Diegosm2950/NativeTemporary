@@ -62,6 +62,13 @@ const Step2_Photo = ({ onNext, onBack, formData, updateForm }: Props) => {
           <Text style={styles.nextText}>Siguiente</Text>
         </TouchableOpacity>
 
+        {/* Botones */}
+        {onBack && (
+          <TouchableOpacity style={styles.backButton} onPress={onBack}>
+            <Text style={styles.backText}>Volver</Text>
+          </TouchableOpacity>
+        )}
+
         {/* Pie de página */}
         <Text style={styles.terms}>
           Al crear una cuenta, aceptas nuestros Términos y Condiciones.
@@ -149,6 +156,20 @@ const getStyles = (isDark: boolean) =>
       color: isDark ? '#bbb' : '#666',
       fontSize: 13,
       marginTop: 16,
+    },
+    backButton: {
+      borderWidth: 1,
+      borderColor: '#28a745',
+      borderRadius: 25,
+      paddingVertical: 14,
+      paddingHorizontal: 32,
+      alignItems: 'center',
+      marginTop: 10,
+    },
+    backText: {
+      color: '#28a745',
+      fontSize: 16,
+      fontWeight: '500',
     },
   });
 
