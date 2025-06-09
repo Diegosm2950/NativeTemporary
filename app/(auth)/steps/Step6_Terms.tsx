@@ -56,8 +56,8 @@ const Step6_Terms = ({ formData, onBack, resetForm, updateForm }: Props) => {
     }
 
     setLoading(true);
-    const API_BASE_URL = Constants.expoConfig?.extra?.API_BASE_URL;
-    const url = `${API_BASE_URL}/api/registro`;
+    const EXPO_PUBLIC_API_BASE_URL = Constants.expoConfig?.extra?.EXPO_PUBLIC_API_BASE_URL;
+    const url = `${EXPO_PUBLIC_API_BASE_URL}/api/registro`;
 
     try {
       const res = await fetch(url, {
