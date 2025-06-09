@@ -3,6 +3,7 @@ import { User } from "@/types/user";
 import { SplashScreen, useRouter } from "expo-router";
 import { createContext, PropsWithChildren, useEffect, useState } from "react";
 import Toast from "react-native-toast-message";
+import AsyncStorage from "@react-native-async-storage/async-storage";
 
 SplashScreen.preventAutoHideAsync();
 
@@ -86,27 +87,39 @@ export function AuthProvider({ children }: PropsWithChildren) {
       });
       return;
     }
-  
+
     try {
       setIsLoading(true);
       const response = await authService.handleLogin(username, password);
-      
+
       if (response.id !== undefined && response.token) {
         const userData = await authService.getUser();
         setUser(userData);
-        setToken(response.token); 
-        
+        setToken(response.token);
+
+        await AsyncStorage.setItem("token", response.token);
+        console.log("✔️ Token guardado:", response.token);
+
+        if (userData?.clubId) {
+          await AsyncStorage.setItem("clubId", String(userData.clubId));
+          console.log("✔️ Club ID guardado:", userData.clubId);
+        } else {
+          console.warn("⚠️ No se encontró clubId en los datos del usuario");
+          await AsyncStorage.removeItem("clubId");
+        }
+
         Toast.show({
           type: 'success',
           text1: 'Bienvenido 👋',
           text2: 'Inicio de sesión exitoso',
         });
+
         router.replace("/(protected)/(tabs)/perfil");
       } else {
         throw new Error('Login failed - no user ID or token returned');
       }
     } catch (error: any) {
-      console.log(error);    
+      console.log(error);
       Toast.show({
         type: 'error',
         text1: 'Error al iniciar sesión',
@@ -116,6 +129,7 @@ export function AuthProvider({ children }: PropsWithChildren) {
       setIsLoading(false);
     }
   };
+
 
   const logOut = async () => {
     try {
