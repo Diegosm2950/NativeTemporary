@@ -1,7 +1,7 @@
 import React, { useState } from "react";
 import { View, ScrollView, StyleSheet, useColorScheme, Alert } from "react-native";
-import { useNavigation } from '@react-navigation/native';
-import { NativeStackNavigationProp } from '@react-navigation/native-stack';
+import { useNavigation } from "@react-navigation/native";
+import { NativeStackNavigationProp } from "@react-navigation/native-stack";
 import HeaderLogo from "@/components/qr-capitan/HeaderLogo";
 import TeamCard from "@/components/qr-capitan/TeamCard";
 import FilterBar from "@/components/qr-capitan/FilterBar";
@@ -13,6 +13,11 @@ import PaginationControls from "@/components/qr-capitan/PaginationControls";
 import PlayerCounter from "@/components/qr-capitan/PlayerCounter";
 import { RootStackParamList } from "@/types/navigation";
 import { Player } from "@/types/user";
+
+type NavigationProp = NativeStackNavigationProp<
+  RootStackParamList,
+  "SeleccionarJugadores"
+>;
 
 const SeleccionarJugadores = () => {
   const playersPerPage = 10;
@@ -31,16 +36,14 @@ const SeleccionarJugadores = () => {
       if (exists) {
         return prev.filter((p) => p.id !== player.id);
       } else {
-        if (prev.length >= 15) {
-          Alert.alert("Límite alcanzado", "Solo puedes seleccionar hasta 15 jugadores.");
+        if (prev.length >= 1) {
+          Alert.alert("Límite alcanzado", "Solo puedes seleccionar 1 jugador.");
           return prev;
         }
         return [...prev, player];
       }
     });
-  }; 
-  
-type NavigationProp = NativeStackNavigationProp<RootStackParamList, 'SeleccionarJugadores'>;
+  };
 
   const handleGenerateQR = () => {
     if (selectedPlayers.length === 0) {
@@ -75,7 +78,7 @@ type NavigationProp = NativeStackNavigationProp<RootStackParamList, 'Seleccionar
             onPrevious={() => setPage((prev) => Math.max(prev - 1, 1))}
           />
         )}
-        <PlayerCounter selected={selectedPlayers.length} total={15} />
+        <PlayerCounter selected={selectedPlayers.length} total={1} />
         <GenerateQRButton onPress={handleGenerateQR} />
       </ScrollView>
     </View>
