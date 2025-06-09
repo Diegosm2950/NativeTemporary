@@ -202,6 +202,10 @@ const Step1_PersonalData = ({ onNext, onBack, formData, updateForm }: Props) => 
           <TouchableOpacity style={styles.submitButton} onPress={onNext}>
             <Text style={styles.submitButtonText}>Siguiente</Text>
           </TouchableOpacity>
+          
+          <View>
+            <GoBackHomeButton />
+          </View>
 
           <Text style={styles.terms}>
             Al crear una cuenta, aceptas nuestros Términos y Condiciones
