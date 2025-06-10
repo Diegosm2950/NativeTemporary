@@ -30,19 +30,27 @@ export default function JuegoScreen() {
       {/* Encabezado del partido */}
       <View style={styles.matchCard}>
         <View style={styles.matchHeader}>
-          <Text style={styles.badge}>{cedulaData.tipoPartido === 'torneo' ? 'Torneo' : 'Amistoso'}</Text>
+          <Text style={styles.badge}>
+            {cedulaData.torneo || (cedulaData.tipoPartido === 'torneo' ? 'Torneo' : 'Amistoso')}
+          </Text>
           <Text style={styles.badge}>Inicio: {cedulaData.horaInicio || '--:--'}</Text>
         </View>
 
         <View style={styles.scoreSection}>
-          <Image style={styles.teamLogo} />
+          <Image
+            style={styles.teamLogo}
+            source={cedulaData.equipoLocal?.logo ? { uri: cedulaData.equipoLocal.logo } : require('@/assets/images/FMRUU.png')}
+          />
           <Text style={styles.score}>{puntosA} : {puntosB}</Text>
-          <Image style={styles.teamLogo} />
+          <Image
+            style={styles.teamLogo}
+            source={cedulaData.equipoVisitante?.logo ? { uri: cedulaData.equipoVisitante.logo } : require('@/assets/images/FMRUU.png')}
+          />
         </View>
 
         <View style={styles.teamNames}>
-          <Text style={styles.teamName}>Equipo A</Text>
-          <Text style={styles.teamName}>Equipo B</Text>
+          <Text style={styles.teamName}>{cedulaData.equipoLocal?.nombre || 'Equipo A'}</Text>
+          <Text style={styles.teamName}>{cedulaData.equipoVisitante?.nombre || 'Equipo B'}</Text>
         </View>
       </View>
 
@@ -67,7 +75,7 @@ export default function JuegoScreen() {
       {/* Botones */}
       <TouchableOpacity
         style={styles.mainButton}
-        onPress={() => router.push('/(protected)/(cedulas)/puntos' as any)}
+        onPress={() => router.push('/(protected)/(cedulas)/puntos')}
       >
         <Text style={styles.mainButtonText}>Agregar punto</Text>
       </TouchableOpacity>
@@ -82,7 +90,7 @@ export default function JuegoScreen() {
           <TouchableOpacity
             key={index}
             style={styles.iconButton}
-            onPress={() => router.push(route as any)}
+            onPress={() => router.push(route)}
           >
             {icon}
             <Text style={styles.iconLabel}>{label}</Text>
@@ -92,7 +100,7 @@ export default function JuegoScreen() {
 
       <TouchableOpacity
         style={styles.digitalSignButton}
-        onPress={() => router.push('/(protected)/(cedulas)/firmas' as any)}
+        onPress={() => router.push('/(protected)/(cedulas)/firmas')}
       >
         <Text style={styles.secondaryText}>Firmas Digitales</Text>
       </TouchableOpacity>
