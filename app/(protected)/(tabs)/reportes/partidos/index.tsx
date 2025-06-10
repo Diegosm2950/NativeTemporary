@@ -28,7 +28,7 @@ export default function PartidosScreen() {
         contentContainerStyle={styles.contentContainer}
         showsVerticalScrollIndicator={false}
       >
-        <View style={styles.scrollContent}>
+        <View>
           {finishedMatches.map((match) => (
             <TouchableOpacity 
               key={match.id} 
@@ -49,12 +49,9 @@ const styles = StyleSheet.create({
   },
   scrollView: {
     flex: 1,
-    width: '100%',
+    marginTop: Layout.spacing.xxl
   },
   contentContainer: {
-    flexGrow: 1,
-  },
-  scrollContent: {
     padding: Layout.spacing.l,
   },
   header: {

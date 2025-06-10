@@ -10,6 +10,7 @@ import { AuthContext } from '@/context/AuthContext';
 import WinnerTeamCard from '@/components/WinnerTeamCard';
 import MatchCard from '@/components/MatchCard';
 import { MatchResults, ResponseTorneoInfo } from '@/types/convocatiorias';
+import Layout from '@/constants/Layout';
 
 export default function TournamentReport() {
   const { torneoId } = useLocalSearchParams<{ torneoId: string }>();
@@ -107,7 +108,10 @@ export default function TournamentReport() {
       style={[styles.container, { backgroundColor: Colors[colorScheme].background }]}
       edges={['top', 'right', 'left']}
     >
-      <ScrollView style={styles.scrollView}>
+      <ScrollView 
+        style={styles.scrollView}
+        contentContainerStyle={styles.contentContainer}
+      >
         <WinnerTeamCard name={thisTournament[0].nombre} team={thisTournament[0].equipoCampeon} />
               
         {tournamentStats.length > 0 && (
@@ -133,10 +137,13 @@ export default function TournamentReport() {
 const styles = StyleSheet.create({
   container: {
     flex: 1,
-    padding: 20,
   },
   scrollView: {
     flex: 1,
+    marginTop: Layout.spacing.xxl
+  },
+  contentContainer: {
+    padding: Layout.spacing.l,
   },
   title: {
     fontSize: 24,

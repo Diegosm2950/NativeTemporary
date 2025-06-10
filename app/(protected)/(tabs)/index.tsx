@@ -14,7 +14,6 @@ export default function HomeScreen() {
   const { user } = useContext(AuthContext);
 
   const { data } = useConvocatorias(user?.clubId ?? undefined);
-  console.log(user?.tipoRegistro_1, user?.rol)
   const nextMatch = data.nextMatch;
   const pastMatches = data.torneos.filter(match => match.estatus == "finalizado");
   const nextMatches = data.torneos.filter(match => match.estatus == "programado");

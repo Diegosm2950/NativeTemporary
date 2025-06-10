@@ -8,7 +8,7 @@ import { useRouter } from 'expo-router';
 import { MatchResults } from '@/types/convocatiorias';
 
 const backgroundImage = require('@/assets/images/rugbyvg.png');
-const defaultTeamLogo = require('@/assets/images/default-team-logo.png');
+const defaultTeamLogo = require('@/assets/images/FMRUU.png');
 
 type MatchCardProps = {
   match: MatchResults;
@@ -59,6 +59,46 @@ export default function MatchCard({ match, variant = 'small' }: MatchCardProps) 
       ]}
       imageStyle={isLarge ? styles.backgroundImageStyle : {}}
     >
+          {!isLarge && (
+        <View style={styles.smallBadgesRow}>
+          <View style={styles.smallBadgeContainer}>
+            <ImageBackground
+              source={require('@/assets/images/rugbyvg.png')}
+              blurRadius={50}
+              style={styles.badge}
+              imageStyle={styles.badgeImageStyle}
+            >
+              <Text 
+                style={styles.badgeText} 
+                numberOfLines={1}
+                ellipsizeMode='tail'
+              >
+                {match.torneo}
+              </Text>
+            </ImageBackground>
+          </View>
+          
+          {match.tipoPartido === "amistoso" && (
+            <View style={styles.smallBadgeContainer}>
+              <ImageBackground
+                source={require('@/assets/images/rugbyvg.png')}
+                blurRadius={50}
+                style={[styles.badge, styles.friendlyBadge]}
+                imageStyle={styles.badgeImageStyle}
+              >
+                <Text 
+                  style={styles.badgeText} 
+                  numberOfLines={1}
+                  ellipsizeMode='tail'
+                >
+                  Amistoso
+                </Text>
+              </ImageBackground>
+            </View>
+          )}
+        </View>
+      )}
+
       {isLarge && (
         <View style={styles.leagueContainer}>
           <View style={styles.badgeContainer}>
@@ -68,7 +108,13 @@ export default function MatchCard({ match, variant = 'small' }: MatchCardProps) 
               style={styles.badge}
               imageStyle={styles.badgeImageStyle}
             >
-              <Text style={styles.badgeText}>{match.torneo}</Text>
+              <Text 
+                style={styles.badgeText} 
+                numberOfLines={1}
+                ellipsizeMode='tail'
+              >
+                {match.torneo}
+              </Text>
             </ImageBackground>
           </View>
           <View style={styles.badgeContainer}>
@@ -78,7 +124,11 @@ export default function MatchCard({ match, variant = 'small' }: MatchCardProps) 
               style={styles.badge}
               imageStyle={styles.badgeImageStyle}
             >
-              <Text style={styles.badgeText}>
+              <Text 
+                style={styles.badgeText} 
+                numberOfLines={1}
+                ellipsizeMode='tail'
+              >
                 {isFinished ? 'Partido Finalizado' : 'Próximo Partido'}
               </Text>
             </ImageBackground>
@@ -251,6 +301,20 @@ const styles = StyleSheet.create({
     fontSize: 14,
     fontFamily: 'Inter-Medium',
   },
+  smallBadgesRow: {
+    flexDirection: 'row',
+    justifyContent: 'center',
+    marginBottom: Layout.spacing.s,
+    gap: Layout.spacing.xs,
+  },
+  friendlyBadge: {
+    backgroundColor: '#257E4240', 
+  },
+  smallBadgeContainer: {
+    borderRadius: 20,
+    overflow: 'hidden', 
+    marginBottom: Layout.spacing.m,
+  },
   badgeContainer: {
     borderRadius: 20,
     overflow: 'hidden', 
@@ -260,11 +324,10 @@ const styles = StyleSheet.create({
     paddingVertical: Layout.spacing.xs,
     borderRadius: 20, 
     backgroundColor: '#020D0626', 
+    maxWidth: 150,
   },
   badgeImageStyle: {
     borderRadius: 20,
-    width: "100%",
-    height: "100%"
   },
   badgeText: {
     color: '#FFFFFF',

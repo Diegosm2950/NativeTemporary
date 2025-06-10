@@ -44,8 +44,6 @@ export default function EditProfileScreen() {
   const { user, token, refreshUser } = useContext(AuthContext);
   const [userData, setUserData] = useState<User | null>(user); 
 
-  console.log(userData)
-
   if (!user) return null;
 
   if (user && userData === null) {
@@ -65,16 +63,14 @@ export default function EditProfileScreen() {
   };
   
   const handleCancel = () => {
-    router.push("/(protected)/(tabs)/perfil");
+    router.back();
   };
   
   const handleSave = async () => {
     if (!userData || !token) return;    
     try {
-      console.log(token)
-      const updatedUser = await updateUserProfile(userData, token, refreshUser);
+      await updateUserProfile(userData, token, refreshUser);
 
-      console.log(updatedUser)
       Toast.show({
         type: 'success',
         text1: '¡Éxito!',

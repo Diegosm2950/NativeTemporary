@@ -15,11 +15,10 @@ interface MatchStatsProps {
   matchData: Cedula;
 }
 
-const MatchStatsCard = ({ matchData }: MatchStatsProps) => {
+export const MatchStatsCard = ({ matchData }: MatchStatsProps) => {
   const colorScheme = useColorScheme();
   const [expandedStats, setExpandedStats] = useState<Record<string, boolean>>({});
 
-  // Toggle expanded state for a stat
   const toggleExpand = (statKey: string) => {
     setExpandedStats(prev => ({
       ...prev,
@@ -27,22 +26,20 @@ const MatchStatsCard = ({ matchData }: MatchStatsProps) => {
     }));
   };
 
-  // Existing stats
   const tarjetasAmarillas = matchData.tarjetas.filter(card => card.tipo === 'T-A').length;
   const tarjetasRojas = matchData.tarjetas.filter(card => card.tipo === 'T-R').length;
   const lesiones = matchData.lesiones.length;
   const cambios = matchData.cambios.length;
 
-  // New match action stats
   const acciones = matchData.marcador || [];
   const tries = acciones.filter(accion => accion.accion === 'T').length;
   const conversiones = acciones.filter(accion => accion.accion === 'C').length;
   const drops = acciones.filter(accion => accion.accion === 'D').length;
+  const penalties = acciones.filter(accion => accion.accion === 'P').length
 
   const equipoLocal = matchData.datosPartido.equipoLocal.nombre;
   const equipoVisitante = matchData.datosPartido.equipoVisitante.nombre;
 
-  // Existing team stats
   const estadisticasLocal = {
     tarjetasAmarillas: matchData.tarjetas.filter(card => card.equipo === equipoLocal && card.tipo === 'T-A').length,
     tarjetasRojas: matchData.tarjetas.filter(card => card.equipo === equipoLocal && card.tipo === 'T-R').length,
@@ -51,6 +48,7 @@ const MatchStatsCard = ({ matchData }: MatchStatsProps) => {
     tries: acciones.filter(accion => accion.equipo === equipoLocal && accion.accion === 'T').length,
     conversiones: acciones.filter(accion => accion.equipo === equipoLocal && accion.accion === 'C').length,
     drops: acciones.filter(accion => accion.equipo === equipoLocal && accion.accion === 'D').length,
+    penalties: acciones.filter(accion => accion.accion === 'P').length
   };
 
   const estadisticasVisitante = {
@@ -61,6 +59,7 @@ const MatchStatsCard = ({ matchData }: MatchStatsProps) => {
     tries: acciones.filter(accion => accion.equipo === equipoVisitante && accion.accion === 'T').length,
     conversiones: acciones.filter(accion => accion.equipo === equipoVisitante && accion.accion === 'C').length,
     drops: acciones.filter(accion => accion.equipo === equipoVisitante && accion.accion === 'D').length,
+    penalties: acciones.filter(accion => accion.accion === 'P').length
   };
 
   const renderStat = (label: string, value: string | number | boolean, subItems: SubItem[] = [], statKey: string) => {
@@ -105,7 +104,34 @@ const MatchStatsCard = ({ matchData }: MatchStatsProps) => {
     ]}>
       <Text style={[styles.title, { color: Colors[colorScheme].text }]}>Estadísticas del Partido</Text>
                   
-      {/* Existing stats */}
+      {renderStat('Tries', tries, 
+        acciones.filter(accion => accion.accion === 'T').map((accion, index) => ({
+          label: `Jugador (min ${accion.tiempo})`,
+          value: accion.jugador
+        })), 'tries'
+      )}
+      
+      {renderStat('Conversiones', conversiones, 
+        acciones.filter(accion => accion.accion === 'C').map((accion, index) => ({
+          label: `Jugador (min ${accion.tiempo})`,
+          value: accion.jugador
+        })), 'conversiones'
+      )}
+      
+      {renderStat('Drops', drops, 
+        acciones.filter(accion => accion.accion === 'D').map((accion, index) => ({
+          label: `Jugador (min ${accion.tiempo})`,
+          value: accion.jugador
+        })), 'drops'
+      )}
+
+      {renderStat('Penalties', penalties, 
+        acciones.filter(accion => accion.accion === 'P').map((card, index) => ({
+          label: `Jugador (min ${card.tiempo})`,
+          value: card.jugador
+        })), 'penalties'
+      )}
+
       {renderStat('Tarjetas Amarillas', tarjetasAmarillas, 
         matchData.tarjetas.filter(card => card.tipo === 'T-A').map((card, index) => ({
           label: `Jugador (min ${card.minuto})`,
@@ -134,27 +160,6 @@ const MatchStatsCard = ({ matchData }: MatchStatsProps) => {
         })), 'cambios'
       )}
       
-      {/* New match action stats */}
-      {renderStat('Tries', tries, 
-        acciones.filter(accion => accion.accion === 'T').map((accion, index) => ({
-          label: `Jugador (min ${accion.tiempo})`,
-          value: accion.jugador
-        })), 'tries'
-      )}
-      
-      {renderStat('Conversiones', conversiones, 
-        acciones.filter(accion => accion.accion === 'C').map((accion, index) => ({
-          label: `Jugador (min ${accion.tiempo})`,
-          value: accion.jugador
-        })), 'conversiones'
-      )}
-      
-      {renderStat('Drops', drops, 
-        acciones.filter(accion => accion.accion === 'D').map((accion, index) => ({
-          label: `Jugador (min ${accion.tiempo})`,
-          value: accion.jugador
-        })), 'drops'
-      )}
       
       {renderStat('Árbitro Presente', matchData.asistioArbitro ? 'Sí' : 'No', [], 'arbitro')}
       {renderStat('Médico Presente', matchData.asistioParamedico ? 'Sí' : 'No', [], 'medico')}
@@ -163,24 +168,26 @@ const MatchStatsCard = ({ matchData }: MatchStatsProps) => {
       
       <View style={styles.teamContainer}>
         <Text style={[styles.title, { color: Colors[colorScheme].text }]}>{equipoLocal}</Text>
+        {renderStat('Tries', estadisticasLocal.tries, [], 'localTries')}
+        {renderStat('Conversiones', estadisticasLocal.conversiones, [], 'localConversiones')}
+        {renderStat('Drops', estadisticasLocal.drops, [], 'localDrops')}
+        {renderStat('Penalties', estadisticasVisitante.penalties, [], 'penalties')}
         {renderStat('Tarjetas Amarillas', estadisticasLocal.tarjetasAmarillas, [], 'localTarjetasAmarillas')}
         {renderStat('Tarjetas Rojas', estadisticasLocal.tarjetasRojas, [], 'localTarjetasRojas')}
         {renderStat('Lesiones', estadisticasLocal.lesiones, [], 'localLesiones')}
         {renderStat('Cambios', estadisticasLocal.cambios, [], 'localCambios')}
-        {renderStat('Tries', estadisticasLocal.tries, [], 'localTries')}
-        {renderStat('Conversiones', estadisticasLocal.conversiones, [], 'localConversiones')}
-        {renderStat('Drops', estadisticasLocal.drops, [], 'localDrops')}
       </View>
       
       <View style={styles.teamContainer}>
         <Text style={[styles.title, { color: Colors[colorScheme].text }]}>{equipoVisitante}</Text>
+        {renderStat('Tries', estadisticasVisitante.tries, [], 'visitanteTries')}
+        {renderStat('Conversiones', estadisticasVisitante.conversiones, [], 'visitanteConversiones')}
+        {renderStat('Drops', estadisticasVisitante.drops, [], 'visitanteDrops')}
+        {renderStat('Penalties', estadisticasVisitante.penalties, [], 'penalties')}
         {renderStat('Tarjetas Amarillas', estadisticasVisitante.tarjetasAmarillas, [], 'visitanteTarjetasAmarillas')}
         {renderStat('Tarjetas Rojas', estadisticasVisitante.tarjetasRojas, [], 'visitanteTarjetasRojas')}
         {renderStat('Lesiones', estadisticasVisitante.lesiones, [], 'visitanteLesiones')}
         {renderStat('Cambios', estadisticasVisitante.cambios, [], 'visitanteCambios')}
-        {renderStat('Tries', estadisticasVisitante.tries, [], 'visitanteTries')}
-        {renderStat('Conversiones', estadisticasVisitante.conversiones, [], 'visitanteConversiones')}
-        {renderStat('Drops', estadisticasVisitante.drops, [], 'visitanteDrops')}
       </View>
       
       <View style={styles.divider} />
@@ -219,11 +226,14 @@ const styles = StyleSheet.create({
   label: {
     fontSize: 16,
     fontFamily: 'Inter-Regular',
+    flex: 1,
+    marginRight: Layout.spacing.s,
   },
   value: {
     fontSize: 16,
     fontFamily: 'Inter-SemiBold',
     marginRight: 4,
+    flexShrink: 1,
   },
   chevron: {
     marginLeft: 4,
@@ -231,7 +241,7 @@ const styles = StyleSheet.create({
   subItemRow: {
     flexDirection: 'row',
     justifyContent: 'space-between',
-    alignItems: 'center',
+    alignItems: 'flex-start',
     paddingVertical: Layout.spacing.xs,
     paddingLeft: Layout.spacing.m,
     paddingRight: Layout.spacing.s,
@@ -239,10 +249,15 @@ const styles = StyleSheet.create({
   subLabel: {
     fontSize: 14,
     fontFamily: 'Inter-Regular',
+    flex: 1,
+    marginRight: Layout.spacing.s,
   },
   subValue: {
     fontSize: 14,
     fontFamily: 'Inter-Regular',
+    flexShrink: 1,
+    textAlign: 'right',
+    maxWidth: '50%',
   },
   teamContainer: {
     marginTop: Layout.spacing.l,
@@ -254,5 +269,3 @@ const styles = StyleSheet.create({
     opacity: 0.2,
   },
 });
-
-export default MatchStatsCard;

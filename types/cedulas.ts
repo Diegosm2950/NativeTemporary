@@ -22,7 +22,7 @@ export interface CedulaResponse {
 }
 
 export interface Marcador {
-    accion: 'T' | 'C' | 'D';
+    accion: 'T' | 'C' | 'D' | "P";
     equipo: string;
     tiempo: string;
     jugador: string;
