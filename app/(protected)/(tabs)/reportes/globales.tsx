@@ -136,6 +136,7 @@ const styles = StyleSheet.create({
   },
   scrollView: {
     flex: 1,
+    marginTop: Layout.spacing.xxl
   },
   contentContainer: {
     padding: Layout.spacing.l,

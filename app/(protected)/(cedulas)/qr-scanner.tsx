@@ -1,5 +1,14 @@
 import React, { useEffect, useState } from 'react';
-import { View, Text, StyleSheet, TouchableOpacity, Image, Platform, ScrollView } from 'react-native';
+import {
+  View,
+  Text,
+  StyleSheet,
+  TouchableOpacity,
+  Image,
+  Platform,
+  ScrollView,
+  FlatList,
+} from 'react-native';
 import { useRouter, useLocalSearchParams } from 'expo-router';
 import { CameraView, useCameraPermissions } from 'expo-camera';
 import { StatusBar } from 'expo-status-bar';
@@ -71,19 +80,25 @@ export default function QRScanner() {
         <Text style={[styles.tableCell, { flex: 1, fontWeight: 'bold' }]}>ID</Text>
         <Text style={[styles.tableCell, { flex: 1, fontWeight: 'bold' }]}>Posición</Text>
       </View>
-      {players.map((p) => (
-        <View key={p.id} style={styles.tableRow}>
-          <Text style={[styles.tableCell, { flex: 0.5 }]}>{p.dorsal}</Text>
-          <View style={{ flex: 2, flexDirection: 'row', alignItems: 'center' }}>
-            <Image source={{ uri: p.foto }} style={styles.avatar} />
-            <Text style={[styles.tableCell, { marginLeft: 6 }]}>{p.nombre}</Text>
+      <FlatList
+        data={players}
+        keyExtractor={(item) => item.id.toString()}
+        renderItem={({ item: p }) => (
+          <View style={styles.tableRow}>
+            <Text style={[styles.tableCell, { flex: 0.5 }]}>{p.dorsal}</Text>
+            <View style={{ flex: 2, flexDirection: 'row', alignItems: 'center' }}>
+              <Image source={{ uri: p.foto }} style={styles.avatar} />
+              <Text style={[styles.tableCell, { marginLeft: 6 }]}>{p.nombre}</Text>
+            </View>
+            <Text style={[styles.tableCell, { flex: 1 }]}>{p.id}</Text>
+            <Text style={[styles.tableCell, { flex: 1 }]}>{p.posicion}</Text>
           </View>
-          <Text style={[styles.tableCell, { flex: 1 }]}>{p.id}</Text>
-          <Text style={[styles.tableCell, { flex: 1 }]}>{p.posicion}</Text>
-        </View>
-      ))}
+        )}
+        scrollEnabled={false}
+      />
     </View>
   );
+  
 
   if (!permission) {
     return <View style={styles.container}><Text>Cargando permisos de cámara...</Text></View>;

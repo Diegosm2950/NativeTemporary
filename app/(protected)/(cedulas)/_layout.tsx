@@ -6,12 +6,6 @@ export default function CedulasLayout() {
     <CedulaProvider>
       <Stack>
         <Stack.Screen
-          name="index"
-          options={{
-            headerShown: false,
-          }}
-        />
-        <Stack.Screen
           name="qr-scanner"
           options={{
             headerShown: false,

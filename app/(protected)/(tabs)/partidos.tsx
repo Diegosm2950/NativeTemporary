@@ -5,6 +5,7 @@ import MatchTabs from '@/components/MatchTabs';
 import { useContext } from 'react';
 import { AuthContext } from '@/context/AuthContext';
 import { useConvocatorias } from '@/hooks/useFetchMatches';
+import Layout from '@/constants/Layout';
 
 
 export default function MatchesScreen() {
@@ -18,13 +19,9 @@ export default function MatchesScreen() {
 
   return (
     <View style={[styles.container, { backgroundColor: Colors[colorScheme].background }]}>
-      <ScrollView style={styles.scrollView}>
-        <View style={styles.header}>
-          <Text style={[styles.title, { color: Colors[colorScheme].text }]}>
-            Partidos
-          </Text>
-        </View>
-        
+      <ScrollView 
+        style={styles.scrollView}
+        >        
         <MatchTabs 
           upcomingMatches={nextMatches}
           pastMatches={pastMatches}
@@ -40,6 +37,7 @@ const styles = StyleSheet.create({
   },
   scrollView: {
     flex: 1,
+    marginTop: Layout.spacing.xxl
   },
   header: {
     paddingHorizontal: 20,

@@ -7,7 +7,7 @@ import { SafeAreaView } from 'react-native-safe-area-context';
 import Colors from '@/constants/Colors';
 import useColorScheme from '@/hooks/useColorScheme';
 import MatchCard from '@/components/MatchCard';
-import MatchStatsCard from '@/components/TeamStats';
+import { MatchStatsCard } from '@/components/TeamStats';
 
 export default function MatchReportScreen() {
   const colorScheme = useColorScheme();
@@ -22,7 +22,6 @@ export default function MatchReportScreen() {
       try {
         setLoading(true);
         const result = await fetchMatchReports(matchId);
-        console.log('Fetched data:', result);
         setMatchData(result);
         
       } catch (err) {
@@ -38,7 +37,6 @@ export default function MatchReportScreen() {
     }
   }, [matchId]);
 
-  console.log(matchData)
 
   return (
     <SafeAreaView
