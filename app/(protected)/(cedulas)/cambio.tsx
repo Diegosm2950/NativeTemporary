@@ -8,6 +8,7 @@ import {
   Platform,
   Image,
   Alert,
+  ScrollView,
 } from 'react-native';
 import { useRouter } from 'expo-router';
 import { StatusBar } from 'expo-status-bar';
@@ -15,38 +16,57 @@ import { useCedula } from '@/context/CedulaContext';
 
 export default function RegistrarCambio() {
   const router = useRouter();
-  const { setCedulaData } = useCedula();
+  const { cedulaData, setCedulaData, jugadoresLocal, jugadoresVisitante } = useCedula();
 
-  const [equipo, setEquipo] = useState('');
+  const [equipo, setEquipo] = useState<'A' | 'B' | null>(null);
   const [jugadorSale, setJugadorSale] = useState('');
   const [jugadorEntra, setJugadorEntra] = useState('');
   const [tiempo, setTiempo] = useState('00:00:00');
   const [motivo, setMotivo] = useState<'tactico' | 'lesion' | 'otro' | null>(null);
 
+  const jugadores = equipo === 'A' ? jugadoresLocal : equipo === 'B' ? jugadoresVisitante : [];
+
   const handleGuardarCambio = () => {
-    if (!equipo || !jugadorSale || !jugadorEntra || !tiempo) {
-      Alert.alert('Campos incompletos', 'Por favor llena todos los campos requeridos.');
-      return;
-    }
+  console.log("Presionado Registrar Cambio");
+  console.log("Valores actuales:", {
+    equipo,
+    jugadorSale,
+    jugadorEntra,
+    tiempo,
+  });
 
-    const nuevoCambio = {
-      equipo,
-      sale: jugadorSale,
-      entra: jugadorEntra,
-      tiempo,
-      motivo,
-    };
+  if (!equipo || !jugadorSale || !jugadorEntra || !tiempo) {
+    Alert.alert('Campos incompletos', 'Por favor llena todos los campos requeridos.');
+    return;
+  }
 
-    setCedulaData(prev => ({
-      ...prev,
-      cambios: [...prev.cambios, nuevoCambio],
-    }));
+  const nombreEquipo = equipo === 'A'
+    ? cedulaData.equipoLocal?.nombre
+    : cedulaData.equipoVisitante?.nombre;
 
-    router.replace('/(protected)/cedulas/juego' as any);
+  const nuevoCambio = {
+    equipo: nombreEquipo || 'Equipo',
+    sale: jugadorSale,
+    entra: jugadorEntra,
+    tiempo,
+    motivo,
   };
 
+  console.log("Nuevo cambio:", nuevoCambio);
+
+  setCedulaData(prev => ({
+    ...prev,
+    cambios: Array.isArray(prev.cambios) ? [...prev.cambios, nuevoCambio] : [nuevoCambio],
+  }));
+
+  console.log("Redirigiendo a juego.tsx...");
+  router.replace('/(protected)/(cedulas)/juego');
+};
+
+
+
   return (
-    <View style={styles.container}>
+    <ScrollView contentContainerStyle={styles.container}>
       <StatusBar style="auto" />
       <Image
         source={require('@/assets/images/FMRUU.png')}
@@ -55,16 +75,51 @@ export default function RegistrarCambio() {
       />
       <Text style={styles.title}>Registrar cambio de jugador</Text>
 
-      {/* Selects simulados */}
-      <TouchableOpacity style={styles.select} onPress={() => setEquipo('Equipo A')}>
-        <Text style={styles.selectText}>{equipo || 'Selección de equipo'}</Text>
-      </TouchableOpacity>
-      <TouchableOpacity style={styles.select} onPress={() => setJugadorSale('Jugador X')}>
-        <Text style={styles.selectText}>{jugadorSale || 'Jugador que sale'}</Text>
-      </TouchableOpacity>
-      <TouchableOpacity style={styles.select} onPress={() => setJugadorEntra('Jugador Y')}>
-        <Text style={styles.selectText}>{jugadorEntra || 'Jugador que entra'}</Text>
-      </TouchableOpacity>
+      <View style={styles.select}>
+        <Text style={{ marginBottom: 8, fontWeight: '500' }}>Selecciona el equipo:</Text>
+        <View style={{ flexDirection: 'row', gap: 10 }}>
+          <TouchableOpacity onPress={() => setEquipo('A')}>
+            <Text style={[styles.selectText, equipo === 'A' && { fontWeight: 'bold', color: '#1B9D3B' }]}>
+              {cedulaData.equipoLocal?.nombre || 'Equipo A'}
+            </Text>
+          </TouchableOpacity>
+          <TouchableOpacity onPress={() => setEquipo('B')}>
+            <Text style={[styles.selectText, equipo === 'B' && { fontWeight: 'bold', color: '#1B9D3B' }]}>
+              {cedulaData.equipoVisitante?.nombre || 'Equipo B'}
+            </Text>
+          </TouchableOpacity>
+        </View>
+      </View>
+
+      <View style={styles.select}>
+        <Text style={{ marginBottom: 8 }}>Jugador que sale:</Text>
+        {jugadores.map(j => (
+          <TouchableOpacity
+            key={`sale-${j.id}`}
+            onPress={() => setJugadorSale(j.nombre)}
+            style={{ flexDirection: 'row', alignItems: 'center', marginBottom: 6 }}
+          >
+            <Image source={{ uri: j.foto }} style={{ width: 32, height: 32, borderRadius: 16, marginRight: 8 }} />
+            <Text style={{ color: jugadorSale === j.nombre ? '#1B9D3B' : '#111' }}>{j.nombre}</Text>
+          </TouchableOpacity>
+        ))}
+        {!jugadores.length && <Text style={{ color: '#999' }}>Selecciona primero un equipo</Text>}
+      </View>
+
+      <View style={styles.select}>
+        <Text style={{ marginBottom: 8 }}>Jugador que entra:</Text>
+        {jugadores.map(j => (
+          <TouchableOpacity
+            key={`entra-${j.id}`}
+            onPress={() => setJugadorEntra(j.nombre)}
+            style={{ flexDirection: 'row', alignItems: 'center', marginBottom: 6 }}
+          >
+            <Image source={{ uri: j.foto }} style={{ width: 32, height: 32, borderRadius: 16, marginRight: 8 }} />
+            <Text style={{ color: jugadorEntra === j.nombre ? '#1B9D3B' : '#111' }}>{j.nombre}</Text>
+          </TouchableOpacity>
+        ))}
+        {!jugadores.length && <Text style={{ color: '#999' }}>Selecciona primero un equipo</Text>}
+      </View>
 
       <TextInput
         style={styles.timerInput}
@@ -75,7 +130,6 @@ export default function RegistrarCambio() {
         maxLength={8}
       />
 
-      {/* Motivo */}
       <Text style={styles.subTitle}>Seleccione una opción</Text>
       <Text style={styles.subText}>Motivo del cambio (opcional)</Text>
       {[
@@ -89,7 +143,7 @@ export default function RegistrarCambio() {
             styles.motivoOption,
             motivo === value && styles.motivoOptionSelected,
           ]}
-          onPress={() => setMotivo(value as typeof motivo)}
+          onPress={() => setMotivo(value as 'tactico' | 'lesion' | 'otro')}
         >
           <Text style={styles.motivoText}>{label}</Text>
         </TouchableOpacity>
@@ -102,13 +156,13 @@ export default function RegistrarCambio() {
       <TouchableOpacity style={styles.backButton} onPress={() => router.back()}>
         <Text style={styles.backText}>Volver</Text>
       </TouchableOpacity>
-    </View>
+    </ScrollView>
   );
 }
 
 const styles = StyleSheet.create({
   container: {
-    flex: 1,
+    flexGrow: 1,
     backgroundColor: '#fff',
     paddingVertical: Platform.OS === 'ios' ? 60 : 40,
     paddingHorizontal: 20,

@@ -12,6 +12,7 @@ import {
 import { useRouter, useLocalSearchParams } from 'expo-router';
 import { CameraView, useCameraPermissions } from 'expo-camera';
 import { StatusBar } from 'expo-status-bar';
+import { useMemo } from 'react';
 import { useCedula } from '@/context/CedulaContext';
 
 type Player = {
@@ -24,74 +25,43 @@ type Player = {
 
 export default function QRScanner() {
   const router = useRouter();
-  const { matchId } = useLocalSearchParams();
-  const { setCedulaData } = useCedula();
+  const { matchId, match } = useLocalSearchParams();
+  const matchData = useMemo(() => {
+    return match ? JSON.parse(match as string) : null;
+  }, [match]);
+
+  const { setCedulaData, setJugadoresLocal, setJugadoresVisitante } = useCedula();
   const [permission, requestPermission] = useCameraPermissions();
 
   const [scanningTeam, setScanningTeam] = useState<'local' | 'visitante' | null>(null);
   const [localPlayers, setLocalPlayers] = useState<Player[]>([]);
   const [visitorPlayers, setVisitorPlayers] = useState<Player[]>([]);
 
-  if (!matchId) {
-    return (
-      <View style={styles.container}>
-        <Text style={{ fontSize: 16, color: '#333' }}>
-          ❌ No se proporcionó un ID de partido.
-        </Text>
-      </View>
-    );
-  }
-
   useEffect(() => {
-    const fetchMatch = async () => {
-      try {
-        const res = await fetch(
-          `https://fmru-next-js.vercel.app/api/app-native-api/partidos/listar-partido-especifico-torneo?id=${matchId}`
-        );
-        const data = await res.json();
-
-        setCedulaData(prev => ({
-          ...prev,
-          partidoId: Number(matchId),
-          tipoPartido: data.tipo || 'torneo',
-          horaInicio: data.horario || '16:00',
-          estadoTerreno: data.estado || 'Bueno',
-        }));
-      } catch (err) {
-        console.error('Error al obtener el partido:', err);
-      }
-    };
-
-    fetchMatch();
-  }, [matchId]);
-
-  if (!permission) {
-    return (
-      <View style={styles.container}>
-        <Text>Cargando permisos de cámara...</Text>
-      </View>
-    );
-  }
-
-  if (!permission.granted) {
-    return (
-      <View style={styles.container}>
-        <Text style={styles.permissionText}>Se necesita permiso para usar la cámara</Text>
-        <TouchableOpacity style={styles.primaryButton} onPress={requestPermission}>
-          <Text style={styles.buttonText}>Permitir cámara</Text>
-        </TouchableOpacity>
-        <TouchableOpacity style={styles.secondaryButton} onPress={() => router.back()}>
-          <Text style={styles.secondaryButtonText}>Cancelar o Volver</Text>
-        </TouchableOpacity>
-      </View>
-    );
-  }
+    if (matchData) {
+      setCedulaData(prev => ({
+        ...prev,
+        partidoId: matchData.id,
+        tipoPartido: matchData.tipo || 'torneo',
+        horaInicio: matchData.hora || '16:00',
+        estadoTerreno: matchData.estado || 'Bueno',
+        equipoLocal: matchData.equipoLocal,
+        equipoVisitante: matchData.equipoVisitante,
+        torneo: matchData.torneo,
+      }));
+    }
+  }, [matchData]);
 
   const handleBarCodeScanned = ({ data }: { data: string }) => {
     try {
       const players: Player[] = JSON.parse(data);
-      if (scanningTeam === 'local') setLocalPlayers(players);
-      else if (scanningTeam === 'visitante') setVisitorPlayers(players);
+      if (scanningTeam === 'local') {
+        setLocalPlayers(players);
+        setJugadoresLocal(players);
+      } else if (scanningTeam === 'visitante') {
+        setVisitorPlayers(players);
+        setJugadoresVisitante(players);
+      }
     } catch (error) {
       alert('QR inválido o estructura incorrecta.');
     } finally {
@@ -130,21 +100,35 @@ export default function QRScanner() {
   );
   
 
+  if (!permission) {
+    return <View style={styles.container}><Text>Cargando permisos de cámara...</Text></View>;
+  }
+
+  if (!permission.granted) {
+    return (
+      <View style={styles.container}>
+        <Text style={styles.permissionText}>Se necesita permiso para usar la cámara</Text>
+        <TouchableOpacity style={styles.primaryButton} onPress={requestPermission}>
+          <Text style={styles.buttonText}>Permitir cámara</Text>
+        </TouchableOpacity>
+        <TouchableOpacity style={styles.secondaryButton} onPress={() => router.back()}>
+          <Text style={styles.secondaryButtonText}>Cancelar o Volver</Text>
+        </TouchableOpacity>
+      </View>
+    );
+  }
+
   return (
     <View style={styles.container}>
       <StatusBar style="auto" />
       <ScrollView contentContainerStyle={styles.scrollContent}>
         <View style={styles.header}>
-          <Image
-            source={require('@/assets/images/FMRUU.png')}
-            style={styles.logo}
-            resizeMode="contain"
-          />
+          <Image source={require('@/assets/images/FMRUU.png')} style={styles.logo} resizeMode="contain" />
           <Text style={styles.title}>Escanear Equipos</Text>
         </View>
 
         {scanningTeam && (
-          <View style={{ marginBottom: 20 }}>
+          <>
             <View style={styles.cameraContainer}>
               <CameraView
                 style={styles.camera}
@@ -152,33 +136,19 @@ export default function QRScanner() {
                 barcodeScannerSettings={{ barcodeTypes: ['qr'] }}
               />
             </View>
-            <TouchableOpacity
-              style={[styles.secondaryButton, { marginTop: 12 }]}
-              onPress={() => setScanningTeam(null)}
-            >
+            <TouchableOpacity style={[styles.secondaryButton, { marginTop: 12 }]} onPress={() => setScanningTeam(null)}>
               <Text style={styles.secondaryButtonText}>Cancelar escaneo</Text>
             </TouchableOpacity>
-          </View>
+          </>
         )}
 
         {!scanningTeam && (
           <View style={styles.buttonContainer}>
-            <TouchableOpacity
-              style={styles.primaryButton}
-              onPress={() => setScanningTeam('local')}
-            >
-              <Text style={styles.buttonText}>
-                {localPlayers.length ? 'Reescanear Equipo Local' : 'Escanear Equipo Local'}
-              </Text>
+            <TouchableOpacity style={styles.primaryButton} onPress={() => setScanningTeam('local')}>
+              <Text style={styles.buttonText}>{localPlayers.length ? 'Reescanear Equipo Local' : 'Escanear Equipo Local'}</Text>
             </TouchableOpacity>
-
-            <TouchableOpacity
-              style={styles.primaryButton}
-              onPress={() => setScanningTeam('visitante')}
-            >
-              <Text style={styles.buttonText}>
-                {visitorPlayers.length ? 'Reescanear Equipo Visitante' : 'Escanear Equipo Visitante'}
-              </Text>
+            <TouchableOpacity style={styles.primaryButton} onPress={() => setScanningTeam('visitante')}>
+              <Text style={styles.buttonText}>{visitorPlayers.length ? 'Reescanear Equipo Visitante' : 'Escanear Equipo Visitante'}</Text>
             </TouchableOpacity>
           </View>
         )}
@@ -187,28 +157,19 @@ export default function QRScanner() {
         {visitorPlayers.length > 0 && renderPlayerList(visitorPlayers, 'Equipo B')}
 
         {(localPlayers.length || visitorPlayers.length) > 0 && (
-          <View style={styles.buttonContainer}>
-            <TouchableOpacity
-              style={styles.secondaryButton}
-              onPress={() => {
-                setLocalPlayers([]);
-                setVisitorPlayers([]);
-              }}
-            >
-              <Text style={styles.secondaryButtonText}>Borrar escaneos</Text>
-            </TouchableOpacity>
-          </View>
+          <TouchableOpacity style={styles.secondaryButton} onPress={() => {
+            setLocalPlayers([]);
+            setVisitorPlayers([]);
+          }}>
+            <Text style={styles.secondaryButtonText}>Borrar escaneos</Text>
+          </TouchableOpacity>
         )}
 
         {localPlayers.length > 0 && visitorPlayers.length > 0 && (
           <View style={styles.buttonContainer}>
-            <TouchableOpacity
-              style={styles.primaryButton}
-              onPress={() => router.push('/(protected)/(cedulas)/juego' as any)}
-            >
+            <TouchableOpacity style={styles.primaryButton} onPress={() => router.push('/(protected)/(cedulas)/juego')}>
               <Text style={styles.buttonText}>Empezar</Text>
             </TouchableOpacity>
-
             <TouchableOpacity style={styles.secondaryButton} onPress={() => router.back()}>
               <Text style={styles.secondaryButtonText}>Volver</Text>
             </TouchableOpacity>

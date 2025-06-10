@@ -16,9 +16,9 @@ import { useCedula } from '@/context/CedulaContext';
 
 export default function RegistrarLesion() {
   const router = useRouter();
-  const { setCedulaData } = useCedula();
+  const { cedulaData, setCedulaData, jugadoresLocal, jugadoresVisitante } = useCedula();
 
-  const [equipo, setEquipo] = useState('');
+  const [equipo, setEquipo] = useState<'A' | 'B' | null>(null);
   const [jugador, setJugador] = useState('');
   const [parte, setParte] = useState<string | null>(null);
   const [gravedad, setGravedad] = useState<'Leve' | 'Media' | 'Grave'>('Leve');
@@ -27,6 +27,13 @@ export default function RegistrarLesion() {
 
   const partesCuerpo = ['Cabeza', 'Hombro', 'Brazo', 'Pierna'];
 
+  const jugadores = equipo === 'A' ? jugadoresLocal : equipo === 'B' ? jugadoresVisitante : [];
+  const nombreEquipo = equipo === 'A'
+    ? cedulaData.equipoLocal?.nombre
+    : equipo === 'B'
+    ? cedulaData.equipoVisitante?.nombre
+    : '';
+
   const handleRegistrarLesion = () => {
     if (!equipo || !jugador || !parte || ambulancia === null) {
       Alert.alert('Faltan campos', 'Completa todos los datos requeridos.');
@@ -34,10 +41,10 @@ export default function RegistrarLesion() {
     }
 
     const nuevaLesion = {
-      equipo,
+      equipo: nombreEquipo,
       jugador,
-      parte,
-      gravedad,
+      area: parte,
+      gravedad: gravedad.toLowerCase(),
       ambulancia,
       observacion,
     };
@@ -60,14 +67,38 @@ export default function RegistrarLesion() {
       />
       <Text style={styles.title}>Registrar Lesión</Text>
 
-      <TouchableOpacity style={styles.select} onPress={() => setEquipo('Equipo A')}>
-        <Text style={styles.selectText}>{equipo || 'Selección de equipo'}</Text>
-      </TouchableOpacity>
+      {/* Selector de equipo */}
+      <View style={styles.teamSwitch}>
+        <TouchableOpacity
+          style={[styles.teamButton, equipo === 'A' && styles.teamButtonSelected]}
+          onPress={() => setEquipo('A')}
+        >
+          <Text style={styles.teamText}>{cedulaData.equipoLocal?.nombre || 'Equipo A'}</Text>
+        </TouchableOpacity>
+        <TouchableOpacity
+          style={[styles.teamButton, equipo === 'B' && styles.teamButtonSelected]}
+          onPress={() => setEquipo('B')}
+        >
+          <Text style={styles.teamText}>{cedulaData.equipoVisitante?.nombre || 'Equipo B'}</Text>
+        </TouchableOpacity>
+      </View>
 
-      <TouchableOpacity style={styles.select} onPress={() => setJugador('Jugador X')}>
+      {/* Selector de jugador */}
+      <TouchableOpacity style={styles.select}>
         <Text style={styles.selectText}>{jugador || 'Seleccionar jugador lesionado'}</Text>
       </TouchableOpacity>
 
+      {jugadores.map(j => (
+        <TouchableOpacity
+          key={j.id}
+          style={styles.select}
+          onPress={() => setJugador(j.nombre)}
+        >
+          <Text style={styles.selectText}>{j.nombre}</Text>
+        </TouchableOpacity>
+      ))}
+
+      {/* Parte del cuerpo */}
       <View style={styles.bodyParts}>
         {partesCuerpo.map((p) => (
           <TouchableOpacity
@@ -80,6 +111,7 @@ export default function RegistrarLesion() {
         ))}
       </View>
 
+      {/* Nivel de gravedad */}
       <View style={styles.gravedadContainer}>
         {['Leve', 'Media', 'Grave'].map((nivel) => (
           <TouchableOpacity
@@ -92,6 +124,7 @@ export default function RegistrarLesion() {
         ))}
       </View>
 
+      {/* Ambulancia */}
       <Text style={styles.sectionTitle}>¿Requiere ambulancia?</Text>
       <TouchableOpacity
         style={[styles.optionButton, ambulancia === true && styles.selected]}
@@ -106,6 +139,7 @@ export default function RegistrarLesion() {
         <Text style={styles.optionText}>No</Text>
       </TouchableOpacity>
 
+      {/* Observación */}
       <Text style={styles.sectionTitle}>Observación</Text>
       <TextInput
         style={styles.textarea}
@@ -120,7 +154,10 @@ export default function RegistrarLesion() {
         <Text style={styles.submitText}>Registrar Lesión</Text>
       </TouchableOpacity>
 
-      <TouchableOpacity style={styles.backButton} onPress={() => router.replace('/(protected)/(cedulas)/juego' as any)}>
+      <TouchableOpacity
+        style={styles.backButton}
+        onPress={() => router.replace('/(protected)/(cedulas)/juego' as any)}
+      >
         <Text style={styles.backText}>Volver</Text>
       </TouchableOpacity>
     </ScrollView>
@@ -245,6 +282,26 @@ const styles = StyleSheet.create({
   backText: {
     color: '#333',
     fontSize: 16,
+    fontWeight: '500',
+  },
+   teamSwitch: {
+    flexDirection: 'row',
+    justifyContent: 'space-between',
+    marginBottom: 16,
+  },
+  teamButton: {
+    flex: 1,
+    backgroundColor: '#E6EFE6',
+    padding: 12,
+    borderRadius: 25,
+    alignItems: 'center',
+    marginHorizontal: 6,
+  },
+  teamButtonSelected: {
+    backgroundColor: '#1B9D3B',
+  },
+  teamText: {
+    color: '#111',
     fontWeight: '500',
   },
 });
