@@ -18,7 +18,7 @@ export default function RegistrarObservacion() {
   const { setCedulaData } = useCedula();
 
   const [texto, setTexto] = useState('');
-  const [categoria, setCategoria] = useState('');
+  const [categoria, setCategoria] = useState<'General' | 'Público' | 'Condiciones' | 'Seguridad' | ''>('');
 
   const handleGuardar = () => {
     if (!texto.trim()) {
@@ -58,14 +58,28 @@ export default function RegistrarObservacion() {
         placeholderTextColor="#555"
       />
 
-      <TouchableOpacity
-        style={styles.select}
-        onPress={() => setCategoria('General')}
-      >
-        <Text style={styles.selectText}>
-          {categoria || 'Seleccione una categoría'}
-        </Text>
-      </TouchableOpacity>
+      <Text style={styles.label}>Categoría</Text>
+      <View style={styles.categoryGroup}>
+        {['General', 'Público', 'Condiciones', 'Seguridad'].map((cat) => (
+          <TouchableOpacity
+            key={cat}
+            style={[
+              styles.categoryButton,
+              categoria === cat && styles.categorySelected
+            ]}
+            onPress={() => setCategoria(cat as typeof categoria)}
+          >
+            <Text
+              style={[
+                styles.categoryText,
+                categoria === cat && styles.categoryTextSelected
+              ]}
+            >
+              {cat}
+            </Text>
+          </TouchableOpacity>
+        ))}
+      </View>
 
       <TouchableOpacity style={styles.submitButton} onPress={handleGuardar}>
         <Text style={styles.submitText}>Guardar Observación</Text>
@@ -106,14 +120,32 @@ const styles = StyleSheet.create({
     textAlignVertical: 'top',
     color: '#000',
   },
-  select: {
-    backgroundColor: '#F3F8F3',
-    padding: 16,
-    borderRadius: 12,
+  label: {
+    fontSize: 16,
+    fontWeight: '600',
+    marginBottom: 8,
+  },
+  categoryGroup: {
+    flexDirection: 'row',
+    flexWrap: 'wrap',
+    gap: 8,
     marginBottom: 20,
   },
-  selectText: {
+  categoryButton: {
+    paddingVertical: 8,
+    paddingHorizontal: 14,
+    backgroundColor: '#F3F8F3',
+    borderRadius: 18,
+  },
+  categorySelected: {
+    backgroundColor: '#1B9D3B',
+  },
+  categoryText: {
     color: '#333',
+    fontSize: 14,
+  },
+  categoryTextSelected: {
+    color: '#fff',
   },
   submitButton: {
     backgroundColor: '#1B9D3B',
