@@ -1,30 +1,22 @@
-import React, { useState, useEffect } from 'react';
-import {
-  View,
-  Text,
-  StyleSheet,
-  TouchableOpacity,
-  TextInput,
-  Platform,
-  ScrollView,
-  Image,
-  Alert,
-} from 'react-native';
+import React, { useState } from 'react';
+import { View, Text, StyleSheet, TouchableOpacity, TextInput, Platform, ScrollView, Image, Alert } from 'react-native';
 import { useRouter } from 'expo-router';
 import { StatusBar } from 'expo-status-bar';
 import { useCedula } from '@/context/CedulaContext';
 
 export default function RegistroPuntos() {
   const router = useRouter();
-  const { cedulaData, setCedulaData } = useCedula();
+  const { cedulaData, setCedulaData, jugadoresLocal, jugadoresVisitante } = useCedula();
 
-  const [equipo, setEquipo] = useState<'A' | 'B' | null>('A');
+  const [equipo, setEquipo] = useState<'A' | 'B'>('A');
   const [jugador, setJugador] = useState('');
   const [accion, setAccion] = useState('');
   const [tiempo, setTiempo] = useState('00:00:00');
 
   const marcadorA = cedulaData.marcador.filter(p => p.equipo === 'A').length;
   const marcadorB = cedulaData.marcador.filter(p => p.equipo === 'B').length;
+
+  const jugadores = equipo === 'A' ? jugadoresLocal : jugadoresVisitante;
 
   const handleAgregarPunto = () => {
     if (!equipo || !jugador || !accion || !tiempo) {
@@ -44,7 +36,6 @@ export default function RegistroPuntos() {
       marcador: [...prev.marcador, nuevoPunto],
     }));
 
-    // Limpia campos tras agregar
     setJugador('');
     setAccion('');
     setTiempo('00:00:00');
@@ -71,13 +62,13 @@ export default function RegistroPuntos() {
           style={[styles.teamButton, equipo === 'A' && styles.teamButtonSelected]}
           onPress={() => setEquipo('A')}
         >
-          <Text style={styles.teamText}>Equipo A</Text>
+          <Text style={styles.teamText}>{cedulaData.equipoLocal?.nombre || 'Equipo A'}</Text>
         </TouchableOpacity>
         <TouchableOpacity
           style={[styles.teamButton, equipo === 'B' && styles.teamButtonSelected]}
           onPress={() => setEquipo('B')}
         >
-          <Text style={styles.teamText}>Equipo B</Text>
+          <Text style={styles.teamText}>{cedulaData.equipoVisitante?.nombre || 'Equipo B'}</Text>
         </TouchableOpacity>
       </View>
 
@@ -92,9 +83,27 @@ export default function RegistroPuntos() {
       />
 
       {/* Jugador */}
-      <TouchableOpacity style={styles.select} onPress={() => setJugador('Jugador X')}>
-        <Text style={styles.selectText}>{jugador || 'Jugador'}</Text>
-      </TouchableOpacity>
+      <View style={styles.select}>
+        {jugadores.map((j) => (
+          <TouchableOpacity
+            key={j.id}
+            style={{
+              paddingVertical: 8,
+              borderBottomWidth: 1,
+              borderBottomColor: '#ccc',
+              flexDirection: 'row',
+              alignItems: 'center',
+            }}
+            onPress={() => setJugador(j.nombre)}
+          >
+            <Image source={{ uri: j.foto }} style={{ width: 32, height: 32, borderRadius: 16, marginRight: 8 }} />
+            <Text>{j.nombre}</Text>
+          </TouchableOpacity>
+        ))}
+        {!jugadores.length && (
+          <Text style={{ color: '#999' }}>Sin jugadores escaneados para este equipo</Text>
+        )}
+      </View>
 
       {/* Agregar Punto */}
       <TouchableOpacity style={styles.submitButton} onPress={handleAgregarPunto}>
@@ -108,9 +117,9 @@ export default function RegistroPuntos() {
         <Text style={styles.teamScore}>{marcadorB}</Text>
       </View>
       <View style={styles.scoreInfo}>
-        <Text style={styles.teamLabel}>Equipo A</Text>
-        <Text style={styles.fecha}>Fecha del partido</Text>
-        <Text style={styles.teamLabel}>Equipo B</Text>
+        <Text style={styles.teamLabel}>{cedulaData.equipoLocal?.nombre || 'Equipo A'}</Text>
+        <Text style={styles.fecha}>Inicio: {cedulaData.horaInicio || '--:--'}</Text>
+        <Text style={styles.teamLabel}>{cedulaData.equipoVisitante?.nombre || 'Equipo B'}</Text>
       </View>
 
       {/* Guardar */}
@@ -125,6 +134,7 @@ export default function RegistroPuntos() {
     </ScrollView>
   );
 }
+
 
 const styles = StyleSheet.create({
   container: {
