@@ -29,7 +29,9 @@ export default function MatchCard({ match, variant = 'small' }: MatchCardProps) 
   };
   
   const handleArbitroPress = () => {
-    router.push(`/(protected)/(cedulas)/qr-scanner?matchId=14`);
+    router.push(
+      `/(protected)/(cedulas)/qr-scanner?match=${encodeURIComponent(JSON.stringify(match))}`
+    );
   };
 
   const isFinished = match.estatus === 'finalizado';
