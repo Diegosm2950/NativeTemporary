@@ -9,6 +9,7 @@ import {
   Platform,
   Image,
   Alert,
+  Switch,
 } from 'react-native';
 import { useRouter } from 'expo-router';
 import { StatusBar } from 'expo-status-bar';
@@ -22,6 +23,7 @@ export default function RecoleccionFirmas() {
   const [firmaVisitante, setFirmaVisitante] = useState('');
   const [repLocal, setRepLocal] = useState('');
   const [repVisitante, setRepVisitante] = useState('');
+  const [esFinal, setEsFinal] = useState(false);
 
   const handleSubmit = async () => {
     if (!firmaLocal || !firmaVisitante || !repLocal || !repVisitante) {
@@ -29,15 +31,16 @@ export default function RecoleccionFirmas() {
       return;
     }
 
-    // Guardar en contexto
+    const datosFirmas = {
+      capitanLocal: firmaLocal,
+      capitanVisitante: firmaVisitante,
+      representanteLocal: repLocal,
+      representanteVisitante: repVisitante,
+    };
+
     setCedulaData(prev => ({
       ...prev,
-      firmas: {
-        capitanLocal: firmaLocal,
-        capitanVisitante: firmaVisitante,
-        representanteLocal: repLocal,
-        representanteVisitante: repVisitante,
-      },
+      firmas: datosFirmas,
     }));
 
     try {
@@ -46,12 +49,8 @@ export default function RecoleccionFirmas() {
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify({
           ...cedulaData,
-          firmas: {
-            capitanLocal: firmaLocal,
-            capitanVisitante: firmaVisitante,
-            representanteLocal: repLocal,
-            representanteVisitante: repVisitante,
-          }
+          firmas: datosFirmas,
+          esFinal,
         }),
       });
 
@@ -82,12 +81,11 @@ export default function RecoleccionFirmas() {
       />
       <Text style={styles.title}>Recolección de firmas</Text>
 
-      {[
-        { label: 'Capitán Local', value: firmaLocal, setter: setFirmaLocal },
+      {[{ label: 'Capitán Local', value: firmaLocal, setter: setFirmaLocal },
         { label: 'Capitán Visitante', value: firmaVisitante, setter: setFirmaVisitante },
         { label: 'Representante Local', value: repLocal, setter: setRepLocal },
-        { label: 'Representante Visitante', value: repVisitante, setter: setRepVisitante },
-      ].map(({ label, value, setter }) => (
+        { label: 'Representante Visitante', value: repVisitante, setter: setRepVisitante }]
+        .map(({ label, value, setter }) => (
         <View key={label} style={styles.section}>
           <Text style={styles.label}>{label}</Text>
           <TextInput
@@ -99,6 +97,16 @@ export default function RecoleccionFirmas() {
           />
         </View>
       ))}
+
+      <View style={styles.switchRow}>
+        <Text style={styles.label}>¿Este partido es una final?</Text>
+        <Switch
+          value={esFinal}
+          onValueChange={setEsFinal}
+          trackColor={{ false: '#ccc', true: '#1B9D3B' }}
+          thumbColor="#fff"
+        />
+      </View>
 
       <TouchableOpacity style={styles.submitButton} onPress={handleSubmit}>
         <Text style={styles.submitText}>Confirmar y continuar</Text>
@@ -140,6 +148,13 @@ const styles = StyleSheet.create({
     textAlignVertical: 'top',
     fontSize: 14,
     color: '#000',
+  },
+  switchRow: {
+    flexDirection: 'row',
+    justifyContent: 'space-between',
+    alignItems: 'center',
+    marginBottom: 20,
+    marginTop: 10,
   },
   submitButton: {
     backgroundColor: '#1B9D3B',
