@@ -181,12 +181,16 @@ const Step3_AdditionalData = ({ onNext, onBack, formData, updateForm }: Props) =
         <Text style={styles.nextText}>Siguiente</Text>
       </TouchableOpacity>
 
+      {/* Botones */}
+            {onBack && (
+              <TouchableOpacity style={styles.backButton} onPress={onBack}>
+                <Text style={styles.backText}>Volver</Text>
+              </TouchableOpacity>
+            )}
+
       <Text style={styles.terms}>
         Al crear una cuenta, aceptas nuestros Términos y Condiciones.
       </Text>
-      <View>
-        <GoBackHomeButton />
-      </View>
     </ScrollView>
   );
 };
@@ -286,6 +290,19 @@ const getStyles = (isDark: boolean) =>
       marginBottom: 40,
       color: "#888",
       fontSize: 14,
+    },
+    backButton: {
+      borderWidth: 1,
+      borderColor: '#28a745',
+      borderRadius: 30,
+      paddingVertical: 16,
+      alignItems: 'center',
+      marginTop: 10,
+    },
+    backText: {
+      color: '#28a745',
+      fontSize: 16,
+      fontWeight: '500',
     },
   });
 
