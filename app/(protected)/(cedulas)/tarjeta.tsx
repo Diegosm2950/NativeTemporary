@@ -15,11 +15,11 @@ import { useCedula } from '@/context/CedulaContext';
 
 export default function RegistrarTarjeta() {
   const router = useRouter();
-  const { setCedulaData } = useCedula();
+  const { cedulaData, setCedulaData, jugadoresLocal, jugadoresVisitante } = useCedula();
 
-  const [equipo, setEquipo] = useState('');
+  const [equipo, setEquipo] = useState<'A' | 'B' | null>(null);
   const [jugador, setJugador] = useState('');
-  const [color, setColor] = useState<'amarilla' | 'roja' | null>(null);
+  const [color, setColor] = useState<'T-A' | 'T-R' | null>(null);
   const [observacion, setObservacion] = useState('');
   const [tiempo, setTiempo] = useState('00:00:00');
 
@@ -29,11 +29,14 @@ export default function RegistrarTarjeta() {
       return;
     }
 
+    const nombreEquipo =
+      equipo === 'A' ? cedulaData.equipoLocal?.nombre : cedulaData.equipoVisitante?.nombre;
+
     const nuevaTarjeta = {
-      equipo,
+      equipo: nombreEquipo,
       jugador,
       tipo: color,
-      tiempo,
+      minuto: tiempo,
       observacion,
     };
 
@@ -45,6 +48,8 @@ export default function RegistrarTarjeta() {
     router.replace('/(protected)/(cedulas)/juego' as any);
   };
 
+  const jugadores = equipo === 'A' ? jugadoresLocal : equipo === 'B' ? jugadoresVisitante : [];
+
   return (
     <View style={styles.container}>
       <StatusBar style="auto" />
@@ -55,41 +60,54 @@ export default function RegistrarTarjeta() {
       />
       <Text style={styles.title}>Registrar Tarjeta</Text>
 
-      <TouchableOpacity style={styles.select} onPress={() => setEquipo('Equipo A')}>
-        <Text style={styles.selectText}>{equipo || 'Seleccionar Equipo'}</Text>
+      <View style={styles.teamSwitch}>
+        <TouchableOpacity
+          style={[styles.teamButton, equipo === 'A' && styles.teamButtonSelected]}
+          onPress={() => setEquipo('A')}
+        >
+          <Text style={styles.teamText}>{cedulaData.equipoLocal?.nombre || 'Equipo A'}</Text>
+        </TouchableOpacity>
+        <TouchableOpacity
+          style={[styles.teamButton, equipo === 'B' && styles.teamButtonSelected]}
+          onPress={() => setEquipo('B')}
+        >
+          <Text style={styles.teamText}>{cedulaData.equipoVisitante?.nombre || 'Equipo B'}</Text>
+        </TouchableOpacity>
+      </View>
+
+      <TouchableOpacity style={styles.select}>
+        <Text style={styles.selectText}>
+          {jugador || 'Seleccionar jugador'}
+        </Text>
       </TouchableOpacity>
 
-      <TouchableOpacity style={styles.select} onPress={() => setJugador('Jugador X')}>
-        <Text style={styles.selectText}>{jugador || 'Seleccionar Jugador'}</Text>
-      </TouchableOpacity>
+      {jugadores.map(j => (
+        <TouchableOpacity key={j.id} style={styles.select} onPress={() => setJugador(j.nombre)}>
+          <Text style={styles.selectText}>{j.nombre}</Text>
+        </TouchableOpacity>
+      ))}
 
       <View style={styles.colorRow}>
-        <TouchableOpacity
-          onPress={() => setColor('amarilla')}
-          style={styles.colorOption}
-        >
+        <TouchableOpacity onPress={() => setColor('T-A')} style={styles.colorOption}>
           <View
             style={[
               styles.colorBox,
               {
                 backgroundColor: '#FFD700',
-                borderColor: color === 'amarilla' ? '#000' : '#FFD700',
+                borderColor: color === 'T-A' ? '#000' : '#FFD700',
               },
             ]}
           />
           <Text style={styles.colorText}>Amarilla</Text>
         </TouchableOpacity>
 
-        <TouchableOpacity
-          onPress={() => setColor('roja')}
-          style={styles.colorOption}
-        >
+        <TouchableOpacity onPress={() => setColor('T-R')} style={styles.colorOption}>
           <View
             style={[
               styles.colorBox,
               {
                 backgroundColor: '#FF4C4C',
-                borderColor: color === 'roja' ? '#000' : '#FF4C4C',
+                borderColor: color === 'T-R' ? '#000' : '#FF4C4C',
               },
             ]}
           />
@@ -151,7 +169,7 @@ const styles = StyleSheet.create({
     backgroundColor: '#F3F8F3',
     padding: 16,
     borderRadius: 12,
-    marginBottom: 12,
+    marginBottom: 8,
   },
   selectText: {
     color: '#333',
@@ -175,12 +193,6 @@ const styles = StyleSheet.create({
     fontSize: 14,
     color: '#333',
   },
-  timer: {
-    textAlign: 'center',
-    fontSize: 22,
-    fontWeight: '600',
-    marginVertical: 16,
-  },
   input: {
     backgroundColor: '#E6EFE6',
     padding: 14,
@@ -190,17 +202,6 @@ const styles = StyleSheet.create({
     minHeight: 80,
     textAlignVertical: 'top',
     color: '#000',
-  },
-  submitButton: {
-    backgroundColor: '#1B9D3B',
-    padding: 16,
-    borderRadius: 25,
-    alignItems: 'center',
-  },
-  submitText: {
-    color: '#fff',
-    fontWeight: '600',
-    fontSize: 16,
   },
   timerInput: {
     fontSize: 22,
@@ -213,6 +214,17 @@ const styles = StyleSheet.create({
     width: 120,
     alignSelf: 'center',
   },
+  submitButton: {
+    backgroundColor: '#1B9D3B',
+    padding: 16,
+    borderRadius: 25,
+    alignItems: 'center',
+  },
+  submitText: {
+    color: '#fff',
+    fontWeight: '600',
+    fontSize: 16,
+  },
   backButton: {
     backgroundColor: '#F0F7F0',
     padding: 14,
@@ -223,6 +235,26 @@ const styles = StyleSheet.create({
   backText: {
     color: '#333',
     fontSize: 16,
+    fontWeight: '500',
+  },
+  teamSwitch: {
+    flexDirection: 'row',
+    justifyContent: 'space-between',
+    marginBottom: 16,
+  },
+  teamButton: {
+    flex: 1,
+    backgroundColor: '#E6EFE6',
+    padding: 12,
+    borderRadius: 25,
+    alignItems: 'center',
+    marginHorizontal: 6,
+  },
+  teamButtonSelected: {
+    backgroundColor: '#1B9D3B',
+  },
+  teamText: {
+    color: '#111',
     fontWeight: '500',
   },
 });
