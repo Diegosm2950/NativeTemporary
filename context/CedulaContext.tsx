@@ -1,5 +1,13 @@
 import React, { createContext, useContext, useState, ReactNode } from 'react';
 
+type Player = {
+  id: number;
+  nombre: string;
+  dorsal: number;
+  posicion: number;
+  foto: string;
+};
+
 type CedulaData = {
   partidoId: number;
   tipoPartido: 'torneo' | 'amistoso';
@@ -16,6 +24,15 @@ type CedulaData = {
   firmas: any;
   asistioArbitro: boolean;
   asistioParamedico: boolean;
+  equipoLocal?: {
+    nombre: string;
+    logo: string;
+  };
+  equipoVisitante?: {
+    nombre: string;
+    logo: string;
+  };
+  torneo?: string;
 };
 
 const initialData: CedulaData = {
@@ -39,18 +56,37 @@ const initialData: CedulaData = {
 const CedulaContext = createContext<{
   cedulaData: CedulaData;
   setCedulaData: React.Dispatch<React.SetStateAction<CedulaData>>;
+  jugadoresLocal: Player[];
+  setJugadoresLocal: (players: Player[]) => void;
+  jugadoresVisitante: Player[];
+  setJugadoresVisitante: (players: Player[]) => void;
 }>({
   cedulaData: initialData,
   setCedulaData: () => {},
+  jugadoresLocal: [],
+  setJugadoresLocal: () => {},
+  jugadoresVisitante: [],
+  setJugadoresVisitante: () => {},
 });
 
 export const useCedula = () => useContext(CedulaContext);
 
 export const CedulaProvider = ({ children }: { children: ReactNode }) => {
   const [cedulaData, setCedulaData] = useState<CedulaData>(initialData);
+  const [jugadoresLocal, setJugadoresLocal] = useState<Player[]>([]);
+  const [jugadoresVisitante, setJugadoresVisitante] = useState<Player[]>([]);
 
   return (
-    <CedulaContext.Provider value={{ cedulaData, setCedulaData }}>
+    <CedulaContext.Provider
+      value={{
+        cedulaData,
+        setCedulaData,
+        jugadoresLocal,
+        setJugadoresLocal,
+        jugadoresVisitante,
+        setJugadoresVisitante,
+      }}
+    >
       {children}
     </CedulaContext.Provider>
   );
