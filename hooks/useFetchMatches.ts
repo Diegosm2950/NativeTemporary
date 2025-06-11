@@ -27,19 +27,31 @@ export const useConvocatorias = (clubId?: number) => {
   
     const getNearestMatch = (matches: TournamentMatch[]): TournamentMatch | null => {
       if (!matches.length) return null;
-  
+    
       const now = new Date();
+      const nowTime = now.getTime();
+      console.log(now, nowTime, "time")
+    
       const upcomingMatches = matches.filter(match => {
-        const matchDate = new Date(match.fecha);
-        return matchDate >= now && match.estatus === 'programado';
+        const matchDate = new Date(`${match.fecha}T${match.horario.split('-')[0]}`);
+        const horasActuales = matchDate.getHours();
+
+        //Se suman 6 por horario UTC-6 GDL
+        console.log(matchDate.setHours(horasActuales + 6))
+        return matchDate.setHours(horasActuales + 6) >= nowTime && match.estatus === "programado";
       });
-  
+    
       if (!upcomingMatches.length) return null;
-  
+      console.log(upcomingMatches, "upcomming")
+    
       return upcomingMatches.reduce((nearest, current) => {
-        const nearestDate = new Date(nearest.fecha);
-        const currentDate = new Date(current.fecha);
-        return currentDate < nearestDate ? current : nearest;
+        const nearestDate = new Date(`${nearest.fecha}T${nearest.horario.split('-')[0]}`);
+        const currentDate = new Date(`${current.fecha}T${current.horario.split('-')[0]}`);
+        
+        const nearestDiff = Math.abs(nearestDate.getTime() - nowTime);
+        const currentDiff = Math.abs(currentDate.getTime() - nowTime);
+        
+        return currentDiff < nearestDiff ? current : nearest;
       });
     };
 
@@ -79,6 +91,7 @@ export const useConvocatorias = (clubId?: number) => {
           const data = await fetchConvocatorias(clubId, token);
           
           const allMatches = [...(data.torneos || []), ...(data.amistosos || [])];
+          console.log(data)
           const nearestMatch = getNearestMatch(allMatches);
 
           const allTournaments = [...(data.torneos || []), ...(data.amistosos || [])];
