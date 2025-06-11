@@ -9,6 +9,7 @@ import {
   Platform,
   Image,
   Alert,
+  KeyboardAvoidingView,
 } from 'react-native';
 import { useRouter } from 'expo-router';
 import { StatusBar } from 'expo-status-bar';
@@ -58,109 +59,114 @@ export default function RegistrarLesion() {
   };
 
   return (
-    <ScrollView contentContainerStyle={styles.container}>
-      <StatusBar style="auto" />
-      <Image
-        source={require('@/assets/images/FMRUU.png')}
-        style={styles.logo}
-        resizeMode="contain"
-      />
-      <Text style={styles.title}>Registrar Lesión</Text>
+    <KeyboardAvoidingView
+      behavior={Platform.OS === 'ios' ? 'padding' : 'height'}
+      style={{ flex: 1 }}
+    >
+      <ScrollView contentContainerStyle={styles.container}>
+        <StatusBar style="auto" />
+        <Image
+          source={require('@/assets/images/FMRUU.png')}
+          style={styles.logo}
+          resizeMode="contain"
+        />
+        <Text style={styles.title}>Registrar Lesión</Text>
 
-      {/* Selector de equipo */}
-      <View style={styles.teamSwitch}>
-        <TouchableOpacity
-          style={[styles.teamButton, equipo === 'A' && styles.teamButtonSelected]}
-          onPress={() => setEquipo('A')}
-        >
-          <Text style={styles.teamText}>{cedulaData.equipoLocal?.nombre || 'Equipo A'}</Text>
-        </TouchableOpacity>
-        <TouchableOpacity
-          style={[styles.teamButton, equipo === 'B' && styles.teamButtonSelected]}
-          onPress={() => setEquipo('B')}
-        >
-          <Text style={styles.teamText}>{cedulaData.equipoVisitante?.nombre || 'Equipo B'}</Text>
-        </TouchableOpacity>
-      </View>
-
-      {/* Selector de jugador */}
-      <TouchableOpacity style={styles.select}>
-        <Text style={styles.selectText}>{jugador || 'Seleccionar jugador lesionado'}</Text>
-      </TouchableOpacity>
-
-      {jugadores.map(j => (
-        <TouchableOpacity
-          key={j.id}
-          style={styles.select}
-          onPress={() => setJugador(j.nombre)}
-        >
-          <Text style={styles.selectText}>{j.nombre}</Text>
-        </TouchableOpacity>
-      ))}
-
-      {/* Parte del cuerpo */}
-      <View style={styles.bodyParts}>
-        {partesCuerpo.map((p) => (
+        {/* Selector de equipo */}
+        <View style={styles.teamSwitch}>
           <TouchableOpacity
-            key={p}
-            style={[styles.partButton, parte === p && styles.partButtonSelected]}
-            onPress={() => setParte(p)}
+            style={[styles.teamButton, equipo === 'A' && styles.teamButtonSelected]}
+            onPress={() => setEquipo('A')}
           >
-            <Text style={styles.partText}>{p}</Text>
+            <Text style={styles.teamText}>{cedulaData.equipoLocal?.nombre || 'Equipo A'}</Text>
+          </TouchableOpacity>
+          <TouchableOpacity
+            style={[styles.teamButton, equipo === 'B' && styles.teamButtonSelected]}
+            onPress={() => setEquipo('B')}
+          >
+            <Text style={styles.teamText}>{cedulaData.equipoVisitante?.nombre || 'Equipo B'}</Text>
+          </TouchableOpacity>
+        </View>
+
+        {/* Selector de jugador */}
+        <TouchableOpacity style={styles.select}>
+          <Text style={styles.selectText}>{jugador || 'Seleccionar jugador lesionado'}</Text>
+        </TouchableOpacity>
+
+        {jugadores.map(j => (
+          <TouchableOpacity
+            key={j.id}
+            style={styles.select}
+            onPress={() => setJugador(j.nombre)}
+          >
+            <Text style={styles.selectText}>{j.nombre}</Text>
           </TouchableOpacity>
         ))}
-      </View>
 
-      {/* Nivel de gravedad */}
-      <View style={styles.gravedadContainer}>
-        {['Leve', 'Media', 'Grave'].map((nivel) => (
-          <TouchableOpacity
-            key={nivel}
-            style={[styles.gravedadButton, gravedad === nivel && styles.gravedadSelected]}
-            onPress={() => setGravedad(nivel as typeof gravedad)}
-          >
-            <Text style={styles.gravedadText}>{nivel}</Text>
-          </TouchableOpacity>
-        ))}
-      </View>
+        {/* Parte del cuerpo */}
+        <View style={styles.bodyParts}>
+          {partesCuerpo.map((p) => (
+            <TouchableOpacity
+              key={p}
+              style={[styles.partButton, parte === p && styles.partButtonSelected]}
+              onPress={() => setParte(p)}
+            >
+              <Text style={styles.partText}>{p}</Text>
+            </TouchableOpacity>
+          ))}
+        </View>
 
-      {/* Ambulancia */}
-      <Text style={styles.sectionTitle}>¿Requiere ambulancia?</Text>
-      <TouchableOpacity
-        style={[styles.optionButton, ambulancia === true && styles.selected]}
-        onPress={() => setAmbulancia(true)}
-      >
-        <Text style={styles.optionText}>Sí</Text>
-      </TouchableOpacity>
-      <TouchableOpacity
-        style={[styles.optionButton, ambulancia === false && styles.selectedNo]}
-        onPress={() => setAmbulancia(false)}
-      >
-        <Text style={styles.optionText}>No</Text>
-      </TouchableOpacity>
+        {/* Nivel de gravedad */}
+        <View style={styles.gravedadContainer}>
+          {['Leve', 'Media', 'Grave'].map((nivel) => (
+            <TouchableOpacity
+              key={nivel}
+              style={[styles.gravedadButton, gravedad === nivel && styles.gravedadSelected]}
+              onPress={() => setGravedad(nivel as typeof gravedad)}
+            >
+              <Text style={styles.gravedadText}>{nivel}</Text>
+            </TouchableOpacity>
+          ))}
+        </View>
 
-      {/* Observación */}
-      <Text style={styles.sectionTitle}>Observación</Text>
-      <TextInput
-        style={styles.textarea}
-        placeholder="Nota del árbitro"
-        value={observacion}
-        onChangeText={setObservacion}
-        multiline
-        placeholderTextColor="#555"
-      />
+        {/* Ambulancia */}
+        <Text style={styles.sectionTitle}>¿Requiere ambulancia?</Text>
+        <TouchableOpacity
+          style={[styles.optionButton, ambulancia === true && styles.selected]}
+          onPress={() => setAmbulancia(true)}
+        >
+          <Text style={styles.optionText}>Sí</Text>
+        </TouchableOpacity>
+        <TouchableOpacity
+          style={[styles.optionButton, ambulancia === false && styles.selectedNo]}
+          onPress={() => setAmbulancia(false)}
+        >
+          <Text style={styles.optionText}>No</Text>
+        </TouchableOpacity>
 
-      <TouchableOpacity style={styles.submitButton} onPress={handleRegistrarLesion}>
-        <Text style={styles.submitText}>Registrar Lesión</Text>
-      </TouchableOpacity>
+        {/* Observación */}
+        <Text style={styles.sectionTitle}>Observación</Text>
+        <TextInput
+          style={styles.textarea}
+          placeholder="Nota del árbitro"
+          value={observacion}
+          onChangeText={setObservacion}
+          multiline
+          placeholderTextColor="#555"
+        />
 
-      <TouchableOpacity
-        style={styles.backButton}
-        onPress={() => router.replace('/(protected)/(cedulas)/juego' as any)}
-      >
-        <Text style={styles.backText}>Volver</Text>
-      </TouchableOpacity>
-    </ScrollView>
+        <TouchableOpacity style={styles.submitButton} onPress={handleRegistrarLesion}>
+          <Text style={styles.submitText}>Registrar Lesión</Text>
+        </TouchableOpacity>
+
+        <TouchableOpacity
+          style={styles.backButton}
+          onPress={() => router.replace('/(protected)/(cedulas)/juego' as any)}
+        >
+          <Text style={styles.backText}>Volver</Text>
+        </TouchableOpacity>
+      </ScrollView>
+    </KeyboardAvoidingView>
   );
 }
 

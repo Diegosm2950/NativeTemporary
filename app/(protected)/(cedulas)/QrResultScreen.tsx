@@ -26,7 +26,6 @@ const QrResultScreen = () => {
       try {
         const jugadores: any[] = params?.jugadoresSeleccionados || [];
 
-        // Aseguramos estructura correcta de cada jugador
         const jugadoresFormatted = jugadores.map((j) => {
           const partes = j.name?.split(' ') || [];
           return {

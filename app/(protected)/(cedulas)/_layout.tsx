@@ -34,6 +34,13 @@ export default function CedulasLayout() {
           }}
         />
         <Stack.Screen
+          name="QrResultScreen"
+          options={{
+            headerShown: false,
+            title: 'QrResult',
+          }}
+        />
+        <Stack.Screen
           name="lesion"
           options={{
             headerShown: false,

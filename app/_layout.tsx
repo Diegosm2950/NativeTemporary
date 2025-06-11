@@ -1,6 +1,5 @@
 import { Stack } from "expo-router";
 import React, { useEffect } from "react";
-import { StatusBar } from "expo-status-bar";
 import { useFrameworkReady } from '@/hooks/useFrameworkReady';
 import { useFonts, Inter_400Regular, Inter_500Medium, Inter_600SemiBold, Inter_700Bold } from '@expo-google-fonts/inter';
 import { Poppins_500Medium, Poppins_600SemiBold, Poppins_700Bold } from '@expo-google-fonts/poppins';
@@ -37,7 +36,7 @@ export default function RootLayout() {
           <React.Fragment>
               <Stack screenOptions={{ headerShown: false }}>
                 <Stack.Screen name="(auth)" options={{ headerShown: false }} />
-                <Stack.Screen name="(tabs)" options={{ headerShown: false }} />
+                <Stack.Screen name="(protected)" options={{ headerShown: false }} />
               </Stack>
               <Toast/>
           </React.Fragment>

@@ -20,6 +20,7 @@ export default {
     success: '#059669',
     warning: '#F59E0B',
     link: '#24693D',
+    navColor: "F8F9FA"
   },
   dark: {
     text: '#FFFFFF',
@@ -39,5 +40,6 @@ export default {
     success: '#10B981',
     warning: '#F59E0B',
     link: '#86EFAC',
+    navColor: "#010D06"
   },
 };
