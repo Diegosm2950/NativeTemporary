@@ -20,7 +20,9 @@ export default function RegistrarObservacion() {
   const { setCedulaData } = useCedula();
 
   const [texto, setTexto] = useState('');
-  const [categoria, setCategoria] = useState<'General' | 'Público' | 'Condiciones' | 'Seguridad' | ''>('');
+  const [categoria, setCategoria] = useState<
+    'General' | 'Público' | 'Condiciones' | 'Seguridad' | ''
+  >('');
 
   const handleGuardar = () => {
     if (!texto.trim()) {
@@ -28,15 +30,21 @@ export default function RegistrarObservacion() {
       return;
     }
 
-    setCedulaData(prev => ({
-      ...prev,
-      observaciones: {
-        texto,
-        publico: categoria || 'General'
-      }
-    }));
+    try {
+      setCedulaData((prev) => ({
+        ...prev,
+        observaciones: {
+          texto,
+          publico: categoria || 'General',
+        },
+      }));
 
-    router.replace('/(protected)/cedulas/juego' as any);
+      console.log('✅ Observación guardada. Redirigiendo a juego...');
+      router.push('/(protected)/(cedulas)/juego');
+    } catch (error) {
+      console.error('❌ Error al guardar observación o redirigir:', error);
+      Alert.alert('Error', 'Ocurrió un problema al continuar.');
+    }
   };
 
   return (
@@ -59,30 +67,29 @@ export default function RegistrarObservacion() {
           }}
           multiline
           placeholderTextColor="#555"
-        />
-
-        <Text style={styles.label}>Categoría</Text>
-        <View style={styles.categoryGroup}>
-          {['General', 'Público', 'Condiciones', 'Seguridad'].map((cat) => (
-            <TouchableOpacity
-              key={cat}
-              style={[
-                styles.categoryButton,
-                categoria === cat && styles.categorySelected
-              ]}
-              onPress={() => setCategoria(cat as typeof categoria)}
-            >
-              <Text
+          />
+          <Text style={styles.label}>Categoría</Text>
+          <View style={styles.categoryGroup}>
+            {['General', 'Público', 'Condiciones', 'Seguridad'].map((cat) => (
+              <TouchableOpacity
+                key={cat}
                 style={[
-                  styles.categoryText,
-                  categoria === cat && styles.categoryTextSelected
+                  styles.categoryButton,
+                  categoria === cat && styles.categorySelected,
                 ]}
+                onPress={() => setCategoria(cat as typeof categoria)}
               >
-                {cat}
-              </Text>
-            </TouchableOpacity>
-          ))}
-        </View>
+                <Text
+                  style={[
+                    styles.categoryText,
+                    categoria === cat && styles.categoryTextSelected,
+                  ]}
+                >
+                  {cat}
+                </Text>
+              </TouchableOpacity>
+            ))}
+          </View>
 
         <TouchableOpacity style={styles.submitButton} onPress={handleGuardar}>
           <Text style={styles.submitText}>Guardar Observación</Text>
