@@ -7,7 +7,9 @@ import {
   TextInput,
   Platform,
   Image,
-  Alert
+  Alert,
+  TouchableWithoutFeedback,
+  Keyboard
 } from 'react-native';
 import { useRouter } from 'expo-router';
 import { StatusBar } from 'expo-status-bar';
@@ -38,57 +40,59 @@ export default function RegistrarObservacion() {
   };
 
   return (
-    <View style={styles.container}>
-      <StatusBar style="auto" />
-      <Image
-        source={require('@/assets/images/FMRUU.png')}
-        style={styles.logo}
-        resizeMode="contain"
-      />
-      <Text style={styles.title}>Registrar Observación</Text>
+    <TouchableWithoutFeedback onPress={Keyboard.dismiss} accessible={false}>
+      <View style={styles.container}>
+        <StatusBar style="auto" />
+        <Image
+          source={require('@/assets/images/FMRUU.png')}
+          style={styles.logo}
+          resizeMode="contain"
+        />
+        <Text style={styles.title}>Registrar Observación</Text>
 
-      <TextInput
-        style={styles.textarea}
-        placeholder="Observación (máx. 300 caracteres)"
-        value={texto}
-        onChangeText={(value) => {
-          if (value.length <= 300) setTexto(value);
-        }}
-        multiline
-        placeholderTextColor="#555"
-      />
+        <TextInput
+          style={styles.textarea}
+          placeholder="Observación (máx. 300 caracteres)"
+          value={texto}
+          onChangeText={(value) => {
+            if (value.length <= 300) setTexto(value);
+          }}
+          multiline
+          placeholderTextColor="#555"
+        />
 
-      <Text style={styles.label}>Categoría</Text>
-      <View style={styles.categoryGroup}>
-        {['General', 'Público', 'Condiciones', 'Seguridad'].map((cat) => (
-          <TouchableOpacity
-            key={cat}
-            style={[
-              styles.categoryButton,
-              categoria === cat && styles.categorySelected
-            ]}
-            onPress={() => setCategoria(cat as typeof categoria)}
-          >
-            <Text
+        <Text style={styles.label}>Categoría</Text>
+        <View style={styles.categoryGroup}>
+          {['General', 'Público', 'Condiciones', 'Seguridad'].map((cat) => (
+            <TouchableOpacity
+              key={cat}
               style={[
-                styles.categoryText,
-                categoria === cat && styles.categoryTextSelected
+                styles.categoryButton,
+                categoria === cat && styles.categorySelected
               ]}
+              onPress={() => setCategoria(cat as typeof categoria)}
             >
-              {cat}
-            </Text>
-          </TouchableOpacity>
-        ))}
+              <Text
+                style={[
+                  styles.categoryText,
+                  categoria === cat && styles.categoryTextSelected
+                ]}
+              >
+                {cat}
+              </Text>
+            </TouchableOpacity>
+          ))}
+        </View>
+
+        <TouchableOpacity style={styles.submitButton} onPress={handleGuardar}>
+          <Text style={styles.submitText}>Guardar Observación</Text>
+        </TouchableOpacity>
+
+        <TouchableOpacity style={styles.backButton} onPress={() => router.back()}>
+          <Text style={styles.backText}>Volver</Text>
+        </TouchableOpacity>
       </View>
-
-      <TouchableOpacity style={styles.submitButton} onPress={handleGuardar}>
-        <Text style={styles.submitText}>Guardar Observación</Text>
-      </TouchableOpacity>
-
-      <TouchableOpacity style={styles.backButton} onPress={() => router.back()}>
-        <Text style={styles.backText}>Volver</Text>
-      </TouchableOpacity>
-    </View>
+    </TouchableWithoutFeedback>
   );
 }
 
