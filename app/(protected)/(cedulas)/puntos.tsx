@@ -3,23 +3,70 @@ import { View, Text, StyleSheet, TouchableOpacity, TextInput, Platform, ScrollVi
 import { useRouter } from 'expo-router';
 import { StatusBar } from 'expo-status-bar';
 import { useCedula } from '@/context/CedulaContext';
+import CancelButton from '@/components/cancelButton';
 
 export default function RegistroPuntos() {
   const router = useRouter();
-  const { cedulaData, setCedulaData, jugadoresLocal, jugadoresVisitante } = useCedula();
+  const { cedulaData, setCedulaData, jugadoresLocal, jugadoresVisitante } =
+    useCedula();
 
   const [equipo, setEquipo] = useState<'A' | 'B'>('A');
   const [jugador, setJugador] = useState('');
   const [accion, setAccion] = useState('');
   const [tiempo, setTiempo] = useState('00:00:00');
 
-  const marcadorA = cedulaData.marcador.filter(p => p.equipo === 'A').length;
-  const marcadorB = cedulaData.marcador.filter(p => p.equipo === 'B').length;
+  const { cronometro } = useCedula();
+
+  const formatTiempo = (milis: number) => {
+    const h = Math.floor(milis / 3600000).toString().padStart(2, '0');
+    const m = Math.floor((milis % 3600000) / 60000).toString().padStart(2, '0');
+    const s = Math.floor((milis % 60000) / 1000).toString().padStart(2, '0');
+    return `${h}:${m}:${s}`;
+  };
+
+  const calcularPuntos = (equipo: 'A' | 'B') => {
+    return cedulaData.marcador
+      .filter((p) => p.equipo === equipo)
+      .reduce((total, punto) => {
+        switch (punto.accion) {
+          case 'T':
+            return total + 5;
+          case 'C':
+            return total + 2;
+          case 'P':
+            return total + 3;
+          case 'D':
+            return total + 3;
+          default:
+            return total;
+        }
+      }, 0);
+  };
+
+  const marcadorA = calcularPuntos('A');
+  const marcadorB = calcularPuntos('B');
 
   const jugadores = equipo === 'A' ? jugadoresLocal : jugadoresVisitante;
 
-  const handleAgregarPunto = () => {
-    if (!equipo || !jugador || !accion || !tiempo) {
+  const getPuntos = (accion: string) => {
+    switch (accion) {
+      case 'T':
+        return 5;
+      case 'C':
+        return 2;
+      case 'P':
+        return 3;
+      case 'D':
+        return 3;
+      default:
+        return 0;
+    }
+  };
+
+ const handleAgregarPunto = () => {
+    const tiempoActual = formatTiempo(cronometro);
+
+    if (!equipo || !jugador || !accion) {
       Alert.alert('Faltan campos', 'Completa todos los datos del punto.');
       return;
     }
@@ -28,10 +75,11 @@ export default function RegistroPuntos() {
       equipo,
       jugador,
       accion,
-      tiempo,
+      tiempo: tiempoActual,
+      puntos: getPuntos(accion),
     };
 
-    setCedulaData(prev => ({
+    setCedulaData((prev) => ({
       ...prev,
       marcador: [...prev.marcador, nuevoPunto],
     }));
@@ -52,34 +100,59 @@ export default function RegistroPuntos() {
       <Text style={styles.title}>Registro de puntos</Text>
 
       {/* Tipo de Acción */}
-      <TouchableOpacity style={styles.select} onPress={() => setAccion('Try')}>
-        <Text style={styles.selectText}>{accion || 'Tipo de Acción'}</Text>
-      </TouchableOpacity>
+      <View style={styles.actionContainer}>
+        {[
+          { label: 'T', puntos: 5 },
+          { label: 'C', puntos: 2 },
+          { label: 'P', puntos: 3 },
+          { label: 'D', puntos: 3 },
+        ].map(({ label, puntos }) => (
+          <TouchableOpacity
+            key={label}
+            style={[
+              styles.actionButton,
+              accion === label && styles.actionButtonSelected,
+            ]}
+            onPress={() => setAccion(label)}
+          >
+            <Text style={styles.actionText}>
+              {label} ({puntos} pts)
+            </Text>
+          </TouchableOpacity>
+        ))}
+      </View>
 
       {/* Equipo A / B */}
       <View style={styles.teamSwitch}>
         <TouchableOpacity
-          style={[styles.teamButton, equipo === 'A' && styles.teamButtonSelected]}
+          style={[
+            styles.teamButton,
+            equipo === 'A' && styles.teamButtonSelected,
+          ]}
           onPress={() => setEquipo('A')}
         >
-          <Text style={styles.teamText}>{cedulaData.equipoLocal?.nombre || 'Equipo A'}</Text>
+          <Text style={styles.teamText}>
+            {cedulaData.equipoLocal?.nombre || 'Equipo A'}
+          </Text>
         </TouchableOpacity>
         <TouchableOpacity
-          style={[styles.teamButton, equipo === 'B' && styles.teamButtonSelected]}
+          style={[
+            styles.teamButton,
+            equipo === 'B' && styles.teamButtonSelected,
+          ]}
           onPress={() => setEquipo('B')}
         >
-          <Text style={styles.teamText}>{cedulaData.equipoVisitante?.nombre || 'Equipo B'}</Text>
+          <Text style={styles.teamText}>
+            {cedulaData.equipoVisitante?.nombre || 'Equipo B'}
+          </Text>
         </TouchableOpacity>
       </View>
 
       {/* Tiempo */}
       <TextInput
         style={styles.timerInput}
-        value={tiempo}
-        onChangeText={setTiempo}
-        placeholder="00:00:00"
-        keyboardType="numeric"
-        maxLength={8}
+        value={formatTiempo(cronometro)}
+        editable={false}
       />
 
       {/* Jugador */}
@@ -96,17 +169,30 @@ export default function RegistroPuntos() {
             }}
             onPress={() => setJugador(j.nombre)}
           >
-            <Image source={{ uri: j.foto }} style={{ width: 32, height: 32, borderRadius: 16, marginRight: 8 }} />
+            <Image
+              source={{ uri: j.foto }}
+              style={{
+                width: 32,
+                height: 32,
+                borderRadius: 16,
+                marginRight: 8,
+              }}
+            />
             <Text>{j.nombre}</Text>
           </TouchableOpacity>
         ))}
         {!jugadores.length && (
-          <Text style={{ color: '#999' }}>Sin jugadores escaneados para este equipo</Text>
+          <Text style={{ color: '#999' }}>
+            Sin jugadores escaneados para este equipo
+          </Text>
         )}
       </View>
 
       {/* Agregar Punto */}
-      <TouchableOpacity style={styles.submitButton} onPress={handleAgregarPunto}>
+      <TouchableOpacity
+        style={styles.submitButton}
+        onPress={handleAgregarPunto}
+      >
         <Text style={styles.submitText}>Agregar Punto</Text>
       </TouchableOpacity>
 
@@ -117,24 +203,33 @@ export default function RegistroPuntos() {
         <Text style={styles.teamScore}>{marcadorB}</Text>
       </View>
       <View style={styles.scoreInfo}>
-        <Text style={styles.teamLabel}>{cedulaData.equipoLocal?.nombre || 'Equipo A'}</Text>
-        <Text style={styles.fecha}>Inicio: {cedulaData.horaInicio || '--:--'}</Text>
-        <Text style={styles.teamLabel}>{cedulaData.equipoVisitante?.nombre || 'Equipo B'}</Text>
+        <Text style={styles.teamLabel}>
+          {cedulaData.equipoLocal?.nombre || 'Equipo A'}
+        </Text>
+        <Text style={styles.fecha}>
+          Inicio: {cedulaData.horaInicio || '--:--'}
+        </Text>
+        <Text style={styles.teamLabel}>
+          {cedulaData.equipoVisitante?.nombre || 'Equipo B'}
+        </Text>
       </View>
 
       {/* Guardar */}
       <TouchableOpacity
-        style={[styles.submitButton, { backgroundColor: '#fff', borderWidth: 1, borderColor: '#1B9D3B' }]}
+        style={[
+          styles.submitButton,
+          { backgroundColor: '#fff', borderWidth: 1, borderColor: '#1B9D3B' },
+        ]}
         onPress={() => router.back()}
       >
         <Text style={[styles.submitText, { color: '#1B9D3B' }]}>
           Guardar marcador y continuar
         </Text>
       </TouchableOpacity>
+      <CancelButton />
     </ScrollView>
   );
 }
-
 
 const styles = StyleSheet.create({
   container: {
@@ -238,5 +333,25 @@ const styles = StyleSheet.create({
     fontSize: 12,
     fontWeight: '600',
     color: '#333',
+  },
+  actionContainer: {
+    flexDirection: 'row',
+    justifyContent: 'space-between',
+    marginBottom: 16,
+  },
+  actionButton: {
+    flex: 1,
+    backgroundColor: '#E6EFE6',
+    padding: 10,
+    marginHorizontal: 5,
+    borderRadius: 12,
+    alignItems: 'center',
+  },
+  actionButtonSelected: {
+    backgroundColor: '#1B9D3B',
+  },
+  actionText: {
+    color: '#111',
+    fontWeight: '600',
   },
 });
