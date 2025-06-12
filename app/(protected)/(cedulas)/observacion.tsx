@@ -8,8 +8,8 @@ import {
   Platform,
   Image,
   Alert,
-  TouchableWithoutFeedback,
-  Keyboard
+  ScrollView,
+  KeyboardAvoidingView,
 } from 'react-native';
 import { useRouter } from 'expo-router';
 import { StatusBar } from 'expo-status-bar';
@@ -20,9 +20,7 @@ export default function RegistrarObservacion() {
   const { setCedulaData } = useCedula();
 
   const [texto, setTexto] = useState('');
-  const [categoria, setCategoria] = useState<
-    'General' | 'Público' | 'Condiciones' | 'Seguridad' | ''
-  >('');
+  const [categoria, setCategoria] = useState<'General' | 'Público' | 'Condiciones' | 'Seguridad' | ''>('');
 
   const handleGuardar = () => {
     if (!texto.trim()) {
@@ -48,8 +46,8 @@ export default function RegistrarObservacion() {
   };
 
   return (
-    <TouchableWithoutFeedback onPress={Keyboard.dismiss} accessible={false}>
-      <View style={styles.container}>
+    <KeyboardAvoidingView style={{ flex: 1 }} behavior="padding">
+      <ScrollView contentContainerStyle={styles.container} keyboardShouldPersistTaps="handled">
         <StatusBar style="auto" />
         <Image
           source={require('@/assets/images/FMRUU.png')}
@@ -67,29 +65,30 @@ export default function RegistrarObservacion() {
           }}
           multiline
           placeholderTextColor="#555"
-          />
-          <Text style={styles.label}>Categoría</Text>
-          <View style={styles.categoryGroup}>
-            {['General', 'Público', 'Condiciones', 'Seguridad'].map((cat) => (
-              <TouchableOpacity
-                key={cat}
+        />
+
+        <Text style={styles.label}>Categoría</Text>
+        <View style={styles.categoryGroup}>
+          {['General', 'Público', 'Condiciones', 'Seguridad'].map((cat) => (
+            <TouchableOpacity
+              key={cat}
+              style={[
+                styles.categoryButton,
+                categoria === cat && styles.categorySelected,
+              ]}
+              onPress={() => setCategoria(cat as typeof categoria)}
+            >
+              <Text
                 style={[
-                  styles.categoryButton,
-                  categoria === cat && styles.categorySelected,
+                  styles.categoryText,
+                  categoria === cat && styles.categoryTextSelected,
                 ]}
-                onPress={() => setCategoria(cat as typeof categoria)}
               >
-                <Text
-                  style={[
-                    styles.categoryText,
-                    categoria === cat && styles.categoryTextSelected,
-                  ]}
-                >
-                  {cat}
-                </Text>
-              </TouchableOpacity>
-            ))}
-          </View>
+                {cat}
+              </Text>
+            </TouchableOpacity>
+          ))}
+        </View>
 
         <TouchableOpacity style={styles.submitButton} onPress={handleGuardar}>
           <Text style={styles.submitText}>Guardar Observación</Text>
@@ -98,17 +97,16 @@ export default function RegistrarObservacion() {
         <TouchableOpacity style={styles.backButton} onPress={() => router.back()}>
           <Text style={styles.backText}>Volver</Text>
         </TouchableOpacity>
-      </View>
-    </TouchableWithoutFeedback>
+      </ScrollView>
+    </KeyboardAvoidingView>
   );
 }
 
 const styles = StyleSheet.create({
   container: {
-    flex: 1,
-    backgroundColor: '#fff',
     paddingVertical: Platform.OS === 'ios' ? 60 : 40,
     paddingHorizontal: 20,
+    backgroundColor: '#fff',
   },
   logo: {
     width: 80,
