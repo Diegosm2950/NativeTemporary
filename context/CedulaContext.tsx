@@ -60,6 +60,8 @@ const CedulaContext = createContext<{
   setJugadoresLocal: (players: Player[]) => void;
   jugadoresVisitante: Player[];
   setJugadoresVisitante: (players: Player[]) => void;
+  cronometro: number;
+  setCronometro: React.Dispatch<React.SetStateAction<number>>;
 }>({
   cedulaData: initialData,
   setCedulaData: () => {},
@@ -67,6 +69,8 @@ const CedulaContext = createContext<{
   setJugadoresLocal: () => {},
   jugadoresVisitante: [],
   setJugadoresVisitante: () => {},
+  cronometro: 0,
+  setCronometro: () => {},
 });
 
 export const useCedula = () => useContext(CedulaContext);
@@ -75,6 +79,7 @@ export const CedulaProvider = ({ children }: { children: ReactNode }) => {
   const [cedulaData, setCedulaData] = useState<CedulaData>(initialData);
   const [jugadoresLocal, setJugadoresLocal] = useState<Player[]>([]);
   const [jugadoresVisitante, setJugadoresVisitante] = useState<Player[]>([]);
+  const [cronometro, setCronometro] = useState<number>(0);
 
   return (
     <CedulaContext.Provider
@@ -85,6 +90,8 @@ export const CedulaProvider = ({ children }: { children: ReactNode }) => {
         setJugadoresLocal,
         jugadoresVisitante,
         setJugadoresVisitante,
+        cronometro,
+        setCronometro,
       }}
     >
       {children}
