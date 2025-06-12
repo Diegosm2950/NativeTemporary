@@ -1,69 +1,53 @@
 import React, { useState } from 'react';
-import {
-  View,
-  Text,
-  StyleSheet,
-  TouchableOpacity,
-  TextInput,
-  Platform,
-  Image,
-  Alert,
-  ScrollView,
-} from 'react-native';
+import { View, Text, StyleSheet, TouchableOpacity, Platform, Image, Alert, ScrollView } from 'react-native';
 import { useRouter } from 'expo-router';
 import { StatusBar } from 'expo-status-bar';
 import { useCedula } from '@/context/CedulaContext';
 
 export default function RegistrarCambio() {
   const router = useRouter();
-  const { cedulaData, setCedulaData, jugadoresLocal, jugadoresVisitante } = useCedula();
+  const { cedulaData, setCedulaData, jugadoresLocal, jugadoresVisitante, cronometro } = useCedula();
 
   const [equipo, setEquipo] = useState<'A' | 'B' | null>(null);
   const [jugadorSale, setJugadorSale] = useState('');
   const [jugadorEntra, setJugadorEntra] = useState('');
-  const [tiempo, setTiempo] = useState('00:00:00');
   const [motivo, setMotivo] = useState<'tactico' | 'lesion' | 'otro' | null>(null);
 
   const jugadores = equipo === 'A' ? jugadoresLocal : equipo === 'B' ? jugadoresVisitante : [];
 
-  const handleGuardarCambio = () => {
-  console.log("Presionado Registrar Cambio");
-  console.log("Valores actuales:", {
-    equipo,
-    jugadorSale,
-    jugadorEntra,
-    tiempo,
-  });
-
-  if (!equipo || !jugadorSale || !jugadorEntra || !tiempo) {
-    Alert.alert('Campos incompletos', 'Por favor llena todos los campos requeridos.');
-    return;
-  }
-
-  const nombreEquipo = equipo === 'A'
-    ? cedulaData.equipoLocal?.nombre
-    : cedulaData.equipoVisitante?.nombre;
-
-  const nuevoCambio = {
-    equipo: nombreEquipo || 'Equipo',
-    sale: jugadorSale,
-    entra: jugadorEntra,
-    tiempo,
-    motivo,
+  const formatTiempo = (milis: number) => {
+    const h = Math.floor(milis / 3600000).toString().padStart(2, '0');
+    const m = Math.floor((milis % 3600000) / 60000).toString().padStart(2, '0');
+    const s = Math.floor((milis % 60000) / 1000).toString().padStart(2, '0');
+    return `${h}:${m}:${s}`;
   };
 
-  console.log("Nuevo cambio:", nuevoCambio);
+  const tiempoActual = formatTiempo(cronometro);
 
-  setCedulaData(prev => ({
-    ...prev,
-    cambios: Array.isArray(prev.cambios) ? [...prev.cambios, nuevoCambio] : [nuevoCambio],
-  }));
+  const handleGuardarCambio = () => {
+    if (!equipo || !jugadorSale || !jugadorEntra) {
+      Alert.alert('Campos incompletos', 'Por favor llena todos los campos requeridos.');
+      return;
+    }
 
-  console.log("Redirigiendo a juego.tsx...");
-  router.replace('/(protected)/(cedulas)/juego');
-};
+    const nombreEquipo =
+      equipo === 'A' ? cedulaData.equipoLocal?.nombre : cedulaData.equipoVisitante?.nombre;
 
+    const nuevoCambio = {
+      equipo: nombreEquipo || 'Equipo',
+      sale: jugadorSale,
+      entra: jugadorEntra,
+      tiempo: tiempoActual,
+      motivo,
+    };
 
+    setCedulaData(prev => ({
+      ...prev,
+      cambios: Array.isArray(prev.cambios) ? [...prev.cambios, nuevoCambio] : [nuevoCambio],
+    }));
+
+    router.replace('/(protected)/(cedulas)/juego');
+  };
 
   return (
     <ScrollView contentContainerStyle={styles.container}>
@@ -121,14 +105,9 @@ export default function RegistrarCambio() {
         {!jugadores.length && <Text style={{ color: '#999' }}>Selecciona primero un equipo</Text>}
       </View>
 
-      <TextInput
-        style={styles.timerInput}
-        value={tiempo}
-        onChangeText={setTiempo}
-        placeholder="00:00:00"
-        keyboardType="numeric"
-        maxLength={8}
-      />
+      <Text style={{ textAlign: 'center', fontSize: 16, marginBottom: 10 }}>
+        Tiempo actual: <Text style={{ fontWeight: 'bold' }}>{tiempoActual}</Text>
+      </Text>
 
       <Text style={styles.subTitle}>Seleccione una opción</Text>
       <Text style={styles.subText}>Motivo del cambio (opcional)</Text>
@@ -159,7 +138,6 @@ export default function RegistrarCambio() {
     </ScrollView>
   );
 }
-
 const styles = StyleSheet.create({
   container: {
     flexGrow: 1,
