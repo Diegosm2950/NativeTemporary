@@ -8,8 +8,8 @@ import {
   Platform,
   Image,
   Alert,
-  TouchableWithoutFeedback,
-  Keyboard
+  ScrollView,
+  KeyboardAvoidingView,
 } from 'react-native';
 import { useRouter } from 'expo-router';
 import { StatusBar } from 'expo-status-bar';
@@ -28,20 +28,26 @@ export default function RegistrarObservacion() {
       return;
     }
 
-    setCedulaData(prev => ({
-      ...prev,
-      observaciones: {
-        texto,
-        publico: categoria || 'General'
-      }
-    }));
+    try {
+      setCedulaData((prev) => ({
+        ...prev,
+        observaciones: {
+          texto,
+          publico: categoria || 'General',
+        },
+      }));
 
-    router.replace('/(protected)/cedulas/juego' as any);
+      console.log('✅ Observación guardada. Redirigiendo a juego...');
+      router.push('/(protected)/(cedulas)/juego');
+    } catch (error) {
+      console.error('❌ Error al guardar observación o redirigir:', error);
+      Alert.alert('Error', 'Ocurrió un problema al continuar.');
+    }
   };
 
   return (
-    <TouchableWithoutFeedback onPress={Keyboard.dismiss} accessible={false}>
-      <View style={styles.container}>
+    <KeyboardAvoidingView style={{ flex: 1 }} behavior="padding">
+      <ScrollView contentContainerStyle={styles.container} keyboardShouldPersistTaps="handled">
         <StatusBar style="auto" />
         <Image
           source={require('@/assets/images/FMRUU.png')}
@@ -68,14 +74,14 @@ export default function RegistrarObservacion() {
               key={cat}
               style={[
                 styles.categoryButton,
-                categoria === cat && styles.categorySelected
+                categoria === cat && styles.categorySelected,
               ]}
               onPress={() => setCategoria(cat as typeof categoria)}
             >
               <Text
                 style={[
                   styles.categoryText,
-                  categoria === cat && styles.categoryTextSelected
+                  categoria === cat && styles.categoryTextSelected,
                 ]}
               >
                 {cat}
@@ -91,17 +97,16 @@ export default function RegistrarObservacion() {
         <TouchableOpacity style={styles.backButton} onPress={() => router.back()}>
           <Text style={styles.backText}>Volver</Text>
         </TouchableOpacity>
-      </View>
-    </TouchableWithoutFeedback>
+      </ScrollView>
+    </KeyboardAvoidingView>
   );
 }
 
 const styles = StyleSheet.create({
   container: {
-    flex: 1,
-    backgroundColor: '#fff',
     paddingVertical: Platform.OS === 'ios' ? 60 : 40,
     paddingHorizontal: 20,
+    backgroundColor: '#fff',
   },
   logo: {
     width: 80,

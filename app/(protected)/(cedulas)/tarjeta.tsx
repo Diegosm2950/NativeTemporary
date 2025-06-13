@@ -8,8 +8,8 @@ import {
   Platform,
   Image,
   Alert,
-  TouchableWithoutFeedback,
-  Keyboard,
+  ScrollView,
+  KeyboardAvoidingView,
 } from 'react-native';
 import { useRouter } from 'expo-router';
 import { StatusBar } from 'expo-status-bar';
@@ -17,16 +17,30 @@ import { useCedula } from '@/context/CedulaContext';
 
 export default function RegistrarTarjeta() {
   const router = useRouter();
-  const { cedulaData, setCedulaData, jugadoresLocal, jugadoresVisitante } = useCedula();
+  const {
+    cedulaData,
+    setCedulaData,
+    jugadoresLocal,
+    jugadoresVisitante,
+    cronometro,
+  } = useCedula();
 
   const [equipo, setEquipo] = useState<'A' | 'B' | null>(null);
   const [jugador, setJugador] = useState('');
   const [color, setColor] = useState<'T-A' | 'T-R' | null>(null);
   const [observacion, setObservacion] = useState('');
-  const [tiempo, setTiempo] = useState('00:00:00');
+
+  const formatTiempo = (milis: number) => {
+    const h = Math.floor(milis / 3600000).toString().padStart(2, '0');
+    const m = Math.floor((milis % 3600000) / 60000).toString().padStart(2, '0');
+    const s = Math.floor((milis % 60000) / 1000).toString().padStart(2, '0');
+    return `${h}:${m}:${s}`;
+  };
 
   const handleRegistrar = () => {
-    if (!equipo || !jugador || !color || !tiempo || !observacion.trim()) {
+    const tiempoActual = formatTiempo(cronometro);
+
+    if (!equipo || !jugador || !color || !observacion.trim()) {
       Alert.alert('Faltan campos', 'Completa todos los campos para registrar la tarjeta.');
       return;
     }
@@ -38,11 +52,11 @@ export default function RegistrarTarjeta() {
       equipo: nombreEquipo,
       jugador,
       tipo: color,
-      minuto: tiempo,
+      minuto: tiempoActual,
       observacion,
     };
 
-    setCedulaData(prev => ({
+    setCedulaData((prev) => ({
       ...prev,
       tarjetas: [...prev.tarjetas, nuevaTarjeta],
     }));
@@ -53,8 +67,11 @@ export default function RegistrarTarjeta() {
   const jugadores = equipo === 'A' ? jugadoresLocal : equipo === 'B' ? jugadoresVisitante : [];
 
   return (
-    <TouchableWithoutFeedback onPress={Keyboard.dismiss} accessible={false}>
-      <View style={styles.container}>
+    <KeyboardAvoidingView behavior="padding" style={{ flex: 1 }}>
+      <ScrollView
+        contentContainerStyle={styles.container}
+        keyboardShouldPersistTaps="handled"
+      >
         <StatusBar style="auto" />
         <Image
           source={require('@/assets/images/FMRUU.png')}
@@ -79,12 +96,10 @@ export default function RegistrarTarjeta() {
         </View>
 
         <TouchableOpacity style={styles.select}>
-          <Text style={styles.selectText}>
-            {jugador || 'Seleccionar jugador'}
-          </Text>
+          <Text style={styles.selectText}>{jugador || 'Seleccionar jugador'}</Text>
         </TouchableOpacity>
 
-        {jugadores.map(j => (
+        {jugadores.map((j) => (
           <TouchableOpacity key={j.id} style={styles.select} onPress={() => setJugador(j.nombre)}>
             <Text style={styles.selectText}>{j.nombre}</Text>
           </TouchableOpacity>
@@ -120,11 +135,8 @@ export default function RegistrarTarjeta() {
 
         <TextInput
           style={styles.timerInput}
-          value={tiempo}
-          onChangeText={setTiempo}
-          placeholder="00:00:00"
-          keyboardType="numeric"
-          maxLength={8}
+          value={formatTiempo(cronometro)}
+          editable={false}
         />
 
         <TextInput
@@ -134,7 +146,6 @@ export default function RegistrarTarjeta() {
           onChangeText={setObservacion}
           placeholderTextColor="#555"
           multiline
-          submitBehavior={'blurAndSubmit'} 
         />
 
         <TouchableOpacity style={styles.submitButton} onPress={handleRegistrar}>
@@ -147,10 +158,11 @@ export default function RegistrarTarjeta() {
         >
           <Text style={styles.backText}>Volver</Text>
         </TouchableOpacity>
-      </View>
-    </TouchableWithoutFeedback>
+      </ScrollView>
+    </KeyboardAvoidingView>
   );
 }
+
 
 const styles = StyleSheet.create({
   container: {

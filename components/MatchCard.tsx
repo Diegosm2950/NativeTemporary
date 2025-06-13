@@ -1,11 +1,12 @@
 import React, { useContext } from 'react';
-import { StyleSheet, Text, View, Image, ImageBackground, TouchableOpacity } from 'react-native';
+import { StyleSheet, Text, View, Image, ImageBackground, TouchableOpacity, ActivityIndicator } from 'react-native';
 import Colors from '@/constants/Colors';
 import useColorScheme from '@/hooks/useColorScheme';
 import Layout from '@/constants/Layout';
 import { AuthContext } from '@/context/AuthContext';
 import { useRouter } from 'expo-router';
 import { MatchResults } from '@/types/convocatiorias';
+import { useConvocatorias } from '@/hooks/useFetchMatches';
 
 const backgroundImage = require('@/assets/images/rugbyvg.png');
 const defaultTeamLogo = require('@/assets/images/FMRUU.png');
@@ -21,21 +22,22 @@ export default function MatchCard({ match, variant = 'small' }: MatchCardProps) 
   const isLarge = variant === 'large';
   const { user } = useContext(AuthContext);
   const router = useRouter();
-  
+
+  const clubId = user?.clubId || 1;
+  const { data: convocatorias, loading, error } = useConvocatorias(clubId);
+
   const ContainerComponent = isLarge ? ImageBackground : View;
-  
+
   const handleCapitanPress = () => {
     router.push('/(protected)/(cedulas)/SeleccionarJugadores');
   };
-  
+
   const handleArbitroPress = () => {
-    router.push(
-      `/(protected)/(cedulas)/qr-scanner?match=${encodeURIComponent(JSON.stringify(match))}`
-    );
+    router.push(`/(protected)/(cedulas)/qr-scanner?match=${encodeURIComponent(JSON.stringify(match))}`);
   };
 
   const isFinished = match.estatus === 'finalizado';
-  
+
   const getScores = () => {
     if (!match.resultadoResumen) return { localScore: '0', awayScore: '0' };
     
@@ -45,12 +47,27 @@ export default function MatchCard({ match, variant = 'small' }: MatchCardProps) 
     }
     return { localScore: '0', awayScore: '0' };
   };
-  
+
   const { localScore, awayScore } = getScores();
   
   const isLocalWinner = match.equipoGanador === match.equipoLocal.nombre;
   const isAwayWinner = match.equipoGanador === match.equipoVisitante.nombre;
-  
+
+  if (loading) {
+    return (
+      <View style={styles.container}>
+        <ActivityIndicator size="small" color="#1B9D3B" />
+      </View>
+    );
+  }
+
+  if (error) {
+    return (
+      <View style={styles.container}>
+        <Text>Error al cargar convocatorias: {error}</Text>
+      </View>
+    );
+  }  
   return (
     <ContainerComponent 
       source={isLarge ? backgroundImage : undefined}

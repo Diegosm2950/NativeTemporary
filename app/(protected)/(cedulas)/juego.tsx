@@ -1,19 +1,78 @@
 import React from 'react';
-import { View, Text, StyleSheet, TouchableOpacity, Image } from 'react-native';
+import { View, Text, StyleSheet, TouchableOpacity, Image, ScrollView } from 'react-native';
 import { Flag, Repeat, Pencil, Bandage } from 'lucide-react-native';
 import { useRouter } from 'expo-router';
 import { StatusBar } from 'expo-status-bar';
 import { useCedula } from '@/context/CedulaContext';
+import { useEffect, useRef, useState } from 'react';
 
 export default function JuegoScreen() {
   const router = useRouter();
-  const { cedulaData } = useCedula();
+  const { cedulaData, cronometro, setCronometro } = useCedula();
+
+  const [corriendo, setCorriendo] = useState(false);
+  const intervaloRef = useRef<NodeJS.Timeout | null>(null);
+
+  const calcularPuntos = (equipo: 'A' | 'B') => {
+    return cedulaData.marcador
+      .filter(p => p.equipo === equipo)
+      .reduce((total, punto) => {
+        switch (punto.accion) {
+          case 'T': return total + 5;
+          case 'C': return total + 2;
+          case 'P': return total + 3;
+          case 'D': return total + 3;
+          default: return total;
+        }
+      }, 0);
+  };
+
+  const puntosA = calcularPuntos('A');
+  const puntosB = calcularPuntos('B');
 
   const marcadorA = cedulaData.marcador.filter(p => p.equipo === 'A');
   const marcadorB = cedulaData.marcador.filter(p => p.equipo === 'B');
 
-  const puntosA = marcadorA.length;
-  const puntosB = marcadorB.length;
+  useEffect(() => {
+    if (corriendo && !intervaloRef.current) {
+      intervaloRef.current = setInterval(() => {
+        setCronometro((prev) => prev + 10);
+      }, 10);
+    }
+
+    if (!corriendo && intervaloRef.current) {
+      clearInterval(intervaloRef.current);
+      intervaloRef.current = null;
+    }
+
+    return () => {
+      if (intervaloRef.current) {
+        clearInterval(intervaloRef.current);
+        intervaloRef.current = null;
+      }
+    };
+  }, [corriendo]);
+
+  const iniciar = () => setCorriendo(true);
+  const pausar = () => setCorriendo(false);
+  const reanudar = () => setCorriendo(true);
+
+  const formatTiempo = (milisegundos: number) => {
+    const horas = Math.floor(milisegundos / 3600000)
+      .toString()
+      .padStart(2, '0');
+    const minutos = Math.floor((milisegundos % 3600000) / 60000)
+      .toString()
+      .padStart(2, '0');
+    const segundos = Math.floor((milisegundos % 60000) / 1000)
+      .toString()
+      .padStart(2, '0');
+    const ms = Math.floor((milisegundos % 1000) / 10)
+      .toString()
+      .padStart(2, '0');
+
+    return `${horas}:${minutos}:${segundos}:${ms}`;
+  };
 
   return (
     <View style={styles.container}>
@@ -62,15 +121,43 @@ export default function JuegoScreen() {
           ))}
         </View>
 
-        {[...marcadorA, ...marcadorB].map((punto, index) => (
-          <View key={index} style={styles.statsRow}>
-            <Text style={styles.statsCell}>{index + 1}</Text>
-            <Text style={styles.statsCell}>{punto.jugador}</Text>
-            <Text style={styles.statsCell}>{punto.accion}</Text>
-            <Text style={styles.statsCell}>{punto.tiempo}</Text>
-          </View>
-        ))}
+        <ScrollView style={styles.statsScroll} nestedScrollEnabled={true}>
+          {[...marcadorA, ...marcadorB].map((punto, index) => (
+            <View key={index} style={styles.statsRow}>
+              <Text style={styles.statsCell}>{index + 1}</Text>
+              <Text style={styles.statsCell}>{punto.jugador}</Text>
+              <Text style={styles.statsCell}>{punto.accion}</Text>
+              <Text style={styles.statsCell}>{punto.tiempo}</Text>
+            </View>
+          ))}
+        </ScrollView>
       </View>
+
+      {/* Cronómetro */}
+      <View style={styles.cronometroContainer}>
+      <Text style={styles.cronometroTiempo}>{formatTiempo(cronometro)}</Text>
+
+        <View style={styles.cronoButtonGroup}>
+          {!corriendo && cronometro === 0 && (
+            <TouchableOpacity onPress={iniciar} style={styles.cronoButton}>
+              <Text style={styles.cronoButtonText}>Iniciar</Text>
+            </TouchableOpacity>
+          )}
+          {corriendo && (
+            <TouchableOpacity onPress={pausar} style={styles.cronoButton}>
+              <Text style={styles.cronoButtonText}>Pausar</Text>
+            </TouchableOpacity>
+          )}
+          {!corriendo && cronometro > 0 && (
+            <>
+              <TouchableOpacity onPress={reanudar} style={styles.cronoButton}>
+                <Text style={styles.cronoButtonText}>Reanudar</Text>
+              </TouchableOpacity>
+            </>
+          )}
+        </View>
+      </View>
+
 
       {/* Botones */}
       <TouchableOpacity
@@ -242,5 +329,43 @@ const styles = StyleSheet.create({
     color: '#111',
     textAlign: 'center',
     fontWeight: '500',
-  }
+  },
+  cronometroContainer: {
+    alignItems: 'center',
+    marginTop: 16,
+    backgroundColor: '#fff',
+    padding: 12,
+    borderRadius: 12,
+    borderWidth: 1,
+    borderColor: '#ddd',
+    elevation: 2,
+    shadowColor: '#000',
+    shadowOffset: { width: 0, height: 1 },
+    shadowOpacity: 0.1,
+    shadowRadius: 2,
+  },
+  cronometroTiempo: {
+    fontSize: 24,
+    fontWeight: '700',
+    marginBottom: 12,
+    color: '#333',
+  },
+  cronoButtonGroup: {
+    flexDirection: 'row',
+    gap: 10,
+  },
+  cronoButton: {
+    backgroundColor: '#1B9D3B',
+    paddingVertical: 8,
+    paddingHorizontal: 14,
+    borderRadius: 10,
+  },
+  cronoButtonText: {
+    color: '#fff',
+    fontWeight: '600',
+    fontSize: 14,
+  },
+  statsScroll: {
+    maxHeight: 220, // Ajusta este valor según tu diseño
+  },
 });
