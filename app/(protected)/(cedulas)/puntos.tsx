@@ -14,6 +14,7 @@ export default function RegistroPuntos() {
   const [jugador, setJugador] = useState('');
   const [accion, setAccion] = useState('');
   const [tiempo, setTiempo] = useState('00:00:00');
+  const [puntosTemporales, setPuntosTemporales] = useState<any[]>([]);
 
   const { cronometro } = useCedula();
 
@@ -43,8 +44,16 @@ export default function RegistroPuntos() {
       }, 0);
   };
 
-  const marcadorA = calcularPuntos('A');
-  const marcadorB = calcularPuntos('B');
+  const marcadorA =
+    calcularPuntos('A') +
+    puntosTemporales
+      .filter((p) => p.equipo === 'A')
+      .reduce((acc, p) => acc + p.puntos, 0);
+  const marcadorB =
+    calcularPuntos('B') +
+    puntosTemporales
+      .filter((p) => p.equipo === 'B')
+      .reduce((acc, p) => acc + p.puntos, 0);
 
   const jugadores = equipo === 'A' ? jugadoresLocal : jugadoresVisitante;
 
@@ -63,7 +72,7 @@ export default function RegistroPuntos() {
     }
   };
 
- const handleAgregarPunto = () => {
+  const handleAgregarPunto = () => {
     const tiempoActual = formatTiempo(cronometro);
 
     if (!equipo || !jugador || !accion) {
@@ -79,14 +88,24 @@ export default function RegistroPuntos() {
       puntos: getPuntos(accion),
     };
 
-    setCedulaData((prev) => ({
-      ...prev,
-      marcador: [...prev.marcador, nuevoPunto],
-    }));
+    setPuntosTemporales((prev) => [...prev, nuevoPunto]);
 
     setJugador('');
     setAccion('');
     setTiempo('00:00:00');
+  };
+
+  const handleCancelarPunto = (index: number) => {
+    setPuntosTemporales((prev) => prev.filter((_, i) => i !== index));
+  };
+
+  const handleGuardarMarcador = () => {
+    setCedulaData((prev) => ({
+      ...prev,
+      marcador: [...prev.marcador, ...puntosTemporales],
+    }));
+    setPuntosTemporales([]);
+    router.back();
   };
 
   return (
@@ -196,6 +215,21 @@ export default function RegistroPuntos() {
         <Text style={styles.submitText}>Agregar Punto</Text>
       </TouchableOpacity>
 
+      {/* Lista de puntos temporales */}
+      {puntosTemporales.length > 0 && (
+        <View style={{ marginTop: 10, padding: 10, backgroundColor: '#F3F8F3', borderRadius: 10 }}>
+          <Text style={{ fontWeight: '600', marginBottom: 6 }}>Puntos pendientes:</Text>
+          {puntosTemporales.map((punto, index) => (
+            <View key={index} style={{ flexDirection: 'row', justifyContent: 'space-between', marginBottom: 4 }}>
+              <Text>{punto.jugador} ({punto.accion}) - {punto.puntos} pts</Text>
+              <TouchableOpacity onPress={() => handleCancelarPunto(index)}>
+                <Text style={{ color: 'red' }}>Cancelar</Text>
+              </TouchableOpacity>
+            </View>
+          ))}
+        </View>
+      )}
+
       {/* Marcador visual */}
       <View style={styles.scoreCard}>
         <Text style={styles.teamScore}>{marcadorA}</Text>
@@ -220,7 +254,7 @@ export default function RegistroPuntos() {
           styles.submitButton,
           { backgroundColor: '#fff', borderWidth: 1, borderColor: '#1B9D3B' },
         ]}
-        onPress={() => router.back()}
+        onPress={handleGuardarMarcador}
       >
         <Text style={[styles.submitText, { color: '#1B9D3B' }]}>
           Guardar marcador y continuar

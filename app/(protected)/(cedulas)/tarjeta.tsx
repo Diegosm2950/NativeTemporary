@@ -1,16 +1,5 @@
 import React, { useState } from 'react';
-import {
-  View,
-  Text,
-  StyleSheet,
-  TouchableOpacity,
-  TextInput,
-  Platform,
-  Image,
-  Alert,
-  ScrollView,
-  KeyboardAvoidingView,
-} from 'react-native';
+import { View, Text, StyleSheet, TouchableOpacity, TextInput, Platform, Image, Alert, ScrollView, KeyboardAvoidingView } from 'react-native';
 import { useRouter } from 'expo-router';
 import { StatusBar } from 'expo-status-bar';
 import { useCedula } from '@/context/CedulaContext';
@@ -29,6 +18,7 @@ export default function RegistrarTarjeta() {
   const [jugador, setJugador] = useState('');
   const [color, setColor] = useState<'T-A' | 'T-R' | null>(null);
   const [observacion, setObservacion] = useState('');
+  const [tarjetasTemporales, setTarjetasTemporales] = useState<any[]>([]);
 
   const formatTiempo = (milis: number) => {
     const h = Math.floor(milis / 3600000).toString().padStart(2, '0');
@@ -56,11 +46,22 @@ export default function RegistrarTarjeta() {
       observacion,
     };
 
+    setTarjetasTemporales((prev) => [...prev, nuevaTarjeta]);
+    setJugador('');
+    setColor(null);
+    setObservacion('');
+  };
+
+  const handleCancelarTarjeta = (index: number) => {
+    setTarjetasTemporales((prev) => prev.filter((_, i) => i !== index));
+  };
+
+  const handleGuardarTarjetas = () => {
     setCedulaData((prev) => ({
       ...prev,
-      tarjetas: [...prev.tarjetas, nuevaTarjeta],
+      tarjetas: [...prev.tarjetas, ...tarjetasTemporales],
     }));
-
+    setTarjetasTemporales([]);
     router.replace('/(protected)/(cedulas)/juego' as any);
   };
 
@@ -148,8 +149,32 @@ export default function RegistrarTarjeta() {
           multiline
         />
 
+        {/* Tarjetas temporales */}
+        {tarjetasTemporales.length > 0 && (
+          <View style={{ marginBottom: 20 }}>
+            <Text style={{ fontWeight: '600', marginBottom: 6 }}>Tarjetas pendientes:</Text>
+            {tarjetasTemporales.map((t, index) => (
+              <View key={index} style={{ flexDirection: 'row', justifyContent: 'space-between', marginBottom: 4 }}>
+                <Text>{t.jugador} ({t.tipo}) - {t.minuto}</Text>
+                <TouchableOpacity onPress={() => handleCancelarTarjeta(index)}>
+                  <Text style={{ color: 'red' }}>Cancelar</Text>
+                </TouchableOpacity>
+              </View>
+            ))}
+          </View>
+        )}
+
         <TouchableOpacity style={styles.submitButton} onPress={handleRegistrar}>
-          <Text style={styles.submitText}>Registrar Tarjeta</Text>
+          <Text style={styles.submitText}>Agregar Tarjeta</Text>
+        </TouchableOpacity>
+
+        <TouchableOpacity
+          style={[styles.submitButton, { backgroundColor: '#fff', borderWidth: 1, borderColor: '#1B9D3B', marginTop: 10 }]}
+          onPress={handleGuardarTarjetas}
+        >
+          <Text style={[styles.submitText, { color: '#1B9D3B' }]}>
+            Guardar tarjetas y continuar
+          </Text>
         </TouchableOpacity>
 
         <TouchableOpacity
