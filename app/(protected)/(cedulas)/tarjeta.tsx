@@ -1,24 +1,9 @@
 import React, { useState } from 'react';
-import {
-  View,
-  Text,
-  StyleSheet,
-  TouchableOpacity,
-  TextInput,
-  Platform,
-  Image,
-  Alert,
-  ScrollView,
-  KeyboardAvoidingView,
-} from 'react-native';
+import { View, Text, StyleSheet, TouchableOpacity, TextInput, Platform, Image, Alert, ScrollView, KeyboardAvoidingView } from 'react-native';
 import { useRouter } from 'expo-router';
-import { StatusBar } from 'expo-status-bar';
 import { useCedula } from '@/context/CedulaContext';
-import Colors from '@/constants/Colors';
-import useColorScheme from '@/hooks/useColorScheme';
 
 export default function RegistrarTarjeta() {
-  const colorScheme = useColorScheme();
   const router = useRouter();
   const {
     cedulaData,
@@ -32,6 +17,7 @@ export default function RegistrarTarjeta() {
   const [jugador, setJugador] = useState('');
   const [color, setColor] = useState<'T-A' | 'T-R' | null>(null);
   const [observacion, setObservacion] = useState('');
+  const [tarjetasTemporales, setTarjetasTemporales] = useState<any[]>([]);
 
   const formatTiempo = (milis: number) => {
     const h = Math.floor(milis / 3600000).toString().padStart(2, '0');
@@ -59,11 +45,22 @@ export default function RegistrarTarjeta() {
       observacion,
     };
 
+    setTarjetasTemporales((prev) => [...prev, nuevaTarjeta]);
+    setJugador('');
+    setColor(null);
+    setObservacion('');
+  };
+
+  const handleCancelarTarjeta = (index: number) => {
+    setTarjetasTemporales((prev) => prev.filter((_, i) => i !== index));
+  };
+
+  const handleGuardarTarjetas = () => {
     setCedulaData((prev) => ({
       ...prev,
-      tarjetas: [...prev.tarjetas, nuevaTarjeta],
+      tarjetas: [...prev.tarjetas, ...tarjetasTemporales],
     }));
-
+    setTarjetasTemporales([]);
     router.replace('/(protected)/(cedulas)/juego' as any);
   };
 
@@ -72,57 +69,38 @@ export default function RegistrarTarjeta() {
   return (
     <KeyboardAvoidingView behavior="padding" style={{ flex: 1 }}>
       <ScrollView
-        contentContainerStyle={[styles.container, { backgroundColor: Colors[colorScheme].background }]}
+        contentContainerStyle={styles.container}
         keyboardShouldPersistTaps="handled"
       >
-        <StatusBar style={colorScheme === 'dark' ? 'light' : 'dark'} />
         <Image
           source={require('@/assets/images/FMRUU.png')}
           style={styles.logo}
           resizeMode="contain"
         />
-        <Text style={[styles.title, { color: Colors[colorScheme].text }]}>Registrar Tarjeta</Text>
+        <Text style={styles.title}>Registrar Tarjeta</Text>
 
         <View style={styles.teamSwitch}>
           <TouchableOpacity
-            style={[
-              styles.teamButton, 
-              { backgroundColor: Colors[colorScheme].buttonSecondary },
-              equipo === 'A' && [styles.teamButtonSelected, { backgroundColor: Colors[colorScheme].buttonPrimary }]
-            ]}
+            style={[styles.teamButton, equipo === 'A' && styles.teamButtonSelected]}
             onPress={() => setEquipo('A')}
           >
-            <Text style={[styles.teamText, { color: Colors[colorScheme].buttonTextSecondary }]}>
-              {cedulaData.equipoLocal?.nombre || 'Equipo A'}
-            </Text>
+            <Text style={styles.teamText}>{cedulaData.equipoLocal?.nombre || 'Equipo A'}</Text>
           </TouchableOpacity>
           <TouchableOpacity
-            style={[
-              styles.teamButton, 
-              { backgroundColor: Colors[colorScheme].buttonSecondary },
-              equipo === 'B' && [styles.teamButtonSelected, { backgroundColor: Colors[colorScheme].buttonPrimary }]
-            ]}
+            style={[styles.teamButton, equipo === 'B' && styles.teamButtonSelected]}
             onPress={() => setEquipo('B')}
           >
-            <Text style={[styles.teamText, { color: Colors[colorScheme].buttonTextSecondary }]}>
-              {cedulaData.equipoVisitante?.nombre || 'Equipo B'}
-            </Text>
+            <Text style={styles.teamText}>{cedulaData.equipoVisitante?.nombre || 'Equipo B'}</Text>
           </TouchableOpacity>
         </View>
 
-        <TouchableOpacity style={[styles.select, { backgroundColor: Colors[colorScheme].inputBackground }]}>
-          <Text style={[styles.selectText, { color: jugador ? Colors[colorScheme].text : Colors[colorScheme].textSecondary }]}>
-            {jugador || 'Seleccionar jugador'}
-          </Text>
+        <TouchableOpacity style={styles.select}>
+          <Text style={styles.selectText}>{jugador || 'Seleccionar jugador'}</Text>
         </TouchableOpacity>
 
         {jugadores.map((j) => (
-          <TouchableOpacity 
-            key={j.id} 
-            style={[styles.select, { backgroundColor: Colors[colorScheme].inputBackground }]} 
-            onPress={() => setJugador(j.nombre)}
-          >
-            <Text style={[styles.selectText, { color: Colors[colorScheme].text }]}>{j.nombre}</Text>
+          <TouchableOpacity key={j.id} style={styles.select} onPress={() => setJugador(j.nombre)}>
+            <Text style={styles.selectText}>{j.nombre}</Text>
           </TouchableOpacity>
         ))}
 
@@ -133,11 +111,11 @@ export default function RegistrarTarjeta() {
                 styles.colorBox,
                 {
                   backgroundColor: '#FFD700',
-                  borderColor: color === 'T-A' ? Colors[colorScheme].text : '#FFD700',
+                  borderColor: color === 'T-A' ? '#000' : '#FFD700',
                 },
               ]}
             />
-            <Text style={[styles.colorText, { color: Colors[colorScheme].text }]}>Amarilla</Text>
+            <Text style={styles.colorText}>Amarilla</Text>
           </TouchableOpacity>
 
           <TouchableOpacity onPress={() => setColor('T-R')} style={styles.colorOption}>
@@ -146,60 +124,68 @@ export default function RegistrarTarjeta() {
                 styles.colorBox,
                 {
                   backgroundColor: '#FF4C4C',
-                  borderColor: color === 'T-R' ? Colors[colorScheme].text : '#FF4C4C',
+                  borderColor: color === 'T-R' ? '#000' : '#FF4C4C',
                 },
               ]}
             />
-            <Text style={[styles.colorText, { color: Colors[colorScheme].text }]}>Roja</Text>
+            <Text style={styles.colorText}>Roja</Text>
           </TouchableOpacity>
         </View>
 
         <TextInput
-          style={[
-            styles.timerInput, 
-            { 
-              backgroundColor: Colors[colorScheme].inputBackground,
-              color: Colors[colorScheme].text,
-              borderColor: Colors[colorScheme].border
-            }
-          ]}
+          style={styles.timerInput}
           value={formatTiempo(cronometro)}
           editable={false}
         />
 
         <TextInput
-          style={[
-            styles.input, 
-            { 
-              backgroundColor: Colors[colorScheme].inputBackground,
-              color: Colors[colorScheme].text,
-              borderColor: Colors[colorScheme].border
-            }
-          ]}
+          style={styles.input}
           placeholder="Observación Breve"
           value={observacion}
           onChangeText={setObservacion}
-          placeholderTextColor={Colors[colorScheme].textSecondary}
+          placeholderTextColor="#555"
           multiline
         />
 
-        <TouchableOpacity 
-          style={[styles.submitButton, { backgroundColor: Colors[colorScheme].buttonPrimary }]} 
-          onPress={handleRegistrar}
-        >
-          <Text style={[styles.submitText, { color: Colors[colorScheme].buttonText }]}>Registrar Tarjeta</Text>
+        {/* Tarjetas temporales */}
+        {tarjetasTemporales.length > 0 && (
+          <View style={{ marginBottom: 20 }}>
+            <Text style={{ fontWeight: '600', marginBottom: 6 }}>Tarjetas pendientes:</Text>
+            {tarjetasTemporales.map((t, index) => (
+              <View key={index} style={{ flexDirection: 'row', justifyContent: 'space-between', marginBottom: 4 }}>
+                <Text>{t.jugador} ({t.tipo}) - {t.minuto}</Text>
+                <TouchableOpacity onPress={() => handleCancelarTarjeta(index)}>
+                  <Text style={{ color: 'red' }}>Cancelar</Text>
+                </TouchableOpacity>
+              </View>
+            ))}
+          </View>
+        )}
+
+        <TouchableOpacity style={styles.submitButton} onPress={handleRegistrar}>
+          <Text style={styles.submitText}>Agregar Tarjeta</Text>
         </TouchableOpacity>
 
         <TouchableOpacity
-          style={[styles.backButton, { backgroundColor: Colors[colorScheme].buttonSecondary }]}
+          style={[styles.submitButton, { backgroundColor: '#fff', borderWidth: 1, borderColor: '#1B9D3B', marginTop: 10 }]}
+          onPress={handleGuardarTarjetas}
+        >
+          <Text style={[styles.submitText, { color: '#1B9D3B' }]}>
+            Guardar tarjetas y continuar
+          </Text>
+        </TouchableOpacity>
+
+        <TouchableOpacity
+          style={styles.backButton}
           onPress={() => router.replace('/(protected)/(cedulas)/juego' as any)}
         >
-          <Text style={[styles.backText, { color: Colors[colorScheme].buttonTextSecondary }]}>Volver</Text>
+          <Text style={styles.backText}>Volver</Text>
         </TouchableOpacity>
       </ScrollView>
     </KeyboardAvoidingView>
   );
 }
+
 
 const styles = StyleSheet.create({
   container: {
