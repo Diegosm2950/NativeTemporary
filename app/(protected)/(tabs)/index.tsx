@@ -18,7 +18,7 @@ export default function HomeScreen() {
   const pastMatches = data.torneos.filter(match => match.estatus == "finalizado");
   const nextMatches = data.torneos.filter(match => match.estatus == "programado");
 
-
+  console.log(data)
   return (
     <SafeAreaView
       style={[styles.container, { backgroundColor: Colors[colorScheme].background }]}

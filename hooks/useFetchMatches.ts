@@ -89,9 +89,9 @@ export const useConvocatorias = (clubId?: number) => {
           }
   
           const data = await fetchConvocatorias(clubId, token);
+          console.log(data)
           
           const allMatches = [...(data.torneos || []), ...(data.amistosos || [])];
-          console.log(data)
           const nearestMatch = getNearestMatch(allMatches);
 
           const allTournaments = [...(data.torneos || []), ...(data.amistosos || [])];

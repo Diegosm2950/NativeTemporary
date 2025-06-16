@@ -14,6 +14,8 @@ import { CameraView, useCameraPermissions } from 'expo-camera';
 import { StatusBar } from 'expo-status-bar';
 import { useMemo } from 'react';
 import { useCedula } from '@/context/CedulaContext';
+import useColorScheme from '@/hooks/useColorScheme';
+import Colors from '@/constants/Colors';
 
 type Player = {
   id: number;
@@ -25,10 +27,11 @@ type Player = {
 
 export default function QRScanner() {
   const router = useRouter();
-  const { matchId, match } = useLocalSearchParams();
+  const { match } = useLocalSearchParams();
   const matchData = useMemo(() => {
     return match ? JSON.parse(match as string) : null;
   }, [match]);
+  const colorScheme = useColorScheme();
 
   const { setCedulaData, setJugadoresLocal, setJugadoresVisitante } = useCedula();
   const [permission, requestPermission] = useCameraPermissions();
@@ -75,10 +78,10 @@ export default function QRScanner() {
         <Text style={styles.teamHeaderText}>{label}</Text>
       </View>
       <View style={styles.tableHeader}>
-        <Text style={[styles.tableCell, { flex: 0.5, fontWeight: 'bold' }]}>#</Text>
-        <Text style={[styles.tableCell, { flex: 2, fontWeight: 'bold' }]}>Nombre</Text>
-        <Text style={[styles.tableCell, { flex: 1, fontWeight: 'bold' }]}>ID</Text>
-        <Text style={[styles.tableCell, { flex: 1, fontWeight: 'bold' }]}>Posición</Text>
+        <Text style={[styles.tableCell, { flex: 0.5, fontWeight: 'bold', color: Colors[colorScheme].text }]}>#</Text>
+        <Text style={[styles.tableCell, { flex: 2, fontWeight: 'bold', color: Colors[colorScheme].text }]}>Nombre</Text>
+        <Text style={[styles.tableCell, { flex: 1, fontWeight: 'bold', color: Colors[colorScheme].text }]}>ID</Text>
+        <Text style={[styles.tableCell, { flex: 1, fontWeight: 'bold', color: Colors[colorScheme].text }]}>Posición</Text>
       </View>
       <FlatList
         data={players}
@@ -88,10 +91,10 @@ export default function QRScanner() {
             <Text style={[styles.tableCell, { flex: 0.5 }]}>{p.dorsal}</Text>
             <View style={{ flex: 2, flexDirection: 'row', alignItems: 'center' }}>
               <Image source={{ uri: p.foto }} style={styles.avatar} />
-              <Text style={[styles.tableCell, { marginLeft: 6 }]}>{p.nombre}</Text>
+              <Text style={[styles.tableCell, { marginLeft: 6, color: Colors[colorScheme].text }]}>{p.nombre}</Text>
             </View>
-            <Text style={[styles.tableCell, { flex: 1 }]}>{p.id}</Text>
-            <Text style={[styles.tableCell, { flex: 1 }]}>{p.posicion}</Text>
+            <Text style={[styles.tableCell, { flex: 1, color: Colors[colorScheme].text }]}>{p.id}</Text>
+            <Text style={[styles.tableCell, { flex: 1, color: Colors[colorScheme].text }]}>{p.posicion}</Text>
           </View>
         )}
         scrollEnabled={false}
@@ -106,25 +109,25 @@ export default function QRScanner() {
 
   if (!permission.granted) {
     return (
-      <View style={styles.container}>
-        <Text style={styles.permissionText}>Se necesita permiso para usar la cámara</Text>
+      <View style={[styles.container, { backgroundColor: Colors[colorScheme].background }]}>
+        <Text style={[styles.permissionText, {color: Colors[colorScheme].text} ]}>Se necesita permiso para usar la cámara</Text>
         <TouchableOpacity style={styles.primaryButton} onPress={requestPermission}>
-          <Text style={styles.buttonText}>Permitir cámara</Text>
+          <Text style={[styles.buttonText, {color: Colors[colorScheme].buttonSecondary}]}>Permitir cámara</Text>
         </TouchableOpacity>
         <TouchableOpacity style={styles.secondaryButton} onPress={() => router.back()}>
-          <Text style={styles.secondaryButtonText}>Cancelar o Volver</Text>
+          <Text style={[styles.secondaryButtonText, { color: Colors[colorScheme].buttonSecondary }]}>Cancelar o Volver</Text>
         </TouchableOpacity>
       </View>
     );
   }
 
   return (
-    <View style={styles.container}>
+    <View style={[styles.container, { backgroundColor: Colors[colorScheme].background }]}>
       <StatusBar style="auto" />
       <ScrollView contentContainerStyle={styles.scrollContent}>
         <View style={styles.header}>
           <Image source={require('@/assets/images/FMRUU.png')} style={styles.logo} resizeMode="contain" />
-          <Text style={styles.title}>Escanear Equipos</Text>
+          <Text style={[styles.title, {color: Colors[colorScheme].buttonText}]}>Escanear Equipos</Text>
         </View>
 
         {scanningTeam && (
@@ -136,8 +139,8 @@ export default function QRScanner() {
                 barcodeScannerSettings={{ barcodeTypes: ['qr'] }}
               />
             </View>
-            <TouchableOpacity style={[styles.secondaryButton, { marginTop: 12 }]} onPress={() => setScanningTeam(null)}>
-              <Text style={styles.secondaryButtonText}>Cancelar escaneo</Text>
+            <TouchableOpacity style={[styles.secondaryButton, { marginTop: 12 }, {backgroundColor: Colors[colorScheme].cardBackground}]} onPress={() => setScanningTeam(null)}>
+              <Text style={[styles.secondaryButtonText, {color: Colors[colorScheme].buttonPrimary}]}>Cancelar escaneo</Text>
             </TouchableOpacity>
           </>
         )}
@@ -183,7 +186,6 @@ export default function QRScanner() {
 const styles = StyleSheet.create({
   container: {
     flex: 1,
-    backgroundColor: '#fff',
     paddingVertical: Platform.OS === 'ios' ? 60 : 40,
     paddingHorizontal: 20,
   },
@@ -202,7 +204,6 @@ const styles = StyleSheet.create({
   title: {
     fontSize: 20,
     fontWeight: '600',
-    color: '#000',
   },
   cameraContainer: {
     height: 300,
@@ -226,9 +227,9 @@ const styles = StyleSheet.create({
     alignItems: 'center',
   },
   buttonText: {
-    color: 'white',
     fontSize: 16,
     fontWeight: '600',
+    color: "#fff"
   },
   secondaryButton: {
     backgroundColor: '#F0F7F0',
@@ -239,7 +240,6 @@ const styles = StyleSheet.create({
     alignItems: 'center',
   },
   secondaryButtonText: {
-    color: '#333',
     fontSize: 16,
     fontWeight: '500',
   },
@@ -252,10 +252,8 @@ const styles = StyleSheet.create({
     marginVertical: 16,
     borderRadius: 12,
     overflow: 'hidden',
-    backgroundColor: '#F9F9F9',
   },
   teamHeader: {
-    backgroundColor: '#E7F4EC',
     paddingVertical: 8,
     paddingHorizontal: 12,
   },
@@ -267,13 +265,11 @@ const styles = StyleSheet.create({
   },
   tableHeader: {
     flexDirection: 'row',
-    backgroundColor: '#F0F0F0',
     paddingVertical: 6,
     paddingHorizontal: 12,
   },
   tableRow: {
     flexDirection: 'row',
-    backgroundColor: 'white',
     paddingVertical: 8,
     paddingHorizontal: 12,
     borderBottomWidth: 1,

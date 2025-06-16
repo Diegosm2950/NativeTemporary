@@ -14,8 +14,11 @@ import {
 import { useRouter } from 'expo-router';
 import { StatusBar } from 'expo-status-bar';
 import { useCedula } from '@/context/CedulaContext';
+import Colors from '@/constants/Colors';
+import useColorScheme from '@/hooks/useColorScheme';
 
 export default function RegistrarObservacion() {
+  const colorScheme = useColorScheme();
   const router = useRouter();
   const { setCedulaData } = useCedula();
 
@@ -47,41 +50,68 @@ export default function RegistrarObservacion() {
 
   return (
     <KeyboardAvoidingView style={{ flex: 1 }} behavior="padding">
-      <ScrollView contentContainerStyle={styles.container} keyboardShouldPersistTaps="handled">
-        <StatusBar style="auto" />
+      <ScrollView 
+        contentContainerStyle={[
+          styles.container, 
+          { backgroundColor: Colors[colorScheme].background }
+        ]} 
+        keyboardShouldPersistTaps="handled"
+      >
         <Image
           source={require('@/assets/images/FMRUU.png')}
           style={styles.logo}
           resizeMode="contain"
         />
-        <Text style={styles.title}>Registrar Observación</Text>
+        <Text style={[styles.title, { color: Colors[colorScheme].text }]}>
+          Registrar Observación
+        </Text>
 
         <TextInput
-          style={styles.textarea}
+          style={[
+            styles.textarea,
+            { 
+              backgroundColor: Colors[colorScheme].inputBackground,
+              color: Colors[colorScheme].text,
+              borderColor: Colors[colorScheme].border
+            }
+          ]}
           placeholder="Observación (máx. 300 caracteres)"
+          placeholderTextColor={Colors[colorScheme].textSecondary}
           value={texto}
           onChangeText={(value) => {
             if (value.length <= 300) setTexto(value);
           }}
           multiline
-          placeholderTextColor="#555"
+          textAlignVertical="top"
         />
 
-        <Text style={styles.label}>Categoría</Text>
+        <Text style={[styles.label, { color: Colors[colorScheme].text }]}>
+          Categoría
+        </Text>
         <View style={styles.categoryGroup}>
           {['General', 'Público', 'Condiciones', 'Seguridad'].map((cat) => (
             <TouchableOpacity
               key={cat}
               style={[
                 styles.categoryButton,
-                categoria === cat && styles.categorySelected,
+                { 
+                  backgroundColor: Colors[colorScheme].buttonSecondary,
+                  borderColor: Colors[colorScheme].border
+                },
+                categoria === cat && {
+                  backgroundColor: Colors[colorScheme].buttonPrimary,
+                  borderColor: Colors[colorScheme].tint
+                }
               ]}
               onPress={() => setCategoria(cat as typeof categoria)}
             >
               <Text
                 style={[
                   styles.categoryText,
-                  categoria === cat && styles.categoryTextSelected,
+                  { color: Colors[colorScheme].buttonTextSecondary },
+                  categoria === cat && {
+                    color: Colors[colorScheme].buttonText
+                  }
                 ]}
               >
                 {cat}
@@ -90,12 +120,28 @@ export default function RegistrarObservacion() {
           ))}
         </View>
 
-        <TouchableOpacity style={styles.submitButton} onPress={handleGuardar}>
-          <Text style={styles.submitText}>Guardar Observación</Text>
+        <TouchableOpacity 
+          style={[
+            styles.submitButton, 
+            { backgroundColor: Colors[colorScheme].buttonPrimary }
+          ]} 
+          onPress={handleGuardar}
+        >
+          <Text style={[styles.submitText, { color: Colors[colorScheme].buttonText }]}>
+            Guardar Observación
+          </Text>
         </TouchableOpacity>
 
-        <TouchableOpacity style={styles.backButton} onPress={() => router.back()}>
-          <Text style={styles.backText}>Volver</Text>
+        <TouchableOpacity 
+          style={[
+            styles.backButton, 
+            { backgroundColor: Colors[colorScheme].buttonSecondary }
+          ]} 
+          onPress={() => router.back()}
+        >
+          <Text style={[styles.backText, { color: Colors[colorScheme].buttonTextSecondary }]}>
+            Volver
+          </Text>
         </TouchableOpacity>
       </ScrollView>
     </KeyboardAvoidingView>
@@ -106,7 +152,7 @@ const styles = StyleSheet.create({
   container: {
     paddingVertical: Platform.OS === 'ios' ? 60 : 40,
     paddingHorizontal: 20,
-    backgroundColor: '#fff',
+    flex: 1
   },
   logo: {
     width: 80,
@@ -120,14 +166,12 @@ const styles = StyleSheet.create({
     marginBottom: 20,
   },
   textarea: {
-    backgroundColor: '#E6EFE6',
     padding: 14,
     borderRadius: 12,
     fontSize: 14,
     marginBottom: 20,
     minHeight: 120,
-    textAlignVertical: 'top',
-    color: '#000',
+    borderWidth: 1,
   },
   label: {
     fontSize: 16,
@@ -143,39 +187,28 @@ const styles = StyleSheet.create({
   categoryButton: {
     paddingVertical: 8,
     paddingHorizontal: 14,
-    backgroundColor: '#F3F8F3',
     borderRadius: 18,
-  },
-  categorySelected: {
-    backgroundColor: '#1B9D3B',
+    borderWidth: 1,
   },
   categoryText: {
-    color: '#333',
     fontSize: 14,
   },
-  categoryTextSelected: {
-    color: '#fff',
-  },
   submitButton: {
-    backgroundColor: '#1B9D3B',
     padding: 16,
     borderRadius: 25,
     alignItems: 'center',
     marginBottom: 12,
   },
   submitText: {
-    color: '#fff',
     fontWeight: '600',
     fontSize: 16,
   },
   backButton: {
-    backgroundColor: '#F0F7F0',
     padding: 14,
     borderRadius: 25,
     alignItems: 'center',
   },
   backText: {
-    color: '#333',
     fontSize: 16,
     fontWeight: '500',
   },

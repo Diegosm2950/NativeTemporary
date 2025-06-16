@@ -3,8 +3,11 @@ import { View, Text, StyleSheet, TouchableOpacity, Platform, Image, Alert, Scrol
 import { useRouter } from 'expo-router';
 import { StatusBar } from 'expo-status-bar';
 import { useCedula } from '@/context/CedulaContext';
+import Colors from '@/constants/Colors';
+import useColorScheme from '@/hooks/useColorScheme';
 
 export default function RegistrarCambio() {
+  const colorScheme = useColorScheme();
   const router = useRouter();
   const { cedulaData, setCedulaData, jugadoresLocal, jugadoresVisitante, cronometro } = useCedula();
 
@@ -50,33 +53,41 @@ export default function RegistrarCambio() {
   };
 
   return (
-    <ScrollView contentContainerStyle={styles.container}>
-      <StatusBar style="auto" />
+    <ScrollView contentContainerStyle={[styles.container, { backgroundColor: Colors[colorScheme].background }]}>
+      <StatusBar style={colorScheme === 'dark' ? 'light' : 'dark'} />
       <Image
         source={require('@/assets/images/FMRUU.png')}
         style={styles.logo}
         resizeMode="contain"
       />
-      <Text style={styles.title}>Registrar cambio de jugador</Text>
+      <Text style={[styles.title, { color: Colors[colorScheme].text }]}>Registrar cambio de jugador</Text>
 
-      <View style={styles.select}>
-        <Text style={{ marginBottom: 8, fontWeight: '500' }}>Selecciona el equipo:</Text>
+      <View style={[styles.select, { backgroundColor: Colors[colorScheme].inputBackground }]}>
+        <Text style={{ marginBottom: 8, fontWeight: '500', color: Colors[colorScheme].text }}>Selecciona el equipo:</Text>
         <View style={{ flexDirection: 'row', gap: 10 }}>
           <TouchableOpacity onPress={() => setEquipo('A')}>
-            <Text style={[styles.selectText, equipo === 'A' && { fontWeight: 'bold', color: '#1B9D3B' }]}>
+            <Text style={[
+              styles.selectText, 
+              { color: Colors[colorScheme].text },
+              equipo === 'A' && { fontWeight: 'bold', color: Colors[colorScheme].tint }
+            ]}>
               {cedulaData.equipoLocal?.nombre || 'Equipo A'}
             </Text>
           </TouchableOpacity>
           <TouchableOpacity onPress={() => setEquipo('B')}>
-            <Text style={[styles.selectText, equipo === 'B' && { fontWeight: 'bold', color: '#1B9D3B' }]}>
+            <Text style={[
+              styles.selectText, 
+              { color: Colors[colorScheme].text },
+              equipo === 'B' && { fontWeight: 'bold', color: Colors[colorScheme].tint }
+            ]}>
               {cedulaData.equipoVisitante?.nombre || 'Equipo B'}
             </Text>
           </TouchableOpacity>
         </View>
       </View>
 
-      <View style={styles.select}>
-        <Text style={{ marginBottom: 8 }}>Jugador que sale:</Text>
+      <View style={[styles.select, { backgroundColor: Colors[colorScheme].inputBackground }]}>
+        <Text style={{ marginBottom: 8, color: Colors[colorScheme].text }}>Jugador que sale:</Text>
         {jugadores.map(j => (
           <TouchableOpacity
             key={`sale-${j.id}`}
@@ -84,14 +95,16 @@ export default function RegistrarCambio() {
             style={{ flexDirection: 'row', alignItems: 'center', marginBottom: 6 }}
           >
             <Image source={{ uri: j.foto }} style={{ width: 32, height: 32, borderRadius: 16, marginRight: 8 }} />
-            <Text style={{ color: jugadorSale === j.nombre ? '#1B9D3B' : '#111' }}>{j.nombre}</Text>
+            <Text style={{ color: jugadorSale === j.nombre ? Colors[colorScheme].tint : Colors[colorScheme].text }}>
+              {j.nombre}
+            </Text>
           </TouchableOpacity>
         ))}
-        {!jugadores.length && <Text style={{ color: '#999' }}>Selecciona primero un equipo</Text>}
+        {!jugadores.length && <Text style={{ color: Colors[colorScheme].textSecondary }}>Selecciona primero un equipo</Text>}
       </View>
 
-      <View style={styles.select}>
-        <Text style={{ marginBottom: 8 }}>Jugador que entra:</Text>
+      <View style={[styles.select, { backgroundColor: Colors[colorScheme].inputBackground }]}>
+        <Text style={{ marginBottom: 8, color: Colors[colorScheme].text }}>Jugador que entra:</Text>
         {jugadores.map(j => (
           <TouchableOpacity
             key={`entra-${j.id}`}
@@ -99,18 +112,25 @@ export default function RegistrarCambio() {
             style={{ flexDirection: 'row', alignItems: 'center', marginBottom: 6 }}
           >
             <Image source={{ uri: j.foto }} style={{ width: 32, height: 32, borderRadius: 16, marginRight: 8 }} />
-            <Text style={{ color: jugadorEntra === j.nombre ? '#1B9D3B' : '#111' }}>{j.nombre}</Text>
+            <Text style={{ color: jugadorEntra === j.nombre ? Colors[colorScheme].tint : Colors[colorScheme].text }}>
+              {j.nombre}
+            </Text>
           </TouchableOpacity>
         ))}
-        {!jugadores.length && <Text style={{ color: '#999' }}>Selecciona primero un equipo</Text>}
+        {!jugadores.length && <Text style={{ color: Colors[colorScheme].textSecondary }}>Selecciona primero un equipo</Text>}
       </View>
 
-      <Text style={{ textAlign: 'center', fontSize: 16, marginBottom: 10 }}>
+      <Text style={{ 
+        textAlign: 'center', 
+        fontSize: 16, 
+        marginBottom: 10,
+        color: Colors[colorScheme].text 
+      }}>
         Tiempo actual: <Text style={{ fontWeight: 'bold' }}>{tiempoActual}</Text>
       </Text>
 
-      <Text style={styles.subTitle}>Seleccione una opción</Text>
-      <Text style={styles.subText}>Motivo del cambio (opcional)</Text>
+      <Text style={[styles.subTitle, { color: Colors[colorScheme].text }]}>Seleccione una opción</Text>
+      <Text style={[styles.subText, { color: Colors[colorScheme].textSecondary }]}>Motivo del cambio (opcional)</Text>
       {[
         { label: 'Táctico', value: 'tactico' },
         { label: 'Lesión', value: 'lesion' },
@@ -120,28 +140,47 @@ export default function RegistrarCambio() {
           key={value}
           style={[
             styles.motivoOption,
-            motivo === value && styles.motivoOptionSelected,
+            { 
+              borderColor: Colors[colorScheme].border,
+              backgroundColor: Colors[colorScheme].cardBackground 
+            },
+            motivo === value && {
+              borderColor: Colors[colorScheme].tint,
+              backgroundColor: Colors[colorScheme].buttonSecondary
+            }
           ]}
           onPress={() => setMotivo(value as 'tactico' | 'lesion' | 'otro')}
         >
-          <Text style={styles.motivoText}>{label}</Text>
+          <Text style={[styles.motivoText, { color: Colors[colorScheme].text }]}>{label}</Text>
         </TouchableOpacity>
       ))}
 
-      <TouchableOpacity style={styles.submitButton} onPress={handleGuardarCambio}>
-        <Text style={styles.submitText}>Registrar Cambio</Text>
+      <TouchableOpacity 
+        style={[
+          styles.submitButton, 
+          { backgroundColor: Colors[colorScheme].buttonPrimary }
+        ]} 
+        onPress={handleGuardarCambio}
+      >
+        <Text style={[styles.submitText, { color: Colors[colorScheme].buttonText }]}>Registrar Cambio</Text>
       </TouchableOpacity>
 
-      <TouchableOpacity style={styles.backButton} onPress={() => router.back()}>
-        <Text style={styles.backText}>Volver</Text>
+      <TouchableOpacity 
+        style={[
+          styles.backButton, 
+          { backgroundColor: Colors[colorScheme].buttonSecondary }
+        ]} 
+        onPress={() => router.back()}
+      >
+        <Text style={[styles.backText, { color: Colors[colorScheme].buttonTextSecondary }]}>Volver</Text>
       </TouchableOpacity>
     </ScrollView>
   );
 }
+
 const styles = StyleSheet.create({
   container: {
     flexGrow: 1,
-    backgroundColor: '#fff',
     paddingVertical: Platform.OS === 'ios' ? 60 : 40,
     paddingHorizontal: 20,
   },
@@ -157,13 +196,12 @@ const styles = StyleSheet.create({
     marginBottom: 20,
   },
   select: {
-    backgroundColor: '#F3F8F3',
     padding: 16,
     borderRadius: 12,
     marginBottom: 12,
   },
   selectText: {
-    color: '#333',
+    fontSize: 16,
   },
   timerInput: {
     fontSize: 22,
@@ -171,7 +209,6 @@ const styles = StyleSheet.create({
     textAlign: 'center',
     marginVertical: 16,
     borderBottomWidth: 1,
-    borderColor: '#ccc',
     paddingVertical: 6,
     width: 120,
     alignSelf: 'center',
@@ -184,45 +221,34 @@ const styles = StyleSheet.create({
   },
   subText: {
     fontSize: 12,
-    color: '#555',
     marginBottom: 8,
   },
   motivoOption: {
     borderWidth: 1,
-    borderColor: '#ccc',
     borderRadius: 12,
     padding: 14,
     marginBottom: 8,
   },
-  motivoOptionSelected: {
-    borderColor: '#1B9D3B',
-    backgroundColor: '#E6EFE6',
-  },
   motivoText: {
     fontSize: 14,
-    color: '#111',
   },
   submitButton: {
-    backgroundColor: '#1B9D3B',
     padding: 16,
     borderRadius: 25,
     alignItems: 'center',
     marginTop: 20,
   },
   submitText: {
-    color: '#fff',
     fontWeight: '600',
     fontSize: 16,
   },
   backButton: {
-    backgroundColor: '#F0F7F0',
     padding: 14,
     borderRadius: 25,
     alignItems: 'center',
     marginTop: 12,
   },
   backText: {
-    color: '#333',
     fontSize: 16,
     fontWeight: '500',
   },

@@ -7,7 +7,7 @@ export default {
     textSecondary: '#666666',
     background: '#F8F9FA',
     tint: tintColorLight,
-    tabIconDefault: '#CCCCCC',
+    tabIconDefault: '#121212',
     tabIconSelected: tintColorLight,
     cardBackground: '#FFFFFF',
     buttonPrimary: '#24693D',

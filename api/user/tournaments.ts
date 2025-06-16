@@ -9,7 +9,6 @@ export const fetchConvocatorias = async (id: number, token: string): Promise<Con
     if (!id || !token) {
       throw new Error('ID and token are required');
     }
-    
     const response = await fetch(`${API_BASE_URL}/api/app-native-api/convocatorias/${id}`, {
       headers: {
         'Authorization': `Bearer ${token}`,

@@ -14,8 +14,11 @@ import {
 import { useRouter } from 'expo-router';
 import { StatusBar } from 'expo-status-bar';
 import { useCedula } from '@/context/CedulaContext';
+import Colors from '@/constants/Colors';
+import useColorScheme from '@/hooks/useColorScheme';
 
 export default function RegistrarLesion() {
+  const colorScheme = useColorScheme();
   const router = useRouter();
   const { cedulaData, setCedulaData, jugadoresLocal, jugadoresVisitante } = useCedula();
 
@@ -63,43 +66,73 @@ export default function RegistrarLesion() {
       behavior={Platform.OS === 'ios' ? 'padding' : 'height'}
       style={{ flex: 1 }}
     >
-      <ScrollView contentContainerStyle={styles.container}>
-        <StatusBar style="auto" />
+      <ScrollView contentContainerStyle={[styles.container, { backgroundColor: Colors[colorScheme].background }]}>
+        <StatusBar style={colorScheme === 'dark' ? 'light' : 'dark'} />
         <Image
           source={require('@/assets/images/FMRUU.png')}
           style={styles.logo}
           resizeMode="contain"
         />
-        <Text style={styles.title}>Registrar Lesión</Text>
+        <Text style={[styles.title, { color: Colors[colorScheme].text }]}>Registrar Lesión</Text>
 
         {/* Selector de equipo */}
         <View style={styles.teamSwitch}>
           <TouchableOpacity
-            style={[styles.teamButton, equipo === 'A' && styles.teamButtonSelected]}
+            style={[
+              styles.teamButton, 
+              { backgroundColor: Colors[colorScheme].buttonSecondary },
+              equipo === 'A' && { 
+                backgroundColor: Colors[colorScheme].buttonPrimary 
+              }
+            ]}
             onPress={() => setEquipo('A')}
           >
-            <Text style={styles.teamText}>{cedulaData.equipoLocal?.nombre || 'Equipo A'}</Text>
+            <Text style={[
+              styles.teamText, 
+              { color: Colors[colorScheme].buttonTextSecondary },
+              equipo === 'A' && { color: Colors[colorScheme].buttonText }
+            ]}>
+              {cedulaData.equipoLocal?.nombre || 'Equipo A'}
+            </Text>
           </TouchableOpacity>
           <TouchableOpacity
-            style={[styles.teamButton, equipo === 'B' && styles.teamButtonSelected]}
+            style={[
+              styles.teamButton, 
+              { backgroundColor: Colors[colorScheme].buttonSecondary },
+              equipo === 'B' && { 
+                backgroundColor: Colors[colorScheme].buttonPrimary 
+              }
+            ]}
             onPress={() => setEquipo('B')}
           >
-            <Text style={styles.teamText}>{cedulaData.equipoVisitante?.nombre || 'Equipo B'}</Text>
+            <Text style={[
+              styles.teamText, 
+              { color: Colors[colorScheme].buttonTextSecondary },
+              equipo === 'B' && { color: Colors[colorScheme].buttonText }
+            ]}>
+              {cedulaData.equipoVisitante?.nombre || 'Equipo B'}
+            </Text>
           </TouchableOpacity>
         </View>
 
         {/* Selector de jugador */}
-        <TouchableOpacity style={styles.select}>
-          <Text style={styles.selectText}>{jugador || 'Seleccionar jugador lesionado'}</Text>
+        <TouchableOpacity style={[styles.select, { backgroundColor: Colors[colorScheme].inputBackground }]}>
+          <Text style={[styles.selectText, { color: jugador ? Colors[colorScheme].text : Colors[colorScheme].textSecondary }]}>
+            {jugador || 'Seleccionar jugador lesionado'}
+          </Text>
         </TouchableOpacity>
 
         {jugadores.map(j => (
           <TouchableOpacity
             key={j.id}
-            style={styles.select}
+            style={[styles.select, { backgroundColor: Colors[colorScheme].inputBackground }]}
             onPress={() => setJugador(j.nombre)}
           >
-            <Text style={styles.selectText}>{j.nombre}</Text>
+            <Text style={[styles.selectText, { 
+              color: jugador === j.nombre ? Colors[colorScheme].tint : Colors[colorScheme].text 
+            }]}>
+              {j.nombre}
+            </Text>
           </TouchableOpacity>
         ))}
 
@@ -108,10 +141,24 @@ export default function RegistrarLesion() {
           {partesCuerpo.map((p) => (
             <TouchableOpacity
               key={p}
-              style={[styles.partButton, parte === p && styles.partButtonSelected]}
+              style={[
+                styles.partButton, 
+                { backgroundColor: Colors[colorScheme].buttonSecondary },
+                parte === p && { 
+                  backgroundColor: Colors[colorScheme].buttonPrimary,
+                  borderColor: Colors[colorScheme].tint,
+                  borderWidth: 1
+                }
+              ]}
               onPress={() => setParte(p)}
             >
-              <Text style={styles.partText}>{p}</Text>
+              <Text style={[
+                styles.partText, 
+                { color: Colors[colorScheme].text },
+                parte === p && { color: Colors[colorScheme].buttonText }
+              ]}>
+                {p}
+              </Text>
             </TouchableOpacity>
           ))}
         </View>
@@ -121,49 +168,108 @@ export default function RegistrarLesion() {
           {['Leve', 'Media', 'Grave'].map((nivel) => (
             <TouchableOpacity
               key={nivel}
-              style={[styles.gravedadButton, gravedad === nivel && styles.gravedadSelected]}
+              style={[
+                styles.gravedadButton,
+                gravedad === nivel && { 
+                  borderColor: Colors[colorScheme].tint 
+                }
+              ]}
               onPress={() => setGravedad(nivel as typeof gravedad)}
             >
-              <Text style={styles.gravedadText}>{nivel}</Text>
+              <Text style={[
+                styles.gravedadText, 
+                { color: Colors[colorScheme].text },
+                gravedad === nivel && { color: Colors[colorScheme].tint }
+              ]}>
+                {nivel}
+              </Text>
             </TouchableOpacity>
           ))}
         </View>
 
         {/* Ambulancia */}
-        <Text style={styles.sectionTitle}>¿Requiere ambulancia?</Text>
+        <Text style={[styles.sectionTitle, { color: Colors[colorScheme].text }]}>¿Requiere ambulancia?</Text>
         <TouchableOpacity
-          style={[styles.optionButton, ambulancia === true && styles.selected]}
+          style={[
+            styles.optionButton, 
+            { backgroundColor: Colors[colorScheme].buttonSecondary },
+            ambulancia === true && { 
+              backgroundColor: Colors[colorScheme].buttonPrimary 
+            }
+          ]}
           onPress={() => setAmbulancia(true)}
         >
-          <Text style={styles.optionText}>Sí</Text>
+          <Text style={[
+            styles.optionText, 
+            { color: Colors[colorScheme].text },
+            ambulancia === true && { color: Colors[colorScheme].buttonText }
+          ]}>
+            Sí
+          </Text>
         </TouchableOpacity>
         <TouchableOpacity
-          style={[styles.optionButton, ambulancia === false && styles.selectedNo]}
+          style={[
+            styles.optionButton, 
+            { backgroundColor: Colors[colorScheme].buttonSecondary },
+            ambulancia === false && { 
+              backgroundColor: Colors[colorScheme].cardBackground 
+            }
+          ]}
           onPress={() => setAmbulancia(false)}
         >
-          <Text style={styles.optionText}>No</Text>
+          <Text style={[
+            styles.optionText, 
+            { color: Colors[colorScheme].text }
+          ]}>
+            No
+          </Text>
         </TouchableOpacity>
 
         {/* Observación */}
-        <Text style={styles.sectionTitle}>Observación</Text>
+        <Text style={[styles.sectionTitle, { color: Colors[colorScheme].text }]}>Observación</Text>
         <TextInput
-          style={styles.textarea}
+          style={[
+            styles.textarea, 
+            { 
+              backgroundColor: Colors[colorScheme].inputBackground,
+              color: Colors[colorScheme].text
+            }
+          ]}
           placeholder="Nota del árbitro"
+          placeholderTextColor={Colors[colorScheme].textSecondary}
           value={observacion}
           onChangeText={setObservacion}
           multiline
-          placeholderTextColor="#555"
         />
 
-        <TouchableOpacity style={styles.submitButton} onPress={handleRegistrarLesion}>
-          <Text style={styles.submitText}>Registrar Lesión</Text>
+        <TouchableOpacity 
+          style={[
+            styles.submitButton, 
+            { backgroundColor: Colors[colorScheme].buttonPrimary }
+          ]} 
+          onPress={handleRegistrarLesion}
+        >
+          <Text style={[
+            styles.submitText, 
+            { color: Colors[colorScheme].buttonText }
+          ]}>
+            Registrar Lesión
+          </Text>
         </TouchableOpacity>
 
         <TouchableOpacity
-          style={styles.backButton}
+          style={[
+            styles.backButton,
+            { backgroundColor: Colors[colorScheme].buttonSecondary }
+          ]}
           onPress={() => router.replace('/(protected)/(cedulas)/juego' as any)}
         >
-          <Text style={styles.backText}>Volver</Text>
+          <Text style={[
+            styles.backText,
+            { color: Colors[colorScheme].buttonTextSecondary }
+          ]}>
+            Volver
+          </Text>
         </TouchableOpacity>
       </ScrollView>
     </KeyboardAvoidingView>
@@ -174,7 +280,7 @@ const styles = StyleSheet.create({
   container: {
     paddingVertical: Platform.OS === 'ios' ? 60 : 40,
     paddingHorizontal: 20,
-    backgroundColor: '#fff',
+    flex: 1
   },
   logo: {
     width: 80,
@@ -188,13 +294,12 @@ const styles = StyleSheet.create({
     marginBottom: 20,
   },
   select: {
-    backgroundColor: '#F3F8F3',
     padding: 16,
     borderRadius: 12,
     marginBottom: 12,
   },
   selectText: {
-    color: '#333',
+    fontSize: 16,
   },
   bodyParts: {
     flexDirection: 'row',
@@ -203,18 +308,11 @@ const styles = StyleSheet.create({
     marginBottom: 20,
   },
   partButton: {
-    backgroundColor: '#E6EFE6',
     borderRadius: 20,
     paddingVertical: 8,
     paddingHorizontal: 16,
   },
-  partButtonSelected: {
-    backgroundColor: '#C2EAC2',
-    borderWidth: 1,
-    borderColor: '#1B9D3B',
-  },
   partText: {
-    color: '#111',
     fontSize: 14,
   },
   gravedadContainer: {
@@ -226,9 +324,6 @@ const styles = StyleSheet.create({
     paddingVertical: 8,
     borderBottomWidth: 2,
     borderColor: 'transparent',
-  },
-  gravedadSelected: {
-    borderColor: '#1B9D3B',
   },
   gravedadText: {
     fontSize: 14,
@@ -242,72 +337,53 @@ const styles = StyleSheet.create({
   optionButton: {
     padding: 14,
     borderRadius: 25,
-    backgroundColor: '#F0F7F0',
     alignItems: 'center',
     marginBottom: 12,
   },
-  selected: {
-    backgroundColor: '#1B9D3B',
-  },
-  selectedNo: {
-    backgroundColor: '#DCEADC',
-  },
   optionText: {
-    color: '#111',
     fontSize: 16,
     fontWeight: '500',
   },
   textarea: {
-    backgroundColor: '#E6EFE6',
     padding: 14,
     borderRadius: 12,
     fontSize: 14,
     minHeight: 100,
     textAlignVertical: 'top',
     marginBottom: 20,
-    color: '#000',
   },
   submitButton: {
-    backgroundColor: '#1B9D3B',
     padding: 16,
     borderRadius: 25,
     alignItems: 'center',
     marginBottom: 12,
   },
   submitText: {
-    color: '#fff',
     fontWeight: '600',
     fontSize: 16,
   },
   backButton: {
-    backgroundColor: '#F0F7F0',
     padding: 14,
     borderRadius: 25,
     alignItems: 'center',
   },
   backText: {
-    color: '#333',
     fontSize: 16,
     fontWeight: '500',
   },
-   teamSwitch: {
+  teamSwitch: {
     flexDirection: 'row',
     justifyContent: 'space-between',
     marginBottom: 16,
   },
   teamButton: {
     flex: 1,
-    backgroundColor: '#E6EFE6',
     padding: 12,
     borderRadius: 25,
     alignItems: 'center',
     marginHorizontal: 6,
   },
-  teamButtonSelected: {
-    backgroundColor: '#1B9D3B',
-  },
   teamText: {
-    color: '#111',
     fontWeight: '500',
   },
 });

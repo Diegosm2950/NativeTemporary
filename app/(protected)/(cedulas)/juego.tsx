@@ -5,11 +5,13 @@ import { useRouter } from 'expo-router';
 import { StatusBar } from 'expo-status-bar';
 import { useCedula } from '@/context/CedulaContext';
 import { useEffect, useRef, useState } from 'react';
+import Colors from '@/constants/Colors';
+import useColorScheme from '@/hooks/useColorScheme';
 
 export default function JuegoScreen() {
   const router = useRouter();
   const { cedulaData, cronometro, setCronometro } = useCedula();
-
+  const colorScheme = useColorScheme();
   const [corriendo, setCorriendo] = useState(false);
   const intervaloRef = useRef<NodeJS.Timeout | null>(null);
 
@@ -75,8 +77,8 @@ export default function JuegoScreen() {
   };
 
   return (
-    <View style={styles.container}>
-      <StatusBar style="auto" />
+    <View style={[styles.container, { backgroundColor: Colors[colorScheme].background }]}>
+      <StatusBar style={colorScheme === 'dark' ? 'light' : 'dark'} />
 
       <Image
         source={require('@/assets/images/FMRUU.png')}
@@ -84,15 +86,17 @@ export default function JuegoScreen() {
         resizeMode="contain"
       />
 
-      <Text style={styles.title}>Cédula del partido</Text>
+      <Text style={[styles.title, { color: Colors[colorScheme].text }]}>Cédula del partido</Text>
 
       {/* Encabezado del partido */}
-      <View style={styles.matchCard}>
+      <View style={[styles.matchCard, { backgroundColor: Colors[colorScheme].cardBackground }]}>
         <View style={styles.matchHeader}>
-          <Text style={styles.badge}>
+          <Text style={[styles.badge, { backgroundColor: Colors[colorScheme].buttonPrimary, color: Colors[colorScheme].buttonText }]}>
             {cedulaData.torneo || (cedulaData.tipoPartido === 'torneo' ? 'Torneo' : 'Amistoso')}
           </Text>
-          <Text style={styles.badge}>Inicio: {cedulaData.horaInicio || '--:--'}</Text>
+          <Text style={[styles.badge, { backgroundColor: Colors[colorScheme].buttonPrimary, color: Colors[colorScheme].buttonText }]}>
+            Inicio: {cedulaData.horaInicio || '--:--'}
+          </Text>
         </View>
 
         <View style={styles.scoreSection}>
@@ -100,7 +104,7 @@ export default function JuegoScreen() {
             style={styles.teamLogo}
             source={cedulaData.equipoLocal?.logo ? { uri: cedulaData.equipoLocal.logo } : require('@/assets/images/FMRUU.png')}
           />
-          <Text style={styles.score}>{puntosA} : {puntosB}</Text>
+          <Text style={[styles.score, { color: Colors[colorScheme].text }]}>{puntosA} : {puntosB}</Text>
           <Image
             style={styles.teamLogo}
             source={cedulaData.equipoVisitante?.logo ? { uri: cedulaData.equipoVisitante.logo } : require('@/assets/images/FMRUU.png')}
@@ -108,88 +112,85 @@ export default function JuegoScreen() {
         </View>
 
         <View style={styles.teamNames}>
-          <Text style={styles.teamName}>{cedulaData.equipoLocal?.nombre || 'Equipo A'}</Text>
-          <Text style={styles.teamName}>{cedulaData.equipoVisitante?.nombre || 'Equipo B'}</Text>
+          <Text style={[styles.teamName, { color: Colors[colorScheme].text }]}>{cedulaData.equipoLocal?.nombre || 'Equipo A'}</Text>
+          <Text style={[styles.teamName, { color: Colors[colorScheme].text }]}>{cedulaData.equipoVisitante?.nombre || 'Equipo B'}</Text>
         </View>
       </View>
 
       {/* Tabla de puntos */}
-      <View style={styles.statsTable}>
-        <View style={styles.statsHeader}>
+      <View style={[styles.statsTable, { backgroundColor: Colors[colorScheme].cardBackground }]}>
+        <View style={[styles.statsHeader, { backgroundColor: Colors[colorScheme].buttonPrimary }]}>
           {['#', 'Jugador', 'Acción', 'Tiempo'].map((h, i) => (
-            <Text key={i} style={styles.statsCell}>{h}</Text>
+            <Text key={i} style={[styles.statsCell, { color: Colors[colorScheme].buttonText }]}>{h}</Text>
           ))}
         </View>
 
         <ScrollView style={styles.statsScroll} nestedScrollEnabled={true}>
           {[...marcadorA, ...marcadorB].map((punto, index) => (
-            <View key={index} style={styles.statsRow}>
-              <Text style={styles.statsCell}>{index + 1}</Text>
-              <Text style={styles.statsCell}>{punto.jugador}</Text>
-              <Text style={styles.statsCell}>{punto.accion}</Text>
-              <Text style={styles.statsCell}>{punto.tiempo}</Text>
+            <View key={index} style={[styles.statsRow, { borderBottomColor: Colors[colorScheme].border }]}>
+              <Text style={[styles.statsCell, { color: Colors[colorScheme].text }]}>{index + 1}</Text>
+              <Text style={[styles.statsCell, { color: Colors[colorScheme].text }]}>{punto.jugador}</Text>
+              <Text style={[styles.statsCell, { color: Colors[colorScheme].text }]}>{punto.accion}</Text>
+              <Text style={[styles.statsCell, { color: Colors[colorScheme].text }]}>{punto.tiempo}</Text>
             </View>
           ))}
         </ScrollView>
       </View>
 
       {/* Cronómetro */}
-      <View style={styles.cronometroContainer}>
-      <Text style={styles.cronometroTiempo}>{formatTiempo(cronometro)}</Text>
+      <View style={[styles.cronometroContainer, { backgroundColor: Colors[colorScheme].cardBackground }]}>
+        <Text style={[styles.cronometroTiempo, { color: Colors[colorScheme].text }]}>{formatTiempo(cronometro)}</Text>
 
         <View style={styles.cronoButtonGroup}>
           {!corriendo && cronometro === 0 && (
-            <TouchableOpacity onPress={iniciar} style={styles.cronoButton}>
-              <Text style={styles.cronoButtonText}>Iniciar</Text>
+            <TouchableOpacity onPress={iniciar} style={[styles.cronoButton, { backgroundColor: Colors[colorScheme].buttonPrimary }]}>
+              <Text style={[styles.cronoButtonText, { color: Colors[colorScheme].buttonText }]}>Iniciar</Text>
             </TouchableOpacity>
           )}
           {corriendo && (
-            <TouchableOpacity onPress={pausar} style={styles.cronoButton}>
-              <Text style={styles.cronoButtonText}>Pausar</Text>
+            <TouchableOpacity onPress={pausar} style={[styles.cronoButton, { backgroundColor: Colors[colorScheme].buttonPrimary }]}>
+              <Text style={[styles.cronoButtonText, { color: Colors[colorScheme].buttonText }]}>Pausar</Text>
             </TouchableOpacity>
           )}
           {!corriendo && cronometro > 0 && (
-            <>
-              <TouchableOpacity onPress={reanudar} style={styles.cronoButton}>
-                <Text style={styles.cronoButtonText}>Reanudar</Text>
-              </TouchableOpacity>
-            </>
+            <TouchableOpacity onPress={reanudar} style={[styles.cronoButton, { backgroundColor: Colors[colorScheme].buttonPrimary }]}>
+              <Text style={[styles.cronoButtonText, { color: Colors[colorScheme].buttonText }]}>Reanudar</Text>
+            </TouchableOpacity>
           )}
         </View>
       </View>
 
-
       {/* Botones */}
       <TouchableOpacity
-        style={styles.mainButton}
+        style={[styles.mainButton, { backgroundColor: Colors[colorScheme].buttonPrimary }]}
         onPress={() => router.push('/(protected)/(cedulas)/puntos')}
       >
-        <Text style={styles.mainButtonText}>Agregar punto</Text>
+        <Text style={[styles.mainButtonText, { color: Colors[colorScheme].buttonText }]}>Agregar punto</Text>
       </TouchableOpacity>
 
       <View style={styles.actionGrid}>
         {[
-          { label: 'Tarjetas', icon: <Flag size={28} color="#111" />, route: '/(protected)/(cedulas)/tarjeta' },
-          { label: 'Cambios', icon: <Repeat size={28} color="#111" />, route: '/(protected)/(cedulas)/cambio' },
-          { label: 'Observaciones', icon: <Pencil size={28} color="#111" />, route: '/(protected)/(cedulas)/observacion' },
-          { label: 'Lesiones', icon: <Bandage size={28} color="#111" />, route: '/(protected)/(cedulas)/lesion' }
+          { label: 'Tarjetas', icon: <Flag size={28} color={Colors[colorScheme].text} />, route: '/(protected)/(cedulas)/tarjeta' },
+          { label: 'Cambios', icon: <Repeat size={28} color={Colors[colorScheme].text} />, route: '/(protected)/(cedulas)/cambio' },
+          { label: 'Observaciones', icon: <Pencil size={28} color={Colors[colorScheme].text} />, route: '/(protected)/(cedulas)/observacion' },
+          { label: 'Lesiones', icon: <Bandage size={28} color={Colors[colorScheme].text} />, route: '/(protected)/(cedulas)/lesion' }
         ].map(({ label, icon, route }, index) => (
           <TouchableOpacity
             key={index}
-            style={styles.iconButton}
+            style={[styles.iconButton, { backgroundColor: Colors[colorScheme].cardBackground }]}
             onPress={() => router.push(route)}
           >
             {icon}
-            <Text style={styles.iconLabel}>{label}</Text>
+            <Text style={[styles.iconLabel, { color: Colors[colorScheme].text }]}>{label}</Text>
           </TouchableOpacity>
         ))}
       </View>
 
       <TouchableOpacity
-        style={styles.digitalSignButton}
+        style={[styles.digitalSignButton, { backgroundColor: Colors[colorScheme].cardBackground }]}
         onPress={() => router.push('/(protected)/(cedulas)/firmas')}
       >
-        <Text style={styles.secondaryText}>Firmas Digitales</Text>
+        <Text style={[styles.secondaryText, { color: Colors[colorScheme].text }]}>Firmas Digitales</Text>
       </TouchableOpacity>
     </View>
   );

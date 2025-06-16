@@ -10,7 +10,6 @@ import {
   ActivityIndicator,
   Alert,
 } from "react-native";
-import Constants from "expo-constants";
 import AsyncStorage from "@react-native-async-storage/async-storage";
 import { Player } from "@/types/user";
 
@@ -39,7 +38,7 @@ const PlayerList: React.FC<PlayerListProps> = ({ filter, page, selected, onUpdat
           return;
         }
 
-        const API_BASE_URL = Constants.expoConfig?.extra?.EXPO_PUBLIC_API_BASE_URL;
+        const API_BASE_URL = process.env.EXPO_PUBLIC_API_BASE_URL;
         if (!API_BASE_URL) {
           console.error("❌ EXPO_PUBLIC_API_BASE_URL no definido");
           Alert.alert("Error de configuración", "No se ha definido la URL base.");
