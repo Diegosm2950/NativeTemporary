@@ -6,12 +6,13 @@ import {
   Image,
   StyleSheet,
   TouchableOpacity,
-  useColorScheme,
   ActivityIndicator,
   Alert,
 } from "react-native";
 import AsyncStorage from "@react-native-async-storage/async-storage";
 import { Player } from "@/types/user";
+import Colors from "@/constants/Colors";
+import useColorScheme from "@/hooks/useColorScheme";
 
 interface PlayerListProps {
   filter: string;
@@ -21,9 +22,10 @@ interface PlayerListProps {
 }
 
 const PlayerList: React.FC<PlayerListProps> = ({ filter, page, selected, onUpdateSelection }) => {
-  const isDark = useColorScheme() === "dark";
   const [loading, setLoading] = useState(true);
   const [players, setPlayers] = useState<Player[]>([]);
+  const colorScheme = useColorScheme();
+
 
   useEffect(() => {
     const fetchPlayers = async () => {
@@ -99,14 +101,14 @@ const PlayerList: React.FC<PlayerListProps> = ({ filter, page, selected, onUpdat
   if (players.length === 0) {
     return (
       <View style={[styles.container, { alignItems: "center", paddingVertical: 32 }]}>
-        <Text style={{ color: isDark ? "#fff" : "#000" }}>No se encontraron jugadores.</Text>
+        <Text style={{ color: Colors[colorScheme].text }}>No se encontraron jugadores.</Text>
       </View>
     );
   }
 
   return (
-    <View style={[styles.container, isDark ? styles.containerDark : styles.containerLight]}>
-      <Text style={[styles.title, isDark && styles.titleDark]}>Lista de Jugadores del Club</Text>
+    <View style={[styles.container, {backgroundColor: Colors[colorScheme].background}]}>
+      <Text style={[styles.title, {color: Colors[colorScheme].textSecondary}]}>Lista de Jugadores del Club</Text>
       <FlatList
         data={players}
         keyExtractor={(item) => item.id}
@@ -114,16 +116,15 @@ const PlayerList: React.FC<PlayerListProps> = ({ filter, page, selected, onUpdat
         renderItem={({ item }) => {
           const isSelected = selected.some((p) => p.id === item.id);
           return (
-            <TouchableOpacity style={[styles.row, isDark && styles.rowDark]} onPress={() => togglePlayer(item)}>
+            <TouchableOpacity style={[styles.row, {backgroundColor: Colors[colorScheme].inputBackground}]} onPress={() => togglePlayer(item)}>
               <Image
                 source={item.foto ? { uri: item.foto } : require("@/assets/images/LogoSnake.png")}
                 style={styles.avatar}
               />
-              <Text style={[styles.name, isDark && styles.nameDark]}>{item.name}</Text>
+              <Text style={[styles.name, {color: Colors[colorScheme].text}]}>{item.name}</Text>
               <View
                 style={[
                   styles.radio,
-                  isDark && styles.radioDark,
                   isSelected && { backgroundColor: "#53F29D", borderColor: "#53F29D" },
                 ]}
               />
@@ -141,10 +142,7 @@ const styles = StyleSheet.create({
     paddingHorizontal: 16,
     paddingTop: 12,
   },
-  containerLight: { backgroundColor: "#FFFFFF" },
-  containerDark: { backgroundColor: "#0B1612" },
   title: { fontSize: 16, fontWeight: "bold", marginBottom: 12, color: "#1A2C23" },
-  titleDark: { color: "#FFFFFF" },
   row: {
     flexDirection: "row",
     alignItems: "center",
@@ -153,12 +151,9 @@ const styles = StyleSheet.create({
     padding: 10,
     borderRadius: 12,
   },
-  rowDark: { backgroundColor: "#1A2C23" },
   avatar: { width: 48, height: 48, borderRadius: 24, marginRight: 12 },
-  name: { flex: 1, fontSize: 14, color: "#1A2C23" },
-  nameDark: { color: "#FFFFFF" },
+  name: { flex: 1, fontSize: 14},
   radio: { width: 20, height: 20, borderRadius: 10, borderWidth: 1, borderColor: "#999" },
-  radioDark: { borderColor: "#53F29D" },
 });
 
 export default PlayerList;

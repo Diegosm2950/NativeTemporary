@@ -39,6 +39,7 @@ const styles = StyleSheet.create({
     marginTop: 16,
     marginBottom: 8,
     flexDirection: "row",
+    maxHeight: 40
   },
   item: {
     marginRight: 24,

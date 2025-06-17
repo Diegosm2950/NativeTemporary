@@ -1,5 +1,5 @@
 import React, { useState } from "react";
-import { View, ScrollView, StyleSheet, useColorScheme, Alert } from "react-native";
+import { View, ScrollView, StyleSheet, Alert } from "react-native";
 import { useNavigation } from "@react-navigation/native";
 import { NativeStackNavigationProp } from "@react-navigation/native-stack";
 import HeaderLogo from "@/components/qr-capitan/HeaderLogo";
@@ -13,6 +13,8 @@ import PaginationControls from "@/components/qr-capitan/PaginationControls";
 import PlayerCounter from "@/components/qr-capitan/PlayerCounter";
 import { RootStackParamList } from "@/types/navigation";
 import { Player } from "@/types/user";
+import Colors from "@/constants/Colors";
+import useColorScheme from "@/hooks/useColorScheme";
 
 type NavigationProp = NativeStackNavigationProp<
   RootStackParamList,
@@ -27,7 +29,7 @@ const SeleccionarJugadores = () => {
   const [searchTerm, setSearchTerm] = useState("");
   const [selectedPlayers, setSelectedPlayers] = useState<Player[]>([]);
   const [page, setPage] = useState(1);
-  const isDark = useColorScheme() === "dark";
+  const colorScheme = useColorScheme();
   const navigation = useNavigation<NavigationProp>();
 
   const handleTogglePlayer = (player: Player) => {
@@ -57,9 +59,9 @@ const SeleccionarJugadores = () => {
   };
 
   return (
-    <View style={[styles.container, isDark && styles.containerDark]}>
+    <View style={[styles.container, {backgroundColor: Colors[colorScheme].background}]}>
       <BackButton />
-      <ScrollView contentContainerStyle={{ paddingBottom: 120 }}>
+      <ScrollView >
         <HeaderLogo />
         <TeamCard />
         <FilterBar active={activeFilter} onChange={setActiveFilter} />
@@ -88,6 +90,5 @@ const SeleccionarJugadores = () => {
 export default SeleccionarJugadores;
 
 const styles = StyleSheet.create({
-  container: { flex: 1, backgroundColor: "#FFFFFF" },
-  containerDark: { backgroundColor: "#010D06" },
+  container: { flex: 1},
 });
