@@ -12,10 +12,10 @@ import {
   KeyboardAvoidingView,
 } from 'react-native';
 import { useRouter } from 'expo-router';
-import { StatusBar } from 'expo-status-bar';
 import { useCedula } from '@/context/CedulaContext';
 import Colors from '@/constants/Colors';
 import useColorScheme from '@/hooks/useColorScheme';
+import { VolverButton } from '@/components/ui/BackButton';
 
 export default function RegistrarObservacion() {
   const colorScheme = useColorScheme();
@@ -57,11 +57,6 @@ export default function RegistrarObservacion() {
         ]} 
         keyboardShouldPersistTaps="handled"
       >
-        <Image
-          source={require('@/assets/images/FMRUU.png')}
-          style={styles.logo}
-          resizeMode="contain"
-        />
         <Text style={[styles.title, { color: Colors[colorScheme].text }]}>
           Registrar Observación
         </Text>
@@ -132,17 +127,7 @@ export default function RegistrarObservacion() {
           </Text>
         </TouchableOpacity>
 
-        <TouchableOpacity 
-          style={[
-            styles.backButton, 
-            { backgroundColor: Colors[colorScheme].buttonSecondary }
-          ]} 
-          onPress={() => router.back()}
-        >
-          <Text style={[styles.backText, { color: Colors[colorScheme].buttonTextSecondary }]}>
-            Volver
-          </Text>
-        </TouchableOpacity>
+        <VolverButton destination="/(protected)/(cedulas)/juego" />
       </ScrollView>
     </KeyboardAvoidingView>
   );
@@ -153,11 +138,6 @@ const styles = StyleSheet.create({
     paddingVertical: Platform.OS === 'ios' ? 60 : 40,
     paddingHorizontal: 20,
     flex: 1
-  },
-  logo: {
-    width: 80,
-    height: 40,
-    marginBottom: 10,
   },
   title: {
     fontSize: 18,

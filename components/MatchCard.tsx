@@ -330,7 +330,8 @@ const styles = StyleSheet.create({
   },
   badgeImageStyle: {
     borderRadius: 20,
-    height: "100%"
+    height: "100%",
+    width: 200
   },
   badgeText: {
     color: '#FFFFFF',

@@ -2,7 +2,6 @@ import React, { useState } from "react";
 import { View, ScrollView, StyleSheet, Alert } from "react-native";
 import { useNavigation } from "@react-navigation/native";
 import { NativeStackNavigationProp } from "@react-navigation/native-stack";
-import HeaderLogo from "@/components/qr-capitan/HeaderLogo";
 import TeamCard from "@/components/qr-capitan/TeamCard";
 import FilterBar from "@/components/qr-capitan/FilterBar";
 import PlayerList from "@/components/qr-capitan/PlayerList";
@@ -60,9 +59,7 @@ const SeleccionarJugadores = () => {
 
   return (
     <View style={[styles.container, {backgroundColor: Colors[colorScheme].background}]}>
-      <BackButton />
       <ScrollView >
-        <HeaderLogo />
         <TeamCard />
         <FilterBar active={activeFilter} onChange={setActiveFilter} />
         <SearchBar value={searchTerm} onChangeText={setSearchTerm} />
@@ -90,5 +87,8 @@ const SeleccionarJugadores = () => {
 export default SeleccionarJugadores;
 
 const styles = StyleSheet.create({
-  container: { flex: 1},
+  container: { 
+    flex: 1,
+    paddingBottom: 40
+  },
 });

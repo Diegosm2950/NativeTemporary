@@ -126,7 +126,6 @@ export default function QRScanner() {
       <StatusBar style="auto" />
       <ScrollView contentContainerStyle={styles.scrollContent}>
         <View style={styles.header}>
-          <Image source={require('@/assets/images/FMRUU.png')} style={styles.logo} resizeMode="contain" />
           <Text style={[styles.title, {color: Colors[colorScheme].buttonText}]}>Escanear Equipos</Text>
         </View>
 
@@ -195,11 +194,6 @@ const styles = StyleSheet.create({
   header: {
     alignItems: 'center',
     marginBottom: 20,
-  },
-  logo: {
-    width: 80,
-    height: 40,
-    marginBottom: 10,
   },
   title: {
     fontSize: 20,

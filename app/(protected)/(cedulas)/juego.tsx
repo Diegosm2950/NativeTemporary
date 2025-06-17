@@ -82,12 +82,6 @@ export default function JuegoScreen() {
 
       <StatusBar style={colorScheme === 'dark' ? 'light' : 'dark'} />
 
-      <Image
-        source={require('@/assets/images/FMRUU.png')}
-        style={styles.logo}
-        resizeMode="contain"
-      />
-
       <Text style={[styles.title, { color: Colors[colorScheme].text }]}>Cédula del partido</Text>
 
       {/* Encabezado del partido */}
@@ -208,13 +202,6 @@ const styles = StyleSheet.create({
   scrollView: {
     flex: 1,
   },
-  logo: {
-    width: 80,
-    height: 40,
-    alignSelf: 'center',
-    marginBottom: 10,
-    marginTop: 30
-  },
   title: {
     fontSize: 18,
     fontWeight: '600',
@@ -271,7 +258,7 @@ const styles = StyleSheet.create({
   statsHeader: {
     flexDirection: 'row',
     justifyContent: 'space-around',
-    marginBottom: 6,
+    borderRadius: 6
   },
   statsRow: {
     flexDirection: 'row',
@@ -282,6 +269,8 @@ const styles = StyleSheet.create({
     width: 40,
     textAlign: 'center',
     fontSize: 13,
+    flex: 1,
+    padding: 5
   },
   mainButton: {
     backgroundColor: '#1B9D3B',

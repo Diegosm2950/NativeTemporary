@@ -5,19 +5,17 @@ import {
   Image,
   TouchableOpacity,
   StyleSheet,
-  useColorScheme,
   ActivityIndicator,
   Alert,
 } from 'react-native';
-import { useRoute, useNavigation } from '@react-navigation/native';
+import { useRoute } from '@react-navigation/native';
 import Constants from 'expo-constants';
+import Colors from '@/constants/Colors';
+import useColorScheme from '@/hooks/useColorScheme';
 
 const QrResultScreen = () => {
   const { params }: any = useRoute();
-  const isDark = useColorScheme() === 'dark';
-  const navigation = useNavigation();
-  const styles = getStyles(isDark);
-
+  const colorScheme = useColorScheme();
   const [qrBase64, setQrBase64] = useState('');
   const [loading, setLoading] = useState(true);
 
@@ -67,22 +65,26 @@ const QrResultScreen = () => {
   }, [params]);
 
   return (
-    <View style={[styles.container, isDark && styles.containerDark]}>
+    <View style={[styles.container, { backgroundColor: Colors[colorScheme].background }]}>
       {loading ? (
         <ActivityIndicator
           size="large"
-          color="#53F29D"
+          color={Colors[colorScheme].buttonPrimary}
           style={{ marginTop: 50 }}
         />
       ) : qrBase64 ? (
         <>
           <Image source={{ uri: qrBase64 }} style={styles.qrImage} />
-          <TouchableOpacity style={styles.downloadButton}>
-            <Text style={styles.downloadText}>Descargar código QR</Text>
+          <TouchableOpacity style={[styles.downloadButton, { borderColor: Colors[colorScheme].border }]}>
+            <Text style={[styles.downloadText, { color: Colors[colorScheme].text }]}>
+              Toma una captura de pantalla
+            </Text>
           </TouchableOpacity>
         </>
       ) : (
-        <Text style={styles.errorText}>No se pudo cargar el código QR.</Text>
+        <Text style={[styles.errorText, { color: Colors[colorScheme].error }]}>
+          No se pudo cargar el código QR.
+        </Text>
       )}
     </View>
   );
@@ -90,40 +92,30 @@ const QrResultScreen = () => {
 
 export default QrResultScreen;
 
-const getStyles = (isDark: boolean) =>
-  StyleSheet.create({
-    container: {
-      flex: 1,
-      alignItems: 'center',
-      justifyContent: 'center',
-      paddingHorizontal: 20,
-      paddingTop: 40,
-      backgroundColor: '#fff',
-    },
-    containerDark: {
-      backgroundColor: '#010D06',
-    },
-    qrImage: {
-      width: 250,
-      height: 250,
-      marginVertical: 40,
-      borderRadius: 16,
-    },
-    downloadButton: {
-      borderColor: '#1A2C23',
-      borderWidth: 1,
-      borderRadius: 999,
-      paddingVertical: 14,
-      paddingHorizontal: 20,
-    },
-    downloadText: {
-      fontSize: 16,
-      fontWeight: '600',
-      color: '#1A2C23',
-    },
-    errorText: {
-      color: 'red',
-      fontSize: 16,
-      marginVertical: 20,
-    },
-  });
+const styles = StyleSheet.create({
+  container: {
+    flex: 1,
+    alignItems: 'center',
+    justifyContent: 'center',
+  },
+  qrImage: {
+    width: 250,
+    height: 250,
+    marginVertical: 40,
+    borderRadius: 16,
+  },
+  downloadButton: {
+    borderWidth: 1,
+    borderRadius: 999,
+    paddingVertical: 14,
+    paddingHorizontal: 20,
+  },
+  downloadText: {
+    fontSize: 16,
+    fontWeight: '600',
+  },
+  errorText: {
+    fontSize: 16,
+    marginVertical: 20,
+  },
+});

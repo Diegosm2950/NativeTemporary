@@ -5,6 +5,7 @@ import { StatusBar } from 'expo-status-bar';
 import { useCedula } from '@/context/CedulaContext';
 import Colors from '@/constants/Colors';
 import useColorScheme from '@/hooks/useColorScheme';
+import { VolverButton } from '@/components/ui/BackButton';
 
 export default function RegistrarCambio() {
   const colorScheme = useColorScheme();
@@ -55,30 +56,57 @@ export default function RegistrarCambio() {
   return (
     <ScrollView contentContainerStyle={[styles.container, { backgroundColor: Colors[colorScheme].background }]}>
       <StatusBar style={colorScheme === 'dark' ? 'light' : 'dark'} />
-      <Image
-        source={require('@/assets/images/FMRUU.png')}
-        style={styles.logo}
-        resizeMode="contain"
-      />
       <Text style={[styles.title, { color: Colors[colorScheme].text }]}>Registrar cambio de jugador</Text>
 
       <View style={[styles.select, { backgroundColor: Colors[colorScheme].inputBackground }]}>
         <Text style={{ marginBottom: 8, fontWeight: '500', color: Colors[colorScheme].text }}>Selecciona el equipo:</Text>
         <View style={{ flexDirection: 'row', gap: 10 }}>
-          <TouchableOpacity onPress={() => setEquipo('A')}>
+          <TouchableOpacity 
+            onPress={() => setEquipo('A')}
+            style={[
+              styles.teamButton,
+              { 
+                backgroundColor: equipo === 'A' 
+                  ? Colors[colorScheme].buttonSecondary 
+                  : Colors[colorScheme].cardBackground,
+                borderColor: equipo === 'A' 
+                  ? Colors[colorScheme].tint 
+                  : Colors[colorScheme].border
+              }
+            ]}
+          >
             <Text style={[
-              styles.selectText, 
-              { color: Colors[colorScheme].text },
-              equipo === 'A' && { fontWeight: 'bold', color: Colors[colorScheme].tint }
+              styles.teamButtonText, 
+              { 
+                color: equipo === 'A' 
+                  ? Colors[colorScheme].tint 
+                  : Colors[colorScheme].text 
+              }
             ]}>
               {cedulaData.equipoLocal?.nombre || 'Equipo A'}
             </Text>
           </TouchableOpacity>
-          <TouchableOpacity onPress={() => setEquipo('B')}>
+          <TouchableOpacity 
+            onPress={() => setEquipo('B')}
+            style={[
+              styles.teamButton,
+              { 
+                backgroundColor: equipo === 'B' 
+                  ? Colors[colorScheme].buttonSecondary 
+                  : Colors[colorScheme].cardBackground,
+                borderColor: equipo === 'B' 
+                  ? Colors[colorScheme].tint 
+                  : Colors[colorScheme].border
+              }
+            ]}
+          >
             <Text style={[
-              styles.selectText, 
-              { color: Colors[colorScheme].text },
-              equipo === 'B' && { fontWeight: 'bold', color: Colors[colorScheme].tint }
+              styles.teamButtonText, 
+              { 
+                color: equipo === 'B' 
+                  ? Colors[colorScheme].tint 
+                  : Colors[colorScheme].text 
+              }
             ]}>
               {cedulaData.equipoVisitante?.nombre || 'Equipo B'}
             </Text>
@@ -165,15 +193,7 @@ export default function RegistrarCambio() {
         <Text style={[styles.submitText, { color: Colors[colorScheme].buttonText }]}>Registrar Cambio</Text>
       </TouchableOpacity>
 
-      <TouchableOpacity 
-        style={[
-          styles.backButton, 
-          { backgroundColor: Colors[colorScheme].buttonSecondary }
-        ]} 
-        onPress={() => router.back()}
-      >
-        <Text style={[styles.backText, { color: Colors[colorScheme].buttonTextSecondary }]}>Volver</Text>
-      </TouchableOpacity>
+      <VolverButton destination="/(protected)/(cedulas)/juego" />
     </ScrollView>
   );
 }
@@ -183,11 +203,6 @@ const styles = StyleSheet.create({
     flexGrow: 1,
     paddingVertical: Platform.OS === 'ios' ? 60 : 40,
     paddingHorizontal: 20,
-  },
-  logo: {
-    width: 80,
-    height: 40,
-    marginBottom: 10,
   },
   title: {
     fontSize: 18,
@@ -241,14 +256,17 @@ const styles = StyleSheet.create({
   submitText: {
     fontWeight: '600',
     fontSize: 16,
-  },
-  backButton: {
-    padding: 14,
-    borderRadius: 25,
+  }, 
+  teamButton: {
+    flex: 1,
+    paddingVertical: 12,
+    paddingHorizontal: 16,
+    borderRadius: 8,
+    borderWidth: 1,
     alignItems: 'center',
-    marginTop: 12,
+    justifyContent: 'center',
   },
-  backText: {
+  teamButtonText: {
     fontSize: 16,
     fontWeight: '500',
   },
