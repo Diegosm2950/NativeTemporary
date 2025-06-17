@@ -7,7 +7,6 @@ import {
   TextInput,
   ScrollView,
   Platform,
-  Image,
   Alert,
   KeyboardAvoidingView,
 } from 'react-native';
@@ -16,6 +15,7 @@ import { StatusBar } from 'expo-status-bar';
 import { useCedula } from '@/context/CedulaContext';
 import Colors from '@/constants/Colors';
 import useColorScheme from '@/hooks/useColorScheme';
+import { VolverButton } from '@/components/ui/BackButton';
 
 export default function RegistrarLesion() {
   const colorScheme = useColorScheme();
@@ -77,11 +77,6 @@ export default function RegistrarLesion() {
         style={{ flex: 1 }} // Ensure ScrollView fills available space
       >
         <StatusBar style={colorScheme === 'dark' ? 'light' : 'dark'} />
-        <Image
-          source={require('@/assets/images/FMRUU.png')}
-          style={styles.logo}
-          resizeMode="contain"
-        />
         <Text style={[styles.title, { color: Colors[colorScheme].text }]}>Registrar Lesión</Text>
 
         {/* Selector de equipo */}
@@ -266,20 +261,7 @@ export default function RegistrarLesion() {
           </Text>
         </TouchableOpacity>
 
-        <TouchableOpacity
-          style={[
-            styles.backButton,
-            { backgroundColor: Colors[colorScheme].buttonSecondary }
-          ]}
-          onPress={() => router.replace('/(protected)/(cedulas)/juego' as any)}
-        >
-          <Text style={[
-            styles.backText,
-            { color: Colors[colorScheme].buttonTextSecondary }
-          ]}>
-            Volver
-          </Text>
-        </TouchableOpacity>
+        <VolverButton destination="/(protected)/(cedulas)/juego" />
       </ScrollView>
     </KeyboardAvoidingView>
   );
@@ -290,11 +272,6 @@ const styles = StyleSheet.create({
     paddingVertical: Platform.OS === 'ios' ? 60 : 40,
     paddingHorizontal: 20,
     minHeight: '100%'
-  },
-  logo: {
-    width: 80,
-    height: 40,
-    marginBottom: 10,
   },
   title: {
     fontSize: 18,

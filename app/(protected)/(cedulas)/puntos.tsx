@@ -1,9 +1,10 @@
 import React, { useState } from 'react';
 import { View, Text, StyleSheet, TouchableOpacity, TextInput, Platform, ScrollView, Image, Alert } from 'react-native';
 import { useRouter } from 'expo-router';
-import { StatusBar } from 'expo-status-bar';
 import { useCedula } from '@/context/CedulaContext';
 import CancelButton from '@/components/cancelButton';
+import Colors from '@/constants/Colors';
+import useColorScheme from '@/hooks/useColorScheme';
 
 export default function RegistroPuntos() {
   const router = useRouter();
@@ -15,8 +16,17 @@ export default function RegistroPuntos() {
   const [accion, setAccion] = useState('');
   const [tiempo, setTiempo] = useState('00:00:00');
   const [puntosTemporales, setPuntosTemporales] = useState<any[]>([]);
+  const colorScheme = useColorScheme();
 
   const { cronometro } = useCedula();
+
+  const actionButtonSelectedStyle = {
+    backgroundColor: Colors[colorScheme].buttonSelected,
+  }
+  
+  const teamButtonSelectedStyle = {
+    backgroundColor: Colors[colorScheme].buttonSelected,
+  }
 
   const formatTiempo = (milis: number) => {
     const h = Math.floor(milis / 3600000).toString().padStart(2, '0');
@@ -109,172 +119,202 @@ export default function RegistroPuntos() {
   };
 
   return (
-    <ScrollView contentContainerStyle={styles.container}>
-      <StatusBar style="auto" />
-      <Image
-        source={require('@/assets/images/FMRUU.png')}
-        style={styles.logo}
-        resizeMode="contain"
-      />
-      <Text style={styles.title}>Registro de puntos</Text>
-
-      {/* Tipo de Acción */}
-      <View style={styles.actionContainer}>
-        {[
-          { label: 'T', puntos: 5 },
-          { label: 'C', puntos: 2 },
-          { label: 'P', puntos: 3 },
-          { label: 'D', puntos: 3 },
-        ].map(({ label, puntos }) => (
-          <TouchableOpacity
-            key={label}
-            style={[
-              styles.actionButton,
-              accion === label && styles.actionButtonSelected,
-            ]}
-            onPress={() => setAccion(label)}
-          >
-            <Text style={styles.actionText}>
-              {label} ({puntos} pts)
-            </Text>
-          </TouchableOpacity>
-        ))}
-      </View>
-
-      {/* Equipo A / B */}
-      <View style={styles.teamSwitch}>
-        <TouchableOpacity
-          style={[
-            styles.teamButton,
-            equipo === 'A' && styles.teamButtonSelected,
-          ]}
-          onPress={() => setEquipo('A')}
-        >
-          <Text style={styles.teamText}>
-            {cedulaData.equipoLocal?.nombre || 'Equipo A'}
-          </Text>
-        </TouchableOpacity>
-        <TouchableOpacity
-          style={[
-            styles.teamButton,
-            equipo === 'B' && styles.teamButtonSelected,
-          ]}
-          onPress={() => setEquipo('B')}
-        >
-          <Text style={styles.teamText}>
-            {cedulaData.equipoVisitante?.nombre || 'Equipo B'}
-          </Text>
-        </TouchableOpacity>
-      </View>
-
-      {/* Tiempo */}
-      <TextInput
-        style={styles.timerInput}
-        value={formatTiempo(cronometro)}
-        editable={false}
-      />
-
-      {/* Jugador */}
-      <View style={styles.select}>
-        {jugadores.map((j) => (
-          <TouchableOpacity
-            key={j.id}
-            style={{
-              paddingVertical: 8,
-              borderBottomWidth: 1,
-              borderBottomColor: '#ccc',
-              flexDirection: 'row',
-              alignItems: 'center',
-            }}
-            onPress={() => setJugador(j.nombre)}
-          >
-            <Image
-              source={{ uri: j.foto }}
-              style={{
-                width: 32,
-                height: 32,
-                borderRadius: 16,
-                marginRight: 8,
-              }}
-            />
-            <Text>{j.nombre}</Text>
-          </TouchableOpacity>
-        ))}
-        {!jugadores.length && (
-          <Text style={{ color: '#999' }}>
-            Sin jugadores escaneados para este equipo
-          </Text>
-        )}
-      </View>
-
-      {/* Agregar Punto */}
-      <TouchableOpacity
-        style={styles.submitButton}
-        onPress={handleAgregarPunto}
+    <View style={[styles.container, { backgroundColor: Colors[colorScheme].background }]}>
+      <ScrollView 
+        contentContainerStyle={styles.scrollContainer}
+        showsVerticalScrollIndicator={false}
       >
-        <Text style={styles.submitText}>Agregar Punto</Text>
-      </TouchableOpacity>
+        <Text style={[styles.title, { color: Colors[colorScheme].text }]}>Registro de puntos</Text>
 
-      {/* Lista de puntos temporales */}
-      {puntosTemporales.length > 0 && (
-        <View style={{ marginTop: 10, padding: 10, backgroundColor: '#F3F8F3', borderRadius: 10 }}>
-          <Text style={{ fontWeight: '600', marginBottom: 6 }}>Puntos pendientes:</Text>
-          {puntosTemporales.map((punto, index) => (
-            <View key={index} style={{ flexDirection: 'row', justifyContent: 'space-between', marginBottom: 4 }}>
-              <Text>{punto.jugador} ({punto.accion}) - {punto.puntos} pts</Text>
-              <TouchableOpacity onPress={() => handleCancelarPunto(index)}>
-                <Text style={{ color: 'red' }}>Cancelar</Text>
-              </TouchableOpacity>
-            </View>
+        {/* Tipo de Acción */}
+        <View style={styles.actionContainer}>
+          {[
+            { label: 'Tries', puntos: 5, value: 'T' },
+            { label: 'Catch', puntos: 2, value: 'C' },
+            { label: 'Penalties', puntos: 3, value: 'P' },
+            { label: 'Drops', puntos: 3, value: 'D' },
+          ].map(({ label, puntos, value }) => (
+            <TouchableOpacity
+              key={label}
+              style={[
+                styles.actionButton,
+                { backgroundColor: Colors[colorScheme].cardBackground },
+                accion === value && {
+                  backgroundColor: Colors[colorScheme].buttonSelected
+                }
+              ]}
+              onPress={() => setAccion(value)}
+            >
+              <Text style={[
+                styles.actionText, 
+                { color: Colors[colorScheme].text },
+                accion === value && {
+                  color: Colors[colorScheme].buttonText
+                }
+              ]}>
+                {label} ({puntos} pts)
+              </Text>
+            </TouchableOpacity>
           ))}
         </View>
-      )}
 
-      {/* Marcador visual */}
-      <View style={styles.scoreCard}>
-        <Text style={styles.teamScore}>{marcadorA}</Text>
-        <Text style={styles.vs}>:</Text>
-        <Text style={styles.teamScore}>{marcadorB}</Text>
-      </View>
-      <View style={styles.scoreInfo}>
-        <Text style={styles.teamLabel}>
-          {cedulaData.equipoLocal?.nombre || 'Equipo A'}
-        </Text>
-        <Text style={styles.fecha}>
-          Inicio: {cedulaData.horaInicio || '--:--'}
-        </Text>
-        <Text style={styles.teamLabel}>
-          {cedulaData.equipoVisitante?.nombre || 'Equipo B'}
-        </Text>
-      </View>
+        {/* Equipo A / B */}
+        <View style={styles.teamSwitch}>
+          <TouchableOpacity
+            style={[
+              styles.teamButton,
+              { backgroundColor: Colors[colorScheme].cardBackground },
+              equipo === 'A' && {
+                backgroundColor: Colors[colorScheme].buttonSelected
+              }
+            ]}
+            onPress={() => setEquipo('A')}
+          >
+            <Text style={[
+              styles.teamText,
+              { color: Colors[colorScheme].text },
+              equipo === 'A' && {
+                color: Colors[colorScheme].buttonText
+              }
+            ]}>
+              {cedulaData.equipoLocal?.nombre || 'Equipo A'}
+            </Text>
+          </TouchableOpacity>
+          <TouchableOpacity
+            style={[
+              styles.teamButton,
+              { backgroundColor: Colors[colorScheme].cardBackground },
+              equipo === 'B' && {
+                backgroundColor: Colors[colorScheme].buttonSelected
+              }
+            ]}
+            onPress={() => setEquipo('B')}
+          >
+            <Text style={[
+              styles.teamText,
+              { color: Colors[colorScheme].text },
+              equipo === 'A' && {
+                color: Colors[colorScheme].buttonText
+              }
+            ]}>
+              {cedulaData.equipoLocal?.nombre || 'Equipo B'}
+            </Text>
+          </TouchableOpacity>
+        </View>
 
-      {/* Guardar */}
-      <TouchableOpacity
-        style={[
-          styles.submitButton,
-          { backgroundColor: '#fff', borderWidth: 1, borderColor: '#1B9D3B' },
-        ]}
-        onPress={handleGuardarMarcador}
-      >
-        <Text style={[styles.submitText, { color: '#1B9D3B' }]}>
-          Guardar marcador y continuar
-        </Text>
-      </TouchableOpacity>
-      <CancelButton />
-    </ScrollView>
+        {/* Tiempo */}
+        <TextInput
+          style={[styles.timerInput, { color: Colors[colorScheme].text, borderBottomColor: Colors[colorScheme].border }]}
+          value={formatTiempo(cronometro)}
+          editable={false}
+        />
+
+        {/* Jugador */}
+        <View style={[styles.select, { backgroundColor: Colors[colorScheme].cardBackground }]}>
+          {jugadores.map((j) => (
+            <TouchableOpacity
+              key={j.id}
+              style={{
+                paddingVertical: 8,
+                borderBottomWidth: 1,
+                borderBottomColor: Colors[colorScheme].border,
+                flexDirection: 'row',
+                alignItems: 'center',
+              }}
+              onPress={() => setJugador(j.nombre)}
+            >
+              <Image
+                source={{ uri: j.foto }}
+                style={{
+                  width: 32,
+                  height: 32,
+                  borderRadius: 16,
+                  marginRight: 8,
+                }}
+              />
+              <Text style={{ color: Colors[colorScheme].text }}>{j.nombre}</Text>
+            </TouchableOpacity>
+          ))}
+          {!jugadores.length && (
+            <Text style={{ color: Colors[colorScheme].textSecondary }}>
+              Sin jugadores escaneados para este equipo
+            </Text>
+          )}
+        </View>
+
+        {/* Agregar Punto */}
+        <TouchableOpacity
+          style={[styles.submitButton, { backgroundColor: Colors[colorScheme].buttonPrimary }]}
+          onPress={handleAgregarPunto}
+        >
+          <Text style={[styles.submitText, { color: Colors[colorScheme].buttonText }]}>Agregar Punto</Text>
+        </TouchableOpacity>
+
+        {/* Lista de puntos temporales */}
+        {puntosTemporales.length > 0 && (
+          <View style={[styles.pendingPointsContainer, { backgroundColor: Colors[colorScheme].cardBackground }]}>
+            <Text style={[styles.pendingPointsTitle, { color: Colors[colorScheme].text }]}>Puntos pendientes:</Text>
+            {puntosTemporales.map((punto, index) => (
+              <View key={index} style={styles.pendingPointRow}>
+                <Text style={{ color: Colors[colorScheme].text }}>
+                  {punto.jugador} ({punto.accion}) - {punto.puntos} pts
+                </Text>
+                <TouchableOpacity onPress={() => handleCancelarPunto(index)}>
+                  <Text style={{ color: Colors[colorScheme].error }}>Cancelar</Text>
+                </TouchableOpacity>
+              </View>
+            ))}
+          </View>
+        )}
+
+        {/* Marcador visual */}
+        <View style={[styles.scoreCard, { backgroundColor: Colors[colorScheme].cardBackground }]}>
+          <Text style={[styles.teamScore, { color: Colors[colorScheme].text }]}>{marcadorA}</Text>
+          <Text style={[styles.vs, { color: Colors[colorScheme].text }]}>:</Text>
+          <Text style={[styles.teamScore, { color: Colors[colorScheme].text }]}>{marcadorB}</Text>
+        </View>
+        <View style={styles.scoreInfo}>
+          <Text style={[styles.teamLabel, { color: Colors[colorScheme].textSecondary }]}>
+            {cedulaData.equipoLocal?.nombre || 'Equipo A'}
+          </Text>
+          <Text style={[styles.fecha, { color: Colors[colorScheme].text }]}>
+            Inicio: {cedulaData.horaInicio || '--:--'}
+          </Text>
+          <Text style={[styles.teamLabel, { color: Colors[colorScheme].textSecondary }]}>
+            {cedulaData.equipoVisitante?.nombre || 'Equipo B'}
+          </Text>
+        </View>
+
+        {/* Guardar */}
+        <TouchableOpacity
+          style={[
+            styles.submitButton,
+            { 
+              backgroundColor: Colors[colorScheme].background,
+              borderWidth: 1,
+              borderColor: Colors[colorScheme].buttonPrimary
+            },
+          ]}
+          onPress={handleGuardarMarcador}
+        >
+          <Text style={[styles.submitText, { color: Colors[colorScheme].buttonPrimary }]}>
+            Guardar marcador y continuar
+          </Text>
+        </TouchableOpacity>
+        <CancelButton />
+      </ScrollView>
+    </View>
   );
 }
 
 const styles = StyleSheet.create({
   container: {
+    flex: 1,
+  },
+  scrollContainer: {
     paddingVertical: Platform.OS === 'ios' ? 60 : 40,
     paddingHorizontal: 20,
-    backgroundColor: '#fff',
-  },
-  logo: {
-    width: 80,
-    height: 40,
-    marginBottom: 10,
+    paddingBottom: 40, 
   },
   title: {
     fontSize: 18,
@@ -283,7 +323,6 @@ const styles = StyleSheet.create({
     marginBottom: 20,
   },
   select: {
-    backgroundColor: '#F3F8F3',
     padding: 16,
     borderRadius: 12,
     marginBottom: 12,
@@ -298,7 +337,6 @@ const styles = StyleSheet.create({
   },
   teamButton: {
     flex: 1,
-    backgroundColor: '#E6EFE6',
     padding: 12,
     borderRadius: 25,
     alignItems: 'center',
@@ -308,7 +346,6 @@ const styles = StyleSheet.create({
     backgroundColor: '#1B9D3B',
   },
   teamText: {
-    color: '#111',
     fontWeight: '500',
   },
   timerInput: {
@@ -317,20 +354,17 @@ const styles = StyleSheet.create({
     textAlign: 'center',
     marginVertical: 16,
     borderBottomWidth: 1,
-    borderColor: '#ccc',
     paddingVertical: 6,
     width: 120,
     alignSelf: 'center',
   },
   submitButton: {
-    backgroundColor: '#1B9D3B',
     padding: 16,
     borderRadius: 25,
     alignItems: 'center',
     marginVertical: 12,
   },
   submitText: {
-    color: '#fff',
     fontWeight: '600',
     fontSize: 16,
   },
@@ -338,7 +372,6 @@ const styles = StyleSheet.create({
     flexDirection: 'row',
     justifyContent: 'center',
     alignItems: 'center',
-    backgroundColor: '#F3F3F3',
     padding: 16,
     borderRadius: 16,
     marginTop: 20,
@@ -360,24 +393,23 @@ const styles = StyleSheet.create({
   },
   teamLabel: {
     fontSize: 12,
-    color: '#555',
     maxWidth: '40%',
   },
   fecha: {
     fontSize: 12,
     fontWeight: '600',
-    color: '#333',
   },
   actionContainer: {
     flexDirection: 'row',
     justifyContent: 'space-between',
     marginBottom: 16,
+    flexWrap: 'wrap',
+    gap: 8,
   },
   actionButton: {
     flex: 1,
-    backgroundColor: '#E6EFE6',
     padding: 10,
-    marginHorizontal: 5,
+    minWidth: '22%',
     borderRadius: 12,
     alignItems: 'center',
   },
@@ -385,7 +417,22 @@ const styles = StyleSheet.create({
     backgroundColor: '#1B9D3B',
   },
   actionText: {
-    color: '#111',
     fontWeight: '600',
+    fontSize: 12,
+    textAlign: 'center',
+  },
+  pendingPointsContainer: {
+    marginTop: 10,
+    padding: 10,
+    borderRadius: 10,
+  },
+  pendingPointsTitle: {
+    fontWeight: '600',
+    marginBottom: 6,
+  },
+  pendingPointRow: {
+    flexDirection: 'row',
+    justifyContent: 'space-between',
+    marginBottom: 4,
   },
 });

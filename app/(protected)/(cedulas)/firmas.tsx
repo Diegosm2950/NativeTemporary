@@ -6,6 +6,7 @@ import { useCedula } from '@/context/CedulaContext';
 import CancelButton from '@/components/cancelButton';
 import Colors from '@/constants/Colors';
 import useColorScheme from '@/hooks/useColorScheme';
+import Toast from 'react-native-toast-message';
 
 const Input = memo(({
   label,
@@ -76,7 +77,89 @@ export default function RecoleccionFirmas() {
   };
 
   const handleSubmit = async () => {
-    // ... (keep your existing handleSubmit implementation)
+    const {
+      capitanLocalNombre, capitanLocalFirma,
+      capitanVisitaNombre, capitanVisitaFirma,
+      repLocalNombre, repLocalFirma, repLocalTel,
+      repVisitaNombre, repVisitaFirma, repVisitaTel,
+      esFinal
+    } = form;
+
+    const missingFields = [];
+  
+    if (!capitanLocalNombre) missingFields.push("Nombre del capitán local");
+    if (!capitanLocalFirma) missingFields.push("Firma del capitán local");
+    if (!capitanVisitaNombre) missingFields.push("Nombre del capitán visitante");
+    if (!capitanVisitaFirma) missingFields.push("Firma del capitán visitante");
+    if (!repLocalNombre) missingFields.push("Nombre del representante local");
+    if (!repLocalFirma) missingFields.push("Firma del representante local");
+    if (!repLocalTel) missingFields.push("Teléfono del representante local");
+    if (!repVisitaNombre) missingFields.push("Nombre del representante visitante");
+    if (!repVisitaFirma) missingFields.push("Firma del representante visitante");
+    if (!repVisitaTel) missingFields.push("Teléfono del representante visitante");
+  
+    if (missingFields.length > 0) {
+      Toast.show({
+        type: 'error',
+        text1: 'Error al crear la cédula',
+        text2: `Faltan datos: ${missingFields.join(', ')}`,
+      });
+      return;
+    }
+
+    const datosFirmas = {
+      capitanLocal: { nombre: capitanLocalNombre, firma: capitanLocalFirma },
+      capitanVisita: { nombre: capitanVisitaNombre, firma: capitanVisitaFirma },
+      representanteLocal: { nombre: repLocalNombre, firma: repLocalFirma, telefono: repLocalTel },
+      representanteVisita: { nombre: repVisitaNombre, firma: repVisitaFirma, telefono: repVisitaTel }
+    };
+
+    console.log('🟨 [Debug] marcador crudo:', cedulaData.marcador);
+
+    const marcadorTransformado = (cedulaData.marcador || []).map(p => ({
+      ...p,
+      equipo:
+        p.equipo === 'A'
+          ? cedulaData.equipoLocal?.nombre
+          : p.equipo === 'B'
+          ? cedulaData.equipoVisitante?.nombre
+          : p.equipo,
+    }));
+
+    console.log('🟩 [Debug] marcadorTransformado:', marcadorTransformado);
+
+    const payload = {
+      ...cedulaData,
+      marcador: [...cedulaData.marcador],
+      registroPuntos: marcadorTransformado, 
+      firmas: datosFirmas,
+      esFinal,
+    };
+
+    console.log("📦 CedulaData actual:", cedulaData);
+    console.log("📦 Payload a enviar (completo):", payload);
+
+    try {
+      const res = await fetch('https://fmru-next-js.vercel.app/api/app-native-api/cedulas/crear-cedula', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify(payload),
+      });
+
+      const data = await res.json();
+      console.log('📥 Respuesta del servidor:', data);
+
+      if (!res.ok) {
+        Alert.alert('Error', 'No se pudo enviar la cédula.');
+        return;
+      }
+
+      Alert.alert('✅ Éxito', 'Cédula enviada correctamente');
+      router.replace('/(protected)/(cedulas)/resumen-final');
+    } catch (error) {
+      console.error('❌ Error al enviar la cédula:', error);
+      Alert.alert('Error', 'No se pudo enviar la cédula.');
+    }
   };
 
   return (
@@ -89,11 +172,6 @@ export default function RecoleccionFirmas() {
         keyboardShouldPersistTaps="handled"
       >
         <StatusBar style={colorScheme === 'dark' ? 'light' : 'dark'} />
-        <Image 
-          source={require('@/assets/images/FMRUU.png')} 
-          style={styles.logo} 
-          resizeMode="contain" 
-        />
         <Text style={[styles.title, { color: Colors[colorScheme].text }]}>
           Recolección de firmas
         </Text>
@@ -152,11 +230,6 @@ const styles = StyleSheet.create({
   container: {
     paddingVertical: Platform.OS === 'ios' ? 60 : 40,
     paddingHorizontal: 20,
-  },
-  logo: {
-    width: 80,
-    height: 40,
-    marginBottom: 10,
   },
   title: {
     fontSize: 18,

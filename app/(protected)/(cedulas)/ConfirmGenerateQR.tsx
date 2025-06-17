@@ -1,13 +1,15 @@
 import React from "react";
-import { View, Text, ScrollView, StyleSheet, Image, TouchableOpacity, useColorScheme } from "react-native";
+import { View, Text, ScrollView, StyleSheet, Image, TouchableOpacity } from "react-native";
+import { useNavigation, useRoute } from "@react-navigation/native";
+import { NativeStackNavigationProp } from "@react-navigation/native-stack";
+import Colors from '@/constants/Colors';
+import useColorScheme from "@/hooks/useColorScheme";
 
 type Player = {
   id: string;
   name: string;
   foto?: string;
 };
-import { useNavigation, useRoute } from "@react-navigation/native";
-import { NativeStackNavigationProp } from "@react-navigation/native-stack";
 
 type RootStackParamList = {
   QrResultScreen: { jugadoresSeleccionados: any };
@@ -16,8 +18,7 @@ type RootStackParamList = {
 const ConfirmGenerateQRScreen = () => {
   const navigation = useNavigation<NativeStackNavigationProp<RootStackParamList, "QrResultScreen">>();
   const route = useRoute();
-  const isDark = useColorScheme() === "dark";
-
+  const colorScheme = useColorScheme();
   const { jugadoresSeleccionados } = route.params as { jugadoresSeleccionados: Player[] };
 
   const handleGenerate = () => {
@@ -27,20 +28,20 @@ const ConfirmGenerateQRScreen = () => {
   };  
 
   return (
-    <View style={[styles.container, isDark && styles.containerDark]}>
+    <View style={[styles.container, { backgroundColor: Colors[colorScheme].background }]}>
       <ScrollView contentContainerStyle={{ paddingBottom: 80 }}>
 
-        <Text style={[styles.title, isDark && styles.textDark]}>Generar QR de cédula</Text>
-        <Text style={[styles.subtitle, isDark && styles.textGray]}>
+        <Text style={[styles.title, { color: Colors[colorScheme].text }]}>Generar QR de cédula</Text>
+        <Text style={[styles.subtitle, { color: Colors[colorScheme].textSecondary }]}>
           ¿Confirmás la convocatoria y generación del QR?
         </Text>
 
-        <Text style={[styles.section, isDark && styles.textDark]}>
+        <Text style={[styles.section, { color: Colors[colorScheme].text }]}>
           Jugadores Seleccionados
         </Text>
 
-        <View style={styles.alertBox}>
-          <Text style={[styles.alertText, isDark && styles.textDark]}>
+        <View style={[styles.alertBox, { backgroundColor: Colors[colorScheme].cardBackground }]}>
+          <Text style={[styles.alertText, { color: Colors[colorScheme].text }]}>
             ⚠️ Una vez generado el código QR, no podrás modificar la lista de
             jugadores convocados.
           </Text>
@@ -53,24 +54,27 @@ const ConfirmGenerateQRScreen = () => {
                 source={jugador.foto ? { uri: jugador.foto } : require("../../../assets/images/LogoSnake.png")}
                 style={styles.avatar}
                 />
-                <Text style={[styles.name, isDark && styles.textDark]}>
+                <Text style={[styles.name, { color: Colors[colorScheme].text }]}>
                 {jugador.name}
                 </Text>
-                <Text style={styles.role}>Convocado</Text>
+                <Text style={[styles.role, { color: Colors[colorScheme].textSecondary }]}>Convocado</Text>
             </View>
             ))}
         </View>
       </ScrollView>
 
       <View style={styles.buttons}>
-        <TouchableOpacity style={styles.primaryBtn} onPress={handleGenerate}>
-          <Text style={styles.primaryText}>Sí, generar QR</Text>
+        <TouchableOpacity 
+          style={[styles.primaryBtn, { backgroundColor: Colors[colorScheme].buttonPrimary }]} 
+          onPress={handleGenerate}
+        >
+          <Text style={[styles.primaryText, { color: Colors[colorScheme].buttonText }]}>Sí, generar QR</Text>
         </TouchableOpacity>
         <TouchableOpacity
-          style={styles.secondaryBtn}
+          style={[styles.secondaryBtn, { backgroundColor: Colors[colorScheme].cardBackground }]}
           onPress={() => navigation.goBack()}
         >
-          <Text style={styles.secondaryText}>Cancelar</Text>
+          <Text style={[styles.secondaryText, { color: Colors[colorScheme].text }]}>Cancelar</Text>
         </TouchableOpacity>
       </View>
     </View>
@@ -80,42 +84,36 @@ const ConfirmGenerateQRScreen = () => {
 export default ConfirmGenerateQRScreen;
 
 const styles = StyleSheet.create({
-  container: { flex: 1, backgroundColor: "#fff", paddingHorizontal: 16 },
-  containerDark: { backgroundColor: "#010D06" },
+  container: { 
+    flex: 1, 
+    paddingHorizontal: 16 
+  },
   title: {
     fontSize: 18,
     fontWeight: "bold",
     textAlign: "center",
-    marginTop: 12,
-    color: "#1A2C23",
+    marginTop: 60,
   },
   subtitle: {
     textAlign: "center",
     marginTop: 8,
     fontSize: 16,
-    color: "#4B5563",
   },
   section: {
     marginTop: 20,
     fontWeight: "bold",
     fontSize: 15,
     marginBottom: 8,
-    color: "#1A2C23",
-  },
-  textDark: {
-    color: "#FFFFFF",
   },
   textGray: {
     color: "#A1A1AA",
   },
   alertBox: {
-    backgroundColor: "#E5F4F0",
     padding: 12,
     borderRadius: 12,
     marginBottom: 20,
   },
   alertText: {
-    color: "#1A2C23",
     fontSize: 14,
   },
   grid: {
@@ -139,39 +137,32 @@ const styles = StyleSheet.create({
     fontSize: 13,
     fontWeight: "600",
     textAlign: "center",
-    color: "#1A2C23",
   },
   role: {
     fontSize: 12,
-    color: "#6B7280",
     textAlign: "center",
   },
   buttons: {
-    position: "absolute",
-    bottom: 24,
-    left: 16,
-    right: 16,
-    gap: 12,
+    marginBottom: 40,
+    flexDirection: "column",
+    gap: 16,
+    paddingHorizontal: 16,
   },
   primaryBtn: {
-    backgroundColor: "#22C55E",
     paddingVertical: 14,
     borderRadius: 999,
     alignItems: "center",
   },
   primaryText: {
-    color: "#fff",
     fontWeight: "bold",
     fontSize: 16,
   },
   secondaryBtn: {
-    backgroundColor: "#F3F4F6",
     paddingVertical: 14,
     borderRadius: 999,
     alignItems: "center",
   },
   secondaryText: {
-    color: "#111827",
     fontWeight: "600",
     fontSize: 16,
   },

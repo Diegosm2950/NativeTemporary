@@ -4,6 +4,7 @@ import { useRouter } from 'expo-router';
 import { useCedula } from '@/context/CedulaContext';
 import useColorScheme from '@/hooks/useColorScheme';
 import Colors from '@/constants/Colors';
+import { VolverButton } from '@/components/ui/BackButton';
 
 export default function RegistrarTarjeta() {
   const router = useRouter();
@@ -81,11 +82,6 @@ export default function RegistrarTarjeta() {
         ]}
         keyboardShouldPersistTaps="handled"
       >
-        <Image
-          source={require('@/assets/images/FMRUU.png')}
-          style={styles.logo}
-          resizeMode="contain"
-        />
         <Text style={[styles.title, { color: Colors[colorScheme].text }]}>
           Registrar Tarjeta
         </Text>
@@ -225,24 +221,7 @@ export default function RegistrarTarjeta() {
           </Text>
         </TouchableOpacity>
 
-        <TouchableOpacity
-          style={[
-            styles.backButton,
-            { 
-              backgroundColor: Colors[colorScheme].buttonSecondary,
-              marginTop: 20,
-              marginBottom: 40 // Added more bottom margin
-            }
-          ]}
-          onPress={() => router.replace('/(protected)/(cedulas)/juego' as any)}
-        >
-          <Text style={[
-            styles.backText,
-            { color: Colors[colorScheme].textSecondary }
-          ]}>
-            Volver
-          </Text>
-        </TouchableOpacity>
+        <VolverButton destination="/(protected)/(cedulas)/juego" />
       </ScrollView>
     </KeyboardAvoidingView>
   );
@@ -253,11 +232,6 @@ const styles = StyleSheet.create({
     flexGrow: 1,
     paddingVertical: Platform.OS === 'ios' ? 60 : 40,
     paddingHorizontal: 20,
-  },
-  logo: {
-    width: 80,
-    height: 40,
-    marginBottom: 10,
   },
   title: {
     fontSize: 18,
