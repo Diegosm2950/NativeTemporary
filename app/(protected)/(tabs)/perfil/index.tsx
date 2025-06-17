@@ -51,7 +51,10 @@ export default function ProfileScreen() {
             <Text style={[styles.sectionTitle, { color: Colors[colorScheme].text }]}>
               Mi Equipo
             </Text>
-            <TouchableOpacity style={styles.seeAllButton}>
+            <TouchableOpacity
+              style={styles.seeAllButton}
+              onPress={() => router.push('/(protected)/perfil/TeamPlayerScreen')}
+            >
               <Text style={[styles.seeAllText, { color: Colors[colorScheme].tint }]}>
                 See All
               </Text>
