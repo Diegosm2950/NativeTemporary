@@ -78,6 +78,8 @@ export default function JuegoScreen() {
 
   return (
     <View style={[styles.container, { backgroundColor: Colors[colorScheme].background }]}>
+      <ScrollView style={styles.scrollView}>
+
       <StatusBar style={colorScheme === 'dark' ? 'light' : 'dark'} />
 
       <Image
@@ -192,6 +194,7 @@ export default function JuegoScreen() {
       >
         <Text style={[styles.secondaryText, { color: Colors[colorScheme].text }]}>Firmas Digitales</Text>
       </TouchableOpacity>
+      </ScrollView>
     </View>
   );
 }
@@ -201,6 +204,9 @@ const styles = StyleSheet.create({
     flex: 1,
     padding: 20,
     backgroundColor: '#fff',
+  },
+  scrollView: {
+    flex: 1,
   },
   logo: {
     width: 80,
@@ -283,6 +289,7 @@ const styles = StyleSheet.create({
     borderRadius: 25,
     alignItems: 'center',
     marginBottom: 16,
+    marginTop: 16
   },
   mainButtonText: {
     color: 'white',
@@ -314,6 +321,7 @@ const styles = StyleSheet.create({
     padding: 12,
     borderRadius: 12,
     alignItems: 'center',
+    marginBottom: 16
   },
   iconButton: {
     backgroundColor: '#E6EFE6',
@@ -367,6 +375,6 @@ const styles = StyleSheet.create({
     fontSize: 14,
   },
   statsScroll: {
-    maxHeight: 220, // Ajusta este valor según tu diseño
+    maxHeight: 220, 
   },
 });

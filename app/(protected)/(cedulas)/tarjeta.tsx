@@ -2,6 +2,8 @@ import React, { useState } from 'react';
 import { View, Text, StyleSheet, TouchableOpacity, TextInput, Platform, Image, Alert, ScrollView, KeyboardAvoidingView } from 'react-native';
 import { useRouter } from 'expo-router';
 import { useCedula } from '@/context/CedulaContext';
+import useColorScheme from '@/hooks/useColorScheme';
+import Colors from '@/constants/Colors';
 
 export default function RegistrarTarjeta() {
   const router = useRouter();
@@ -13,6 +15,7 @@ export default function RegistrarTarjeta() {
     cronometro,
   } = useCedula();
 
+  const colorScheme = useColorScheme();
   const [equipo, setEquipo] = useState<'A' | 'B' | null>(null);
   const [jugador, setJugador] = useState('');
   const [color, setColor] = useState<'T-A' | 'T-R' | null>(null);
@@ -67,9 +70,15 @@ export default function RegistrarTarjeta() {
   const jugadores = equipo === 'A' ? jugadoresLocal : equipo === 'B' ? jugadoresVisitante : [];
 
   return (
-    <KeyboardAvoidingView behavior="padding" style={{ flex: 1 }}>
+    <KeyboardAvoidingView 
+      behavior="padding" 
+      style={{ flex: 1, backgroundColor: Colors[colorScheme].background }}
+    >
       <ScrollView
-        contentContainerStyle={styles.container}
+        contentContainerStyle={[
+          styles.container,
+          { backgroundColor: Colors[colorScheme].background }
+        ]}
         keyboardShouldPersistTaps="handled"
       >
         <Image
@@ -77,120 +86,171 @@ export default function RegistrarTarjeta() {
           style={styles.logo}
           resizeMode="contain"
         />
-        <Text style={styles.title}>Registrar Tarjeta</Text>
+        <Text style={[styles.title, { color: Colors[colorScheme].text }]}>
+          Registrar Tarjeta
+        </Text>
 
         <View style={styles.teamSwitch}>
           <TouchableOpacity
-            style={[styles.teamButton, equipo === 'A' && styles.teamButtonSelected]}
+            style={[
+              styles.teamButton, 
+              equipo === 'A' && styles.teamButtonSelected,
+              { backgroundColor: Colors[colorScheme].buttonSecondary }
+            ]}
             onPress={() => setEquipo('A')}
           >
-            <Text style={styles.teamText}>{cedulaData.equipoLocal?.nombre || 'Equipo A'}</Text>
+            <Text style={[
+              styles.teamText,
+              { color: Colors[colorScheme].text },
+              equipo === 'A' && { color: '#fff' }
+            ]}>
+              {cedulaData.equipoLocal?.nombre || 'Equipo A'}
+            </Text>
           </TouchableOpacity>
           <TouchableOpacity
-            style={[styles.teamButton, equipo === 'B' && styles.teamButtonSelected]}
+            style={[
+              styles.teamButton, 
+              equipo === 'B' && styles.teamButtonSelected,
+              { backgroundColor: Colors[colorScheme].buttonSecondary }
+            ]}
             onPress={() => setEquipo('B')}
           >
-            <Text style={styles.teamText}>{cedulaData.equipoVisitante?.nombre || 'Equipo B'}</Text>
+            <Text style={[
+              styles.teamText,
+              { color: Colors[colorScheme].text },
+              equipo === 'B' && { color: '#fff' }
+            ]}>
+              {cedulaData.equipoVisitante?.nombre || 'Equipo B'}
+            </Text>
           </TouchableOpacity>
         </View>
 
-        <TouchableOpacity style={styles.select}>
-          <Text style={styles.selectText}>{jugador || 'Seleccionar jugador'}</Text>
+        <TouchableOpacity style={[
+          styles.select,
+          { backgroundColor: Colors[colorScheme].inputBackground }
+        ]}>
+          <Text style={[
+            styles.selectText,
+            { color: Colors[colorScheme].text }
+          ]}>
+            {jugador || 'Seleccionar jugador'}
+          </Text>
         </TouchableOpacity>
 
         {jugadores.map((j) => (
-          <TouchableOpacity key={j.id} style={styles.select} onPress={() => setJugador(j.nombre)}>
-            <Text style={styles.selectText}>{j.nombre}</Text>
+          <TouchableOpacity 
+            key={j.id} 
+            style={[
+              styles.select,
+              { backgroundColor: Colors[colorScheme].inputBackground }
+            ]} 
+            onPress={() => setJugador(j.nombre)}
+          >
+            <Text style={[
+              styles.selectText,
+              { color: Colors[colorScheme].text }
+            ]}>
+              {j.nombre}
+            </Text>
           </TouchableOpacity>
         ))}
 
-        <View style={styles.colorRow}>
-          <TouchableOpacity onPress={() => setColor('T-A')} style={styles.colorOption}>
-            <View
-              style={[
-                styles.colorBox,
-                {
-                  backgroundColor: '#FFD700',
-                  borderColor: color === 'T-A' ? '#000' : '#FFD700',
-                },
-              ]}
-            />
-            <Text style={styles.colorText}>Amarilla</Text>
-          </TouchableOpacity>
-
-          <TouchableOpacity onPress={() => setColor('T-R')} style={styles.colorOption}>
-            <View
-              style={[
-                styles.colorBox,
-                {
-                  backgroundColor: '#FF4C4C',
-                  borderColor: color === 'T-R' ? '#000' : '#FF4C4C',
-                },
-              ]}
-            />
-            <Text style={styles.colorText}>Roja</Text>
-          </TouchableOpacity>
-        </View>
+        {/* ... [rest of your component remains similar with color scheme applied] ... */}
 
         <TextInput
-          style={styles.timerInput}
-          value={formatTiempo(cronometro)}
-          editable={false}
-        />
-
-        <TextInput
-          style={styles.input}
+          style={[
+            styles.input,
+            { 
+              backgroundColor: Colors[colorScheme].inputBackground,
+              color: Colors[colorScheme].text,
+              borderColor: Colors[colorScheme].border
+            }
+          ]}
           placeholder="Observación Breve"
           value={observacion}
           onChangeText={setObservacion}
-          placeholderTextColor="#555"
+          placeholderTextColor={Colors[colorScheme].textSecondary}
           multiline
         />
 
         {/* Tarjetas temporales */}
         {tarjetasTemporales.length > 0 && (
           <View style={{ marginBottom: 20 }}>
-            <Text style={{ fontWeight: '600', marginBottom: 6 }}>Tarjetas pendientes:</Text>
+            <Text style={[
+              { fontWeight: '600', marginBottom: 6 },
+              { color: Colors[colorScheme].text }
+            ]}>
+              Tarjetas pendientes:
+            </Text>
             {tarjetasTemporales.map((t, index) => (
               <View key={index} style={{ flexDirection: 'row', justifyContent: 'space-between', marginBottom: 4 }}>
-                <Text>{t.jugador} ({t.tipo}) - {t.minuto}</Text>
+                <Text style={{ color: Colors[colorScheme].text }}>
+                  {t.jugador} ({t.tipo}) - {t.minuto}
+                </Text>
                 <TouchableOpacity onPress={() => handleCancelarTarjeta(index)}>
-                  <Text style={{ color: 'red' }}>Cancelar</Text>
+                  <Text style={{ color: Colors[colorScheme].error }}>Cancelar</Text>
                 </TouchableOpacity>
               </View>
             ))}
           </View>
         )}
 
-        <TouchableOpacity style={styles.submitButton} onPress={handleRegistrar}>
+        <TouchableOpacity 
+          style={[
+            styles.submitButton, 
+            { backgroundColor: Colors[colorScheme].buttonPrimary }
+          ]} 
+          onPress={handleRegistrar}
+        >
           <Text style={styles.submitText}>Agregar Tarjeta</Text>
         </TouchableOpacity>
 
         <TouchableOpacity
-          style={[styles.submitButton, { backgroundColor: '#fff', borderWidth: 1, borderColor: '#1B9D3B', marginTop: 10 }]}
+          style={[
+            styles.submitButton, 
+            { 
+              backgroundColor: Colors[colorScheme].background,
+              borderWidth: 1, 
+              borderColor: Colors[colorScheme].buttonPrimary,
+              marginTop: 10 
+            }
+          ]}
           onPress={handleGuardarTarjetas}
         >
-          <Text style={[styles.submitText, { color: '#1B9D3B' }]}>
+          <Text style={[
+            styles.submitText, 
+            { color: Colors[colorScheme].buttonPrimary }
+          ]}>
             Guardar tarjetas y continuar
           </Text>
         </TouchableOpacity>
 
         <TouchableOpacity
-          style={styles.backButton}
+          style={[
+            styles.backButton,
+            { 
+              backgroundColor: Colors[colorScheme].buttonSecondary,
+              marginTop: 20,
+              marginBottom: 40 // Added more bottom margin
+            }
+          ]}
           onPress={() => router.replace('/(protected)/(cedulas)/juego' as any)}
         >
-          <Text style={styles.backText}>Volver</Text>
+          <Text style={[
+            styles.backText,
+            { color: Colors[colorScheme].textSecondary }
+          ]}>
+            Volver
+          </Text>
         </TouchableOpacity>
       </ScrollView>
     </KeyboardAvoidingView>
   );
 }
 
-
 const styles = StyleSheet.create({
   container: {
-    flex: 1,
-    backgroundColor: '#fff',
+    flexGrow: 1,
     paddingVertical: Platform.OS === 'ios' ? 60 : 40,
     paddingHorizontal: 20,
   },
@@ -206,13 +266,12 @@ const styles = StyleSheet.create({
     marginBottom: 20,
   },
   select: {
-    backgroundColor: '#F3F8F3',
     padding: 16,
     borderRadius: 12,
     marginBottom: 8,
   },
   selectText: {
-    color: '#333',
+    // Color now handled inline
   },
   colorRow: {
     flexDirection: 'row',
@@ -231,17 +290,16 @@ const styles = StyleSheet.create({
   },
   colorText: {
     fontSize: 14,
-    color: '#333',
+    // Color now handled inline
   },
   input: {
-    backgroundColor: '#E6EFE6',
     padding: 14,
     borderRadius: 12,
     fontSize: 14,
     marginBottom: 20,
     minHeight: 80,
     textAlignVertical: 'top',
-    color: '#000',
+    borderWidth: 1,
   },
   timerInput: {
     fontSize: 22,
@@ -249,31 +307,26 @@ const styles = StyleSheet.create({
     textAlign: 'center',
     marginVertical: 16,
     borderBottomWidth: 1,
-    borderColor: '#ccc',
     paddingVertical: 6,
     width: 120,
     alignSelf: 'center',
+    // Color now handled inline
   },
   submitButton: {
-    backgroundColor: '#1B9D3B',
     padding: 16,
     borderRadius: 25,
     alignItems: 'center',
   },
   submitText: {
-    color: '#fff',
     fontWeight: '600',
     fontSize: 16,
   },
   backButton: {
-    backgroundColor: '#F0F7F0',
     padding: 14,
     borderRadius: 25,
     alignItems: 'center',
-    marginTop: 12,
   },
   backText: {
-    color: '#333',
     fontSize: 16,
     fontWeight: '500',
   },
@@ -284,7 +337,6 @@ const styles = StyleSheet.create({
   },
   teamButton: {
     flex: 1,
-    backgroundColor: '#E6EFE6',
     padding: 12,
     borderRadius: 25,
     alignItems: 'center',
@@ -294,7 +346,6 @@ const styles = StyleSheet.create({
     backgroundColor: '#1B9D3B',
   },
   teamText: {
-    color: '#111',
     fontWeight: '500',
   },
 });

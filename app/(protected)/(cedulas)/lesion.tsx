@@ -66,7 +66,16 @@ export default function RegistrarLesion() {
       behavior={Platform.OS === 'ios' ? 'padding' : 'height'}
       style={{ flex: 1 }}
     >
-      <ScrollView contentContainerStyle={[styles.container, { backgroundColor: Colors[colorScheme].background }]}>
+      <ScrollView 
+        contentContainerStyle={[
+          styles.container, 
+          { 
+            backgroundColor: Colors[colorScheme].background,
+            paddingBottom: 40 // Add extra padding at the bottom
+          }
+        ]}
+        style={{ flex: 1 }} // Ensure ScrollView fills available space
+      >
         <StatusBar style={colorScheme === 'dark' ? 'light' : 'dark'} />
         <Image
           source={require('@/assets/images/FMRUU.png')}
@@ -280,7 +289,7 @@ const styles = StyleSheet.create({
   container: {
     paddingVertical: Platform.OS === 'ios' ? 60 : 40,
     paddingHorizontal: 20,
-    flex: 1
+    minHeight: '100%'
   },
   logo: {
     width: 80,
