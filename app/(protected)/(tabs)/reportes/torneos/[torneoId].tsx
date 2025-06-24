@@ -39,7 +39,7 @@ export default function TournamentReport() {
             throw new Error('Invalid clubId');
           }
   
-          const torneoInfo = await fetchTorneosByEquipo(user.clubId, token);
+          const torneoInfo = await fetchTorneosByEquipo(torneoId, token);
           setTorneoInfo(torneoInfo)
           const partidosTorneos = await fetchPartidosTorneo(torneoId, token)
           setTournamentMatches(partidosTorneos.partidos || [])
@@ -79,15 +79,15 @@ export default function TournamentReport() {
 
   if (loading) {
     return (
-      <View style={styles.container}>
-        <Text>Loading...</Text>
+      <View style={[styles.container, { backgroundColor: Colors[colorScheme].background }]}>
+        <Text style={{color: Colors[colorScheme].text}}>Loading...</Text>
       </View>
     );
   }
 
   if (error) {
     return (
-      <View style={styles.container}>
+      <View style={[styles.container, { backgroundColor: Colors[colorScheme].background }]}>
         <Text>{error}</Text>
       </View>
     );
@@ -95,13 +95,24 @@ export default function TournamentReport() {
 
   if (!torneoInfo) {
     return (
+      <View style={[styles.container, { backgroundColor: Colors[colorScheme].background }]}>
+        <Text style={{color: Colors[colorScheme].text}}>No hay informacion de torneo...</Text>
+      </View>
+    );
+  }
+
+  const thisTournament = torneoInfo.torneos.filter(t => String(t.id) == torneoId)
+
+  console.log(thisTournament)
+  if(thisTournament.length === 0) {
+    return (
       <View style={styles.container}>
         <Text>No hay torneo...</Text>
       </View>
     );
   }
 
-  const thisTournament = torneoInfo.torneos.filter(t => String(t.id) == torneoId)
+
   
   return (
     <SafeAreaView

@@ -84,7 +84,7 @@ export async function fetchPartidosTorneo(id: string, token: string): Promise<Pa
 }
 
 export async function fetchTorneosByEquipo(
-  idEquipo: number,
+  idEquipo: string,
   token: string
 ): Promise<ResponseTorneoInfo> {
   try {

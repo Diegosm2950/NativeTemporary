@@ -49,7 +49,7 @@ export default function MatchReportScreen() {
           {error && <Text style={styles.error}>Error: {error}</Text>}
           
           {matchData?.resultados?.[0] && (
-            <>
+            <View>
               <MatchCard match={{
                 ...matchData.resultados[0].datosPartido,
                 equipoGanador: matchData.resultados[0].equipoGanador,
@@ -57,7 +57,7 @@ export default function MatchReportScreen() {
               }}  />
               
               <MatchStatsCard matchData={matchData.resultados[0]} />
-            </>
+            </View>
           )}
         </View>
       </ScrollView>
