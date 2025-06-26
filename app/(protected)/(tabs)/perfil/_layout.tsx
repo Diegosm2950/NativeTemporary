@@ -12,6 +12,10 @@ export default function ProfileLayout() {
         name="edit"
         options={{ headerShown: false, presentation: 'modal' }}
       />
+      <Stack.Screen
+        name="TeamPlayerScreen"
+        options={{ headerShown: false }}
+      />
     </Stack>
   );
 }

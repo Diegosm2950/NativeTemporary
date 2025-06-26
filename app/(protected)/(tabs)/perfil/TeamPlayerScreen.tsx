@@ -1,6 +1,8 @@
 import { View, Text, FlatList, Image, StyleSheet } from 'react-native';
 import { useEffect, useState, useContext } from 'react';
 import { AuthContext } from '@/context/AuthContext';
+import Colors from '@/constants/Colors';
+import useColorScheme from '@/hooks/useColorScheme';
 
 interface Player {
   id: string;
@@ -13,6 +15,7 @@ interface Player {
 export default function TeamPlayersScreen() {
   const [players, setPlayers] = useState<Player[]>([]);
   const { user, token } = useContext(AuthContext);
+  const colorScheme = useColorScheme();
 
   useEffect(() => {
     const fetchPlayers = async () => {
@@ -45,7 +48,7 @@ export default function TeamPlayersScreen() {
   }, [user?.clubId, token]);
 
   return (
-    <View style={styles.container}>
+    <View style={[styles.container, { backgroundColor: Colors[colorScheme].background }]}>
       <Text style={styles.title}>Jugadores de {user?.club}</Text>
       <FlatList
         data={players}
@@ -72,8 +75,9 @@ export default function TeamPlayersScreen() {
 const styles = StyleSheet.create({
   container: {
     flex: 1,
-    backgroundColor: '#0f0f0f', // fondo oscuro como en el dashboard
-    padding: 16,
+    paddingLeft: 24,
+    paddingRight: 24,
+    paddingTop: 24,
   },
   title: {
     fontSize: 20,

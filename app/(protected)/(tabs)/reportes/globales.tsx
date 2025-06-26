@@ -7,6 +7,7 @@ import StatsCard, { StatItem } from '@/components/StatsCard';
 import { useContext, useEffect, useState } from 'react';
 import { AuthContext } from '@/context/AuthContext';
 import { fetchPlayerSummary, fetchTeamSummary } from '@/api/user/stats';
+import { LoadingIndicator } from '@/components/ui/Indicators';
 
 interface PlayerStatsResponse {
   id: number;
@@ -94,11 +95,7 @@ export default function GlobalesScreen() {
 
     if (loading) {
         return (
-            <SafeAreaView style={[styles.container, { backgroundColor: Colors[colorScheme].background }]}>
-                <View style={styles.loadingContainer}>
-                      {/* Add your loading indicator here */}
-                </View>
-            </SafeAreaView>
+            <LoadingIndicator/>
         );
     }
 
@@ -136,7 +133,6 @@ const styles = StyleSheet.create({
   },
   scrollView: {
     flex: 1,
-    marginTop: Layout.spacing.xxl
   },
   contentContainer: {
     padding: Layout.spacing.l,

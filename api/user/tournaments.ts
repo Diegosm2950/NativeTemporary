@@ -89,7 +89,7 @@ export async function fetchTorneosByEquipo(
 ): Promise<ResponseTorneoInfo> {
   try {
     const url = new URL(`${API_BASE_URL}/api/app-native-api/torneos/consultar-torneo`);
-    url.searchParams.append('idEquipo', idEquipo.toString());
+    url.searchParams.append('idTorneo', idEquipo.toString());
 
     const response = await fetch(url.toString(), {
       method: 'GET',

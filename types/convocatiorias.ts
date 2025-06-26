@@ -36,8 +36,17 @@ export interface PartidosTorneoResponse {
 }
 
 export interface ResponseTorneoInfo {
-  convocado: boolean
-  torneos: TorneoInfo[]
+  torneo: {
+      id: number;
+      nombre: string;
+      categoria: string;
+      fechaInicio: string; 
+      fechaFin: string;   
+      equipos: Team[];   
+      equipoGanador: string;
+      descripcion: string;
+      sede: string;
+  };
 }
 
 export interface TournamentMatch {

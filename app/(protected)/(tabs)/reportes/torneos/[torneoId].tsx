@@ -1,4 +1,4 @@
-import { View, Text, StyleSheet, ScrollView, TouchableOpacity } from 'react-native';
+import { View, Text, StyleSheet, ScrollView, TouchableOpacity, ActivityIndicator } from 'react-native';
 import { router, useLocalSearchParams } from 'expo-router';
 import { useContext, useEffect, useState } from 'react';
 import { fetchPartidosTorneo, fetchTorneosByEquipo, fetchTournamentReport } from '@/api/user/tournaments';
@@ -11,6 +11,7 @@ import WinnerTeamCard from '@/components/WinnerTeamCard';
 import MatchCard from '@/components/MatchCard';
 import { MatchResults, ResponseTorneoInfo } from '@/types/convocatiorias';
 import Layout from '@/constants/Layout';
+import { EmptyDataIndicator, ErrorIndicator, LoadingIndicator } from '@/components/ui/Indicators';
 
 export default function TournamentReport() {
   const { torneoId } = useLocalSearchParams<{ torneoId: string }>();
@@ -79,41 +80,22 @@ export default function TournamentReport() {
 
   if (loading) {
     return (
-      <View style={[styles.container, { backgroundColor: Colors[colorScheme].background }]}>
-        <Text style={{color: Colors[colorScheme].text}}>Loading...</Text>
-      </View>
+      <LoadingIndicator/>
     );
   }
 
   if (error) {
     return (
-      <View style={[styles.container, { backgroundColor: Colors[colorScheme].background }]}>
-        <Text>{error}</Text>
-      </View>
+      <ErrorIndicator error={error}/>
     );
   }
 
   if (!torneoInfo) {
     return (
-      <View style={[styles.container, { backgroundColor: Colors[colorScheme].background }]}>
-        <Text style={{color: Colors[colorScheme].text}}>No hay informacion de torneo...</Text>
-      </View>
+      <EmptyDataIndicator message='No hay información de torneo...'/>
     );
   }
 
-  const thisTournament = torneoInfo.torneos.filter(t => String(t.id) == torneoId)
-
-  console.log(thisTournament)
-  if(thisTournament.length === 0) {
-    return (
-      <View style={styles.container}>
-        <Text>No hay torneo...</Text>
-      </View>
-    );
-  }
-
-
-  
   return (
     <SafeAreaView
       style={[styles.container, { backgroundColor: Colors[colorScheme].background }]}
@@ -123,7 +105,7 @@ export default function TournamentReport() {
         style={styles.scrollView}
         contentContainerStyle={styles.contentContainer}
       >
-        <WinnerTeamCard name={thisTournament[0].nombre} team={thisTournament[0].equipoCampeon} />
+        <WinnerTeamCard name={torneoInfo.torneo.equipoGanador} team={torneoInfo.torneo.equipos[0]} />
               
         {tournamentStats.length > 0 && (
           <StatsCard
@@ -151,10 +133,19 @@ const styles = StyleSheet.create({
   },
   scrollView: {
     flex: 1,
-    marginTop: Layout.spacing.xxl
   },
   contentContainer: {
     padding: Layout.spacing.l,
+  },
+  centerContainer: {
+    flex: 1,
+    justifyContent: 'center',
+    alignItems: 'center',
+  },
+  centerText: {
+    textAlign: 'center',
+    marginTop: Layout.spacing.m,
+    fontSize: 16,
   },
   title: {
     fontSize: 24,

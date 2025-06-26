@@ -76,7 +76,6 @@ export default function ProfileScreen() {
             title="Editar Perfil"
             onPress={handleEditProfile}
             variant="secondary"
-            style={styles.editButton}
           />
           <Button
             title="Cerrar Sesión"
@@ -123,23 +122,6 @@ const styles = StyleSheet.create({
     width: 90,
     height: 90,
     borderRadius: 45,
-  },
-  checkmarkContainer: {
-    position: 'absolute',
-    right: 0,
-    bottom: 0,
-    backgroundColor: '#24693D',
-    width: 24,
-    height: 24,
-    borderRadius: 12,
-    justifyContent: 'center',
-    alignItems: 'center',
-    borderWidth: 2,
-    borderColor: '#FFFFFF',
-  },
-  checkmark: {
-    width: 14,
-    height: 14,
   },
   name: {
     fontSize: 24,
@@ -194,7 +176,5 @@ const styles = StyleSheet.create({
   },
   downloadButton: {
     marginBottom: Layout.spacing.m,
-  },
-  editButton: {
   },
 });

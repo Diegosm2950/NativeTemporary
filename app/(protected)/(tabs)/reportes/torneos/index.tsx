@@ -8,6 +8,7 @@ import ReportCard from '@/components/ReportCard';
 import { useContext } from 'react';
 import { AuthContext } from '@/context/AuthContext';
 import { useConvocatorias } from '@/hooks/useFetchMatches';
+import { ErrorIndicator, LoadingIndicator } from '@/components/ui/Indicators';
 
 export default function TorneosReportes() {
   const colorScheme = useColorScheme();
@@ -15,7 +16,19 @@ export default function TorneosReportes() {
 
   const { user } = useContext(AuthContext);
 
-  const { data } = useConvocatorias(user?.clubId ?? undefined);
+  const { data, loading, error } = useConvocatorias(user?.clubId ?? undefined);
+
+  if (loading) {
+    return (
+      <LoadingIndicator/>
+    );
+  }
+
+  if (error) {
+    return (
+      <ErrorIndicator error={error}/>
+    );
+  }
 
   const finalizedTournaments = data.filteredTournaments.filter(tournament => tournament.estatus === "finalizado")
 

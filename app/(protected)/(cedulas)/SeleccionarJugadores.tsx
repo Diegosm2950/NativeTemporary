@@ -6,7 +6,6 @@ import TeamCard from "@/components/qr-capitan/TeamCard";
 import FilterBar from "@/components/qr-capitan/FilterBar";
 import PlayerList from "@/components/qr-capitan/PlayerList";
 import GenerateQRButton from "@/components/qr-capitan/GenerateQRButton";
-import BackButton from "@/components/qr-capitan/BackButton";
 import SearchBar from "@/components/qr-capitan/SearchBar";
 import PaginationControls from "@/components/qr-capitan/PaginationControls";
 import PlayerCounter from "@/components/qr-capitan/PlayerCounter";
@@ -37,8 +36,8 @@ const SeleccionarJugadores = () => {
       if (exists) {
         return prev.filter((p) => p.id !== player.id);
       } else {
-        if (prev.length >= 1) {
-          Alert.alert("Límite alcanzado", "Solo puedes seleccionar 1 jugador.");
+        if (prev.length >= 11) {
+          Alert.alert("Límite alcanzado", "Solo puedes seleccionar 11 jugadores.");
           return prev;
         }
         return [...prev, player];
@@ -77,7 +76,7 @@ const SeleccionarJugadores = () => {
             onPrevious={() => setPage((prev) => Math.max(prev - 1, 1))}
           />
         )}
-        <PlayerCounter selected={selectedPlayers.length} total={1} />
+        <PlayerCounter selected={selectedPlayers.length} total={11} />
         <GenerateQRButton onPress={handleGenerateQR} />
       </ScrollView>
     </View>

@@ -37,6 +37,8 @@ export default function MatchReportScreen() {
     }
   }, [matchId]);
 
+  console.log(matchData)
+
 
   return (
     <SafeAreaView
@@ -52,6 +54,7 @@ export default function MatchReportScreen() {
             <View>
               <MatchCard match={{
                 ...matchData.resultados[0].datosPartido,
+                estatus: "finalizado",
                 equipoGanador: matchData.resultados[0].equipoGanador,
                 resultadoResumen: matchData.resultados[0].resultadoResumen
               }}  />

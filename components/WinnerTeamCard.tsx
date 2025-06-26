@@ -43,7 +43,7 @@ export default function WinnerTeamCard({ team, name }: WinnerTeamCardProps) {
           </>
         ) : (
           <Text style={[styles.teamName, { color: Colors[colorScheme].text }]}>
-            No champion team yet
+            No hay datos del campeón
           </Text>
         )}
       </View>

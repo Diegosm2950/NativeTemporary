@@ -8,16 +8,28 @@ import { useContext } from 'react';
 import { AuthContext } from '@/context/AuthContext';
 import { useConvocatorias } from '@/hooks/useFetchMatches';
 import { useRouter } from 'expo-router';
+import { ErrorIndicator, LoadingIndicator } from '@/components/ui/Indicators';
 
 export default function PartidosScreen() {
   const colorScheme = useColorScheme();
   const { user } = useContext(AuthContext);
   const router = useRouter();
 
-  const { data } = useConvocatorias(user?.clubId ?? undefined);
+  const { data, loading, error } = useConvocatorias(user?.clubId ?? undefined);
+
+  if (loading) {
+    return (
+      <LoadingIndicator/>
+    );
+  }
+
+  if (error) {
+    return (
+      <ErrorIndicator error={error}/>
+    );
+  }
 
   const finishedMatches = data.torneos.filter(match => match.estatus === "finalizado");
-  console.log(finishedMatches)
   return (
     <SafeAreaView
       style={[styles.container, { backgroundColor: Colors[colorScheme].background }]}
@@ -49,7 +61,6 @@ const styles = StyleSheet.create({
   },
   scrollView: {
     flex: 1,
-    marginTop: Layout.spacing.xxl
   },
   contentContainer: {
     padding: Layout.spacing.l,
