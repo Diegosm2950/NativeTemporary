@@ -57,13 +57,24 @@ export default function QRScanner() {
 
   const handleBarCodeScanned = ({ data }: { data: string }) => {
     try {
-      const players: Player[] = JSON.parse(data);
+      const players = JSON.parse(data);
+
+      if (!Array.isArray(players)) throw new Error();
+
       if (scanningTeam === 'local') {
         setLocalPlayers(players);
         setJugadoresLocal(players);
+        setCedulaData(prev => ({
+          ...prev,
+          participantesLocal: players,
+        }));
       } else if (scanningTeam === 'visitante') {
         setVisitorPlayers(players);
         setJugadoresVisitante(players);
+        setCedulaData(prev => ({
+          ...prev,
+          participantesVisitante: players,
+        }));
       }
     } catch (error) {
       alert('QR inválido o estructura incorrecta.');
