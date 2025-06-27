@@ -1,11 +1,16 @@
 {
-    "cli": {
-      "version": "~16.9.0"
+  "cli": {
+    "version": "~16.9.0"
+  },
+  "build": {
+    "preview": {
+      "channel": "beta",
+      "distribution": "internal"
     },
-    "build": {
-      "preview": {
-        "channel": "beta",
-        "distribution": "internal"
+    "production": {
+      "android": {
+        "buildType": "app-bundle"
       }
     }
   }
+}
