@@ -5,6 +5,7 @@ import { useCedula } from '@/context/CedulaContext';
 import CancelButton from '@/components/cancelButton';
 import Colors from '@/constants/Colors';
 import useColorScheme from '@/hooks/useColorScheme';
+import TeamSelector from '@/components/TeamSelector';
 
 export default function RegistroPuntos() {
   const router = useRouter();
@@ -12,21 +13,13 @@ export default function RegistroPuntos() {
     useCedula();
 
   const [equipo, setEquipo] = useState<'A' | 'B'>('A');
-  const [jugador, setJugador] = useState('');
+  const [jugador, setJugador] = useState<number | null>();
   const [accion, setAccion] = useState('');
-  const [tiempo, setTiempo] = useState('00:00:00');
   const [puntosTemporales, setPuntosTemporales] = useState<any[]>([]);
   const colorScheme = useColorScheme();
 
   const { cronometro } = useCedula();
 
-  const actionButtonSelectedStyle = {
-    backgroundColor: Colors[colorScheme].buttonSelected,
-  }
-  
-  const teamButtonSelectedStyle = {
-    backgroundColor: Colors[colorScheme].buttonSelected,
-  }
 
   const formatTiempo = (milis: number) => {
     const h = Math.floor(milis / 3600000).toString().padStart(2, '0');
@@ -84,25 +77,31 @@ export default function RegistroPuntos() {
 
   const handleAgregarPunto = () => {
     const tiempoActual = formatTiempo(cronometro);
-
+  
     if (!equipo || !jugador || !accion) {
       Alert.alert('Faltan campos', 'Completa todos los datos del punto.');
       return;
     }
-
+  
+    const player = jugadores.find(j => j.id === jugador);
+    if (!player) {
+      Alert.alert('Error', 'Jugador no encontrado');
+      return;
+    }
+  
     const nuevoPunto = {
       equipo,
-      jugador,
+      jugador: player.nombre,
+      jugadorId: jugador,     
       accion,
       tiempo: tiempoActual,
       puntos: getPuntos(accion),
     };
-
+  
     setPuntosTemporales((prev) => [...prev, nuevoPunto]);
-
-    setJugador('');
+  
+    setJugador(null);  
     setAccion('');
-    setTiempo('00:00:00');
   };
 
   const handleCancelarPunto = (index: number) => {
@@ -159,48 +158,12 @@ export default function RegistroPuntos() {
         </View>
 
         {/* Equipo A / B */}
-        <View style={styles.teamSwitch}>
-          <TouchableOpacity
-            style={[
-              styles.teamButton,
-              { backgroundColor: Colors[colorScheme].cardBackground },
-              equipo === 'A' && {
-                backgroundColor: Colors[colorScheme].buttonSelected
-              }
-            ]}
-            onPress={() => setEquipo('A')}
-          >
-            <Text style={[
-              styles.teamText,
-              { color: Colors[colorScheme].text },
-              equipo === 'A' && {
-                color: Colors[colorScheme].buttonText
-              }
-            ]}>
-              {cedulaData.equipoLocal?.nombre || 'Equipo A'}
-            </Text>
-          </TouchableOpacity>
-          <TouchableOpacity
-            style={[
-              styles.teamButton,
-              { backgroundColor: Colors[colorScheme].cardBackground },
-              equipo === 'B' && {
-                backgroundColor: Colors[colorScheme].buttonSelected
-              }
-            ]}
-            onPress={() => setEquipo('B')}
-          >
-            <Text style={[
-              styles.teamText,
-              { color: Colors[colorScheme].text },
-              equipo === 'A' && {
-                color: Colors[colorScheme].buttonText
-              }
-            ]}>
-              {cedulaData.equipoLocal?.nombre || 'Equipo B'}
-            </Text>
-          </TouchableOpacity>
-        </View>
+        <TeamSelector
+          equipo={equipo}
+          setEquipo={setEquipo}
+          equipoLocalNombre={cedulaData.equipoLocal?.nombre}
+          equipoVisitanteNombre={cedulaData.equipoVisitante?.nombre}
+        />
 
         {/* Tiempo */}
         <TextInput
@@ -214,14 +177,19 @@ export default function RegistroPuntos() {
           {jugadores.map((j) => (
             <TouchableOpacity
               key={j.id}
-              style={{
-                paddingVertical: 8,
-                borderBottomWidth: 1,
-                borderBottomColor: Colors[colorScheme].border,
-                flexDirection: 'row',
-                alignItems: 'center',
-              }}
-              onPress={() => setJugador(j.nombre)}
+              style={[
+                {
+                  paddingVertical: 8,
+                  borderBottomWidth: 1,
+                  borderBottomColor: Colors[colorScheme].border,
+                  flexDirection: 'row',
+                  alignItems: 'center',
+                },
+                jugador === j.id && {  // Now comparing by ID
+                  backgroundColor: Colors[colorScheme].buttonSelected,
+                }
+              ]}
+              onPress={() => setJugador(j.id)}  
             >
               <Image
                 source={{ uri: j.foto }}
@@ -232,7 +200,14 @@ export default function RegistroPuntos() {
                   marginRight: 8,
                 }}
               />
-              <Text style={{ color: Colors[colorScheme].text }}>{j.nombre}</Text>
+              <Text style={[
+                { color: Colors[colorScheme].text },
+                jugador === j.id && {  // Now comparing by ID
+                  color: Colors[colorScheme].buttonText
+                }
+              ]}>
+                {j.nombre}
+              </Text>
             </TouchableOpacity>
           ))}
           {!jugadores.length && (
@@ -327,27 +302,6 @@ const styles = StyleSheet.create({
     borderRadius: 12,
     marginBottom: 12,
   },
-  selectText: {
-    color: '#333',
-  },
-  teamSwitch: {
-    flexDirection: 'row',
-    justifyContent: 'space-between',
-    marginBottom: 16,
-  },
-  teamButton: {
-    flex: 1,
-    padding: 12,
-    borderRadius: 25,
-    alignItems: 'center',
-    marginHorizontal: 6,
-  },
-  teamButtonSelected: {
-    backgroundColor: '#1B9D3B',
-  },
-  teamText: {
-    fontWeight: '500',
-  },
   timerInput: {
     fontSize: 22,
     fontWeight: '600',
@@ -412,9 +366,6 @@ const styles = StyleSheet.create({
     minWidth: '22%',
     borderRadius: 12,
     alignItems: 'center',
-  },
-  actionButtonSelected: {
-    backgroundColor: '#1B9D3B',
   },
   actionText: {
     fontWeight: '600',

@@ -1,5 +1,14 @@
-import React, { useContext, useState } from 'react';
-import { StyleSheet, Text, View, Image, ScrollView } from 'react-native';
+import React, { useContext, useState, useCallback, useEffect } from 'react';
+import { 
+  StyleSheet, 
+  Text, 
+  View, 
+  Image, 
+  ScrollView, 
+  RefreshControl,
+  Alert,
+  ActivityIndicator
+} from 'react-native';
 import { SafeAreaView } from 'react-native-safe-area-context';
 import Colors from '@/constants/Colors';
 import useColorScheme from '@/hooks/useColorScheme';
@@ -12,19 +21,95 @@ import { useConvocatorias } from '@/hooks/useFetchMatches';
 export default function HomeScreen() {
   const colorScheme = useColorScheme();
   const { user } = useContext(AuthContext);
+  const [refreshing, setRefreshing] = useState(false);
+  const [initialLoad, setInitialLoad] = useState(true);
 
-  const { data } = useConvocatorias(user?.clubId ?? undefined);
+  const { data, refetch, loading, error, isOffline } = useConvocatorias(user?.clubId ?? undefined);
   const nextMatch = data.nextMatch;
   const pastMatches = data.torneos.filter(match => match.estatus == "finalizado");
   const nextMatches = data.torneos.filter(match => match.estatus == "programado");
 
-  console.log(data)
+  useEffect(() => {
+    if (!loading) {
+      setInitialLoad(false);
+    }
+  }, [loading]);
+
+  const onRefresh = useCallback(async () => {
+    setRefreshing(true);
+    try {
+      await refetch();
+      if (isOffline) {
+        Alert.alert(
+          "Modo sin conexión",
+          "Estás viendo información guardada. Conéctate a internet para obtener datos actualizados.",
+          [{ text: "OK" }]
+        );
+      }
+    } catch (err) {
+      console.error("Refresh error:", err);
+    } finally {
+      setRefreshing(false);
+    }
+  }, [refetch, isOffline]);
+
+  // Show loading state only on initial load
+  if (initialLoad && loading) {
+    return (
+      <SafeAreaView style={[styles.container, { backgroundColor: Colors[colorScheme].background }]}>
+        <View style={styles.loadingContainer}>
+          <ActivityIndicator size="large" color={Colors[colorScheme].tint} />
+        </View>
+      </SafeAreaView>
+    );
+  }
+
+  // Only show error state if we don't have any data at all (including cached)
+  if (error && !nextMatch && !data.torneos.length && !data.amistosos.length) {
+    return (
+      <SafeAreaView style={[styles.container, { backgroundColor: Colors[colorScheme].background }]}>
+        <View style={styles.errorContainer}>
+          <Text style={[styles.errorText, { color: Colors[colorScheme].text }]}>
+            Error al cargar los partidos
+          </Text>
+          <Text style={[styles.errorSubtext, { color: Colors[colorScheme].textSecondary }]}>
+            {error}
+          </Text>
+          <Text 
+            style={[styles.retryText, { color: Colors[colorScheme].tint }]}
+            onPress={refetch}
+          >
+            Reintentar
+          </Text>
+        </View>
+      </SafeAreaView>
+    );
+  }
+
   return (
     <SafeAreaView
       style={[styles.container, { backgroundColor: Colors[colorScheme].background }]}
       edges={['top', 'right', 'left']}
     >
-      <ScrollView style={styles.scrollView}>
+      <ScrollView 
+        style={styles.scrollView}
+        refreshControl={
+          <RefreshControl
+            refreshing={refreshing}
+            onRefresh={onRefresh}
+            colors={[Colors[colorScheme].tint]}
+            tintColor={Colors[colorScheme].tint} 
+            progressBackgroundColor={Colors[colorScheme].background}
+          />
+        }
+      >
+        {/* Offline indicator banner */}
+        {isOffline && (
+          <View style={[styles.offlineBanner, { backgroundColor: Colors[colorScheme].warning }]}>
+            <Text style={styles.offlineText}>Modo sin conexión - Datos guardados</Text>
+          </View>
+        )}
+
         <View style={styles.header}>
           <View style={styles.profileContainer}>
             <Image
@@ -38,13 +123,24 @@ export default function HomeScreen() {
           ¡Hola, {user?.nombre}!
         </Text>
         <Text style={[styles.subtitle, { color: Colors[colorScheme].textSecondary }]}>
-          Listo para tu próximo partido?
+          {isOffline ? "Datos guardados - Conéctate para actualizar" : "Listo para tu próximo partido?"}
         </Text>
         
-        {nextMatch && (
+        {nextMatch ? (
           <View style={styles.nextMatchContainer}>
-            <MatchCard match={nextMatch} variant="large" />
+            <MatchCard 
+              match={nextMatch} 
+              variant="large" 
+            />
           </View>
+        ) : (
+          !loading && (
+            <View style={styles.noMatchesContainer}>
+              <Text style={[styles.noMatchesText, { color: Colors[colorScheme].textSecondary }]}>
+                No hay partidos próximos
+              </Text>
+            </View>
+          )
         )}
         
         <MatchTabs 
@@ -69,10 +165,6 @@ const styles = StyleSheet.create({
     alignItems: 'center',
     paddingHorizontal: Layout.spacing.l,
     paddingVertical: Layout.spacing.m,
-  },
-  logo: {
-    width: 36,
-    height: 36,
   },
   profileContainer: {
     width: 60,
@@ -100,5 +192,47 @@ const styles = StyleSheet.create({
   nextMatchContainer: {
     paddingHorizontal: Layout.spacing.l,
     marginBottom: Layout.spacing.l,
-  }
+  },
+  loadingContainer: {
+    flex: 1,
+    justifyContent: 'center',
+    alignItems: 'center',
+  },
+  errorContainer: {
+    flex: 1,
+    justifyContent: 'center',
+    alignItems: 'center',
+    padding: 20,
+  },
+  errorText: {
+    fontSize: 18,
+    fontWeight: 'bold',
+    marginBottom: 10,
+  },
+  errorSubtext: {
+    fontSize: 14,
+    textAlign: 'center',
+    marginBottom: 20,
+  },
+  retryText: {
+    fontSize: 16,
+    fontWeight: 'bold',
+    padding: 10,
+  },
+  offlineBanner: {
+    padding: 10,
+    alignItems: 'center',
+    backgroundColor: Colors.light.warning,
+  },
+  offlineText: {
+    color: 'white',
+    fontWeight: 'bold',
+  },
+  noMatchesContainer: {
+    padding: 20,
+    alignItems: 'center',
+  },
+  noMatchesText: {
+    fontSize: 16,
+  },
 });

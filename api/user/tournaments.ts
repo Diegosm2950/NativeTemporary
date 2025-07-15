@@ -28,6 +28,31 @@ export const fetchConvocatorias = async (id: number, token: string): Promise<Con
   }
 };
 
+export const fetchConvocatoriasPasadas = async (id: number, token: string): Promise<ConvocatoriaResponse> => {
+  try {
+
+    if (!id || !token) {
+      throw new Error('ID and token are required');
+    }
+    const response = await fetch(`${API_BASE_URL}/api/app-native-api/convocatorias/finished/${id}`, {
+      headers: {
+        'Authorization': `Bearer ${token}`,
+        'Content-Type': 'application/json',
+      },
+    });
+
+    if (!response.ok) {
+      const errorData = await response.json();
+      throw new Error(errorData.error || 'Error fetching convocatorias');
+    }
+
+    return await response.json();
+  } catch (error) {
+    console.error('Error in fetchConvocatorias:', error);
+    throw error;
+  }
+};
+
 export const fetchTournamentReport = async (torneoId: string): Promise<CedulaResponse> => {
   try {
     const response = await fetch(`${API_BASE_URL}/api/app-native-api/cedulas/por-torneo/${torneoId}`);

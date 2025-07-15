@@ -49,18 +49,18 @@ export default function TeamPlayersScreen() {
 
   return (
     <View style={[styles.container, { backgroundColor: Colors[colorScheme].background }]}>
-      <Text style={styles.title}>Jugadores de {user?.club}</Text>
+      <Text style={[styles.title, { color: Colors[colorScheme].text }]}>Jugadores de {user?.club}</Text>
       <FlatList
         data={players}
         keyExtractor={(item) => item.id}
         renderItem={({ item }) => (
-          <View style={styles.card}>
+          <View style={[styles.card, {backgroundColor: Colors[colorScheme].buttonSecondary}]}>
             <Image source={{ uri: item.foto }} style={styles.avatar} />
             <View>
-              <Text style={styles.name}>
+              <Text style={[styles.name, { color: Colors[colorScheme].text }]}>
                 {item.nombre} {item.apellido1}
               </Text>
-              <Text style={styles.status}>
+              <Text style={[styles.status, { color: Colors[colorScheme].textSecondary }]}>
                 {item.estatus || 'Sin estatus'}
               </Text>
             </View>
@@ -82,12 +82,10 @@ const styles = StyleSheet.create({
   title: {
     fontSize: 20,
     fontWeight: '700',
-    color: '#ffffff',
     marginBottom: 20,
     textAlign: 'center',
   },
   card: {
-    backgroundColor: '#1c1c1e',
     borderRadius: 16,
     padding: 16,
     marginBottom: 12,
@@ -105,11 +103,9 @@ const styles = StyleSheet.create({
   name: {
     fontSize: 16,
     fontWeight: '600',
-    color: '#fff',
   },
   status: {
     fontSize: 13,
-    color: '#a1a1aa',
     marginTop: 4,
   },
 });

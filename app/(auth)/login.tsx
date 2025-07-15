@@ -13,6 +13,11 @@ const LoginScreen = () => {
   const isDarkMode = colorScheme === 'dark';
   const styles = getStyles(isDarkMode);
 
+  const handleLogin = () => {
+    const lowercaseUsername = username.toLowerCase();
+    authContext.logIn({ username: lowercaseUsername, password });
+  };
+
   return (
     <ScrollView contentContainerStyle={styles.container}>
       <Text style={styles.title}>¡Bienvenido de nuevo!</Text>
@@ -23,6 +28,8 @@ const LoginScreen = () => {
         value={username}
         onChangeText={setUsername}
         placeholderTextColor="#555"
+        autoCapitalize="none" 
+        keyboardType="email-address" 
       />
       <TextInput
         style={styles.input}
@@ -35,7 +42,7 @@ const LoginScreen = () => {
 
       <TouchableOpacity 
         style={styles.loginButton} 
-        onPress={() => authContext.logIn({ username, password })}
+        onPress={handleLogin}
       >
         <Text style={styles.loginText}>Iniciar sesión</Text>
       </TouchableOpacity>
