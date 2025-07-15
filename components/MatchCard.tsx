@@ -25,7 +25,10 @@ export default function MatchCard({ match, variant = 'small' }: MatchCardProps) 
   const ContainerComponent = isLarge ? ImageBackground : View;
   
   const handleCapitanPress = () => {
-    router.push('/(protected)/(cedulas)/SeleccionarJugadores');
+    router.push({
+      pathname: '/(protected)/(cedulas)/SeleccionarJugadores',
+      params: { match: JSON.stringify(match) }
+    });
   };
   
   const handleArbitroPress = () => {
@@ -67,7 +70,6 @@ export default function MatchCard({ match, variant = 'small' }: MatchCardProps) 
             <ImageBackground
               source={require('@/assets/images/rugbyvg.png')}
               blurRadius={50}
-              style={styles.badge}
               imageStyle={styles.badgeImageStyle}
             >
               <Text 
@@ -85,7 +87,7 @@ export default function MatchCard({ match, variant = 'small' }: MatchCardProps) 
               <ImageBackground
                 source={require('@/assets/images/rugbyvg.png')}
                 blurRadius={50}
-                style={[styles.badge, styles.friendlyBadge]}
+                style={[styles.friendlyBadge]}
                 imageStyle={styles.badgeImageStyle}
               >
                 <Text 
@@ -107,7 +109,6 @@ export default function MatchCard({ match, variant = 'small' }: MatchCardProps) 
             <ImageBackground
               source={require('@/assets/images/rugbyvg.png')}
               blurRadius={50}
-              style={styles.badge}
               imageStyle={styles.badgeImageStyle}
             >
               <Text 
@@ -123,7 +124,6 @@ export default function MatchCard({ match, variant = 'small' }: MatchCardProps) 
             <ImageBackground
               source={require('@/assets/images/rugbyvg.png')}
               blurRadius={50}
-              style={styles.badge}
               imageStyle={styles.badgeImageStyle}
             >
               <Text 
@@ -321,23 +321,18 @@ const styles = StyleSheet.create({
     borderRadius: 20,
     overflow: 'hidden', 
   },
-  badge: {
-    paddingHorizontal: Layout.spacing.s,
-    paddingVertical: Layout.spacing.xs,
-    borderRadius: 20, 
-    backgroundColor: '#020D0626', 
-    maxWidth: 150,
-  },
   badgeImageStyle: {
     borderRadius: 20,
     height: "100%",
-    width: 200
+    width: 200,
   },
   badgeText: {
     color: '#FFFFFF',
     fontSize: 12, 
     fontFamily: 'Inter-Medium',
     textAlign: 'center',
+    paddingHorizontal: Layout.spacing.s,
+    paddingVertical: Layout.spacing.xs,
   },
   teamsContainer: {
     flexDirection: 'row',

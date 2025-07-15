@@ -137,7 +137,7 @@ export default function QRScanner() {
       <StatusBar style="auto" />
       <ScrollView contentContainerStyle={styles.scrollContent}>
         <View style={styles.header}>
-          <Text style={[styles.title, {color: Colors[colorScheme].buttonText}]}>Escanear Equipos</Text>
+          <Text style={[styles.title, {color: Colors[colorScheme].text}]}>Escanear Equipos</Text>
         </View>
 
         {scanningTeam && (

@@ -13,8 +13,9 @@ export default function JuegoScreen() {
   const { cedulaData, cronometro, setCronometro } = useCedula();
   const colorScheme = useColorScheme();
   const [corriendo, setCorriendo] = useState(false);
-  const intervaloRef = useRef<NodeJS.Timeout | null>(null);
-
+  const [startTime, setStartTime] = useState<number | null>(null);
+  const [pausedTime, setPausedTime] = useState(0);
+  
   const calcularPuntos = (equipo: 'A' | 'B') => {
     return cedulaData.marcador
       .filter(p => p.equipo === equipo)
@@ -36,28 +37,38 @@ export default function JuegoScreen() {
   const marcadorB = cedulaData.marcador.filter(p => p.equipo === 'B');
 
   useEffect(() => {
-    if (corriendo && !intervaloRef.current) {
-      intervaloRef.current = setInterval(() => {
-        setCronometro((prev) => prev + 10);
-      }, 10);
+    let interval: NodeJS.Timeout;
+    
+    if (corriendo) {
+      const start = Date.now() - (pausedTime || 0);
+      setStartTime(start);
+      
+      interval = setInterval(() => {
+        const elapsed = Date.now() - start;
+        setCronometro(elapsed);
+      }, 100); 
     }
-
-    if (!corriendo && intervaloRef.current) {
-      clearInterval(intervaloRef.current);
-      intervaloRef.current = null;
-    }
-
+  
     return () => {
-      if (intervaloRef.current) {
-        clearInterval(intervaloRef.current);
-        intervaloRef.current = null;
-      }
+      if (interval) clearInterval(interval);
     };
-  }, [corriendo]);
+  }, [corriendo, pausedTime]);
 
-  const iniciar = () => setCorriendo(true);
-  const pausar = () => setCorriendo(false);
-  const reanudar = () => setCorriendo(true);
+  const iniciar = () => {
+    setStartTime(Date.now());
+    setCorriendo(true);
+  };
+  
+  const pausar = () => {
+    setPausedTime(cronometro);
+    setCorriendo(false);
+  };
+  
+  const reanudar = () => {
+    setStartTime(Date.now() - pausedTime);
+    setPausedTime(0);
+    setCorriendo(true);
+  };
 
   const formatTiempo = (milisegundos: number) => {
     const horas = Math.floor(milisegundos / 3600000)
@@ -69,11 +80,8 @@ export default function JuegoScreen() {
     const segundos = Math.floor((milisegundos % 60000) / 1000)
       .toString()
       .padStart(2, '0');
-    const ms = Math.floor((milisegundos % 1000) / 10)
-      .toString()
-      .padStart(2, '0');
-
-    return `${horas}:${minutos}:${segundos}:${ms}`;
+  
+    return `${horas}:${minutos}:${segundos}`;
   };
 
   return (

@@ -2,7 +2,6 @@ import React, { useState } from "react";
 import { View, ScrollView, StyleSheet, Alert } from "react-native";
 import { useNavigation } from "@react-navigation/native";
 import { NativeStackNavigationProp } from "@react-navigation/native-stack";
-import TeamCard from "@/components/qr-capitan/TeamCard";
 import FilterBar from "@/components/qr-capitan/FilterBar";
 import PlayerList from "@/components/qr-capitan/PlayerList";
 import GenerateQRButton from "@/components/qr-capitan/GenerateQRButton";
@@ -13,6 +12,9 @@ import { RootStackParamList } from "@/types/navigation";
 import { Player } from "@/types/user";
 import Colors from "@/constants/Colors";
 import useColorScheme from "@/hooks/useColorScheme";
+import MatchCard from "@/components/MatchCard";
+import { useLocalSearchParams } from 'expo-router';
+
 
 type NavigationProp = NativeStackNavigationProp<
   RootStackParamList,
@@ -29,6 +31,10 @@ const SeleccionarJugadores = () => {
   const [page, setPage] = useState(1);
   const colorScheme = useColorScheme();
   const navigation = useNavigation<NavigationProp>();
+  
+  const params = useLocalSearchParams();
+  const match = JSON.parse(params.match as string || '{}');
+
 
   const handleTogglePlayer = (player: Player) => {
     setSelectedPlayers((prev) => {
@@ -59,7 +65,9 @@ const SeleccionarJugadores = () => {
   return (
     <View style={[styles.container, {backgroundColor: Colors[colorScheme].background}]}>
       <ScrollView >
-        <TeamCard />
+        <View style={styles.matchContainer}>
+          <MatchCard match={match}/>
+        </View>
         <FilterBar active={activeFilter} onChange={setActiveFilter} />
         <SearchBar value={searchTerm} onChangeText={setSearchTerm} />
         <PlayerList
@@ -90,4 +98,7 @@ const styles = StyleSheet.create({
     flex: 1,
     paddingBottom: 40
   },
+  matchContainer: {
+    padding: 16
+  }
 });

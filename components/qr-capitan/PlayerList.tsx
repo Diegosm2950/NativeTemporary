@@ -48,7 +48,6 @@ const PlayerList: React.FC<PlayerListProps> = ({ filter, page, selected, onUpdat
         }
 
         const url = `${API_BASE_URL}/api/app-native-api/jugadores/equipo?id=${clubId}&nombre=${filter}&page=${page}`;
-        console.log("🔗 Solicitando jugadores desde:", url);
 
         const response = await fetch(url, {
           headers: {
