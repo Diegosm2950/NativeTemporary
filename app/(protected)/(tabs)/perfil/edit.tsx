@@ -9,7 +9,6 @@ import ProfileHeader from '@/components/ProfileHeader';
 import FormInput from '@/components/FormInput';
 import SelectInput from '@/components/SelectInput';
 import Button from '@/components/Button';
-import Animated, { FadeInDown } from 'react-native-reanimated';
 import { User } from '@/types/user';
 import { AuthContext } from '@/context/AuthContext';
 import Toast from 'react-native-toast-message';
@@ -107,8 +106,7 @@ export default function EditProfileScreen() {
             showCheckmark
           />
           
-          <Animated.View
-            entering={FadeInDown.duration(600).delay(100)}
+          <View
             style={styles.formSection}
           >
             <Text style={[styles.sectionTitle, { color: Colors[colorScheme].text }]}>
@@ -132,10 +130,9 @@ export default function EditProfileScreen() {
               autoCapitalize="none"
               isRequired
             />
-          </Animated.View>
+          </View>
           
-          <Animated.View
-            entering={FadeInDown.duration(600).delay(200)}
+          <View
             style={styles.formSection}
           >
             <Text style={[styles.sectionTitle, { color: Colors[colorScheme].text }]}>
@@ -195,10 +192,9 @@ export default function EditProfileScreen() {
                 containerStyle={styles.halfInput}
               />
             </View>
-          </Animated.View>
+          </View>
           
-          <Animated.View
-            entering={FadeInDown.duration(600).delay(300)}
+          <View
             style={styles.formSection}
           >
             <Text style={[styles.sectionTitle, { color: Colors[colorScheme].text }]}>
@@ -237,11 +233,10 @@ export default function EditProfileScreen() {
               options={parentescoOptions}
               isRequired
             />
-          </Animated.View>
+          </View>
 
           
-          <Animated.View
-            entering={FadeInDown.duration(600).delay(400)}
+          <View
             style={styles.buttonContainer}
           >
             <Button
@@ -256,7 +251,7 @@ export default function EditProfileScreen() {
               onPress={handleSave}
               style={styles.saveButton}
             />
-          </Animated.View>
+          </View>
         </ScrollView>
       </KeyboardAvoidingView>
     </SafeAreaView>

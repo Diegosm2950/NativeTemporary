@@ -13,12 +13,6 @@ import Colors from '@/constants/Colors';
 import useColorScheme from '@/hooks/useColorScheme';
 import Layout from '@/constants/Layout';
 import { ChevronDown, Check, X } from 'lucide-react-native';
-import Animated, { 
-  useAnimatedStyle, 
-  useSharedValue, 
-  withTiming,
-  interpolateColor
-} from 'react-native-reanimated';
 
 type SelectInputProps = {
   label?: string;
@@ -44,28 +38,12 @@ export default function SelectInput({
   const colorScheme = useColorScheme();
   const [modalVisible, setModalVisible] = useState(false);
   const selectedOption = options.find(option => option === value);
-  
-  const borderColorValue = useSharedValue(0);
-  
-  const animatedBorderStyle = useAnimatedStyle(() => {
-    const borderColor = interpolateColor(
-      borderColorValue.value,
-      [0, 1],
-      [Colors[colorScheme].border, Colors[colorScheme].tint]
-    );
-    
-    return {
-      borderColor,
-    };
-  });
 
   const openModal = () => {
-    borderColorValue.value = withTiming(1, { duration: 200 });
     setModalVisible(true);
   };
 
   const closeModal = () => {
-    borderColorValue.value = withTiming(0, { duration: 200 });
     setModalVisible(false);
   };
 
@@ -87,10 +65,9 @@ export default function SelectInput({
         activeOpacity={0.7}
         onPress={openModal}
       >
-        <Animated.View style={[
+        <View style={[
           styles.selectContainer, 
           { backgroundColor: Colors[colorScheme].inputBackground },
-          animatedBorderStyle
         ]}>
           <Text 
             style={[
@@ -105,7 +82,7 @@ export default function SelectInput({
             {selectedOption ? selectedOption : placeholder}
           </Text>
           <ChevronDown size={20} color={Colors[colorScheme].textSecondary} />
-        </Animated.View>
+        </View>
       </TouchableOpacity>
       
       {error && (
