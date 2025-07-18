@@ -11,12 +11,6 @@ import {
 import Colors from '@/constants/Colors';
 import useColorScheme from '@/hooks/useColorScheme';
 import Layout from '@/constants/Layout';
-import Animated, { 
-  useAnimatedStyle, 
-  useSharedValue, 
-  withTiming,
-  interpolateColor
-} from 'react-native-reanimated';
 
 type FormInputProps = {
   label?: string;
@@ -49,28 +43,7 @@ export default function FormInput({
   maxLength,
   multiline = false,
 }: FormInputProps) {
-  const colorScheme = useColorScheme();
-  const isFocused = useSharedValue(0);
-  
-  const animatedBorderStyle = useAnimatedStyle(() => {
-    const borderColor = interpolateColor(
-      isFocused.value,
-      [0, 1],
-      [Colors[colorScheme].border, Colors[colorScheme].tint]
-    );
-    
-    return {
-      borderColor,
-    };
-  });
-
-  const handleFocus = () => {
-    isFocused.value = withTiming(1, { duration: 200 });
-  };
-
-  const handleBlur = () => {
-    isFocused.value = withTiming(0, { duration: 200 });
-  };
+  const colorScheme = useColorScheme();  
 
   return (
     <View style={[styles.container, containerStyle]}>
@@ -81,10 +54,9 @@ export default function FormInput({
         </Text>
       )}
       
-      <Animated.View style={[
+      <View style={[
         styles.inputContainer, 
         { backgroundColor: Colors[colorScheme].inputBackground },
-        animatedBorderStyle
       ]}>
         <TextInput
           style={[
@@ -102,10 +74,8 @@ export default function FormInput({
           autoCorrect={autoCorrect}
           maxLength={maxLength}
           multiline={multiline}
-          onFocus={handleFocus}
-          onBlur={handleBlur}
         />
-      </Animated.View>
+      </View>
       
       {error && (
         <Text style={[styles.errorText, { color: Colors[colorScheme].error }]}>
