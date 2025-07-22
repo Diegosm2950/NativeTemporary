@@ -15,7 +15,7 @@ export default function PartidosScreen() {
   const { user } = useContext(AuthContext);
   const router = useRouter();
 
-  const { data, loading, error } = useConvocatorias(user?.clubId ?? undefined);
+  const { loading, error, pastMatches } = useConvocatorias(user?.clubId ?? undefined);
 
   if (loading) {
     return (
@@ -29,7 +29,6 @@ export default function PartidosScreen() {
     );
   }
 
-  const finishedMatches = data.torneos.filter(match => match.estatus === "finalizado");
   return (
     <SafeAreaView
       style={[styles.container, { backgroundColor: Colors[colorScheme].background }]}
@@ -41,7 +40,7 @@ export default function PartidosScreen() {
         showsVerticalScrollIndicator={false}
       >
         <View>
-          {finishedMatches.map((match) => (
+          {pastMatches.map((match) => (
             <TouchableOpacity 
               key={match.id} 
               onPress={() => router.push(`/(protected)/(tabs)/reportes/partidos/${match.id}`)}

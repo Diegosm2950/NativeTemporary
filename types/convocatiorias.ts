@@ -49,6 +49,13 @@ export interface ResponseTorneoInfo {
   };
 }
 
+export interface TeamMatchesResponse {
+  convocado: boolean;
+  partidosTorneo: TournamentMatch[];
+  partidosAmistoso: TournamentMatch[]; 
+  rol: string;
+}
+
 export interface TournamentMatch {
   equipoLocal: Team;
   equipoVisitante: Team;
@@ -64,7 +71,12 @@ export interface TournamentMatch {
   estatus: string;
   id: number;
   __v: number;
+  marcador?: {
+    local: number;
+    visitante: number;
+  }
 }
+
 
 export interface MatchResults extends TournamentMatch {
   resultadoResumen?: string;

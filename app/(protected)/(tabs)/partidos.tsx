@@ -11,12 +11,10 @@ import Layout from '@/constants/Layout';
 export default function MatchesScreen() {
   const { user } = useContext(AuthContext);
 
-  const { data, refetch } = useConvocatorias(user?.clubId ?? undefined);
+  const { data, refetch, pastMatches } = useConvocatorias(user?.clubId ?? undefined);
   const [refreshing, setRefreshing] = useState(false);
 
   const colorScheme = useColorScheme();
-  const pastMatches = data.torneos.filter(match => match.estatus == "finalizado");
-  const nextMatches = data.torneos.filter(match => match.estatus == "programado");
 
   const onRefresh = useCallback(async () => {
     setRefreshing(true);
@@ -44,7 +42,7 @@ export default function MatchesScreen() {
         }
         >        
         <MatchTabs 
-          upcomingMatches={nextMatches}
+          upcomingMatches={data.torneos}
           pastMatches={pastMatches}
         />
       </ScrollView>
