@@ -17,7 +17,6 @@ import MatchCard from '@/components/MatchCard';
 import { AuthContext } from '@/context/AuthContext';
 import MatchTabs from '@/components/MatchTabs';
 import { useConvocatorias } from '@/hooks/useFetchMatches';
-import { usePushNotifications } from '@/hooks/usePushNotifications';
 
 export default function HomeScreen() {
   const colorScheme = useColorScheme();
@@ -25,8 +24,6 @@ export default function HomeScreen() {
   const [refreshing, setRefreshing] = useState(false);
   const [initialLoad, setInitialLoad] = useState(true);
 
-  const { expoPushToken } = usePushNotifications();
-  console.log(expoPushToken)
   const { data, refetch, loading, error, isOffline, pastMatches } = useConvocatorias(user?.clubId ?? undefined);
   const nextMatch = data.nextMatch;
 

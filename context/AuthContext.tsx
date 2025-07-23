@@ -18,7 +18,8 @@ type AuthState = {
 
 type LoginProps = {
   username: string,
-  password: string
+  password: string,
+  expoPushTokenString?: string | undefined
 }
 
 export const AuthContext = createContext<AuthState>({
@@ -78,7 +79,7 @@ export function AuthProvider({ children }: PropsWithChildren) {
     }
   };
 
-  const logIn = async ({ username, password }: LoginProps) => {
+  const logIn = async ({ username, password, expoPushTokenString }: LoginProps) => {
     if (!username || !password) {
       Toast.show({
         type: 'error',
@@ -90,7 +91,7 @@ export function AuthProvider({ children }: PropsWithChildren) {
 
     try {
       setIsLoading(true);
-      const response = await authService.handleLogin(username, password);
+      const response = await authService.handleLogin(username, password, expoPushTokenString);
 
       if (response.id !== undefined && response.token) {
         const userData = await authService.getUser();

@@ -1,15 +1,13 @@
-import React from "react";
+import React, { useContext } from "react";
 import { View, Text, ScrollView, StyleSheet, Image, TouchableOpacity } from "react-native";
 import { useNavigation, useRoute } from "@react-navigation/native";
 import { NativeStackNavigationProp } from "@react-navigation/native-stack";
 import Colors from '@/constants/Colors';
 import useColorScheme from "@/hooks/useColorScheme";
+import { sendNotification } from "@/api/notifications/notifications";
+import { Player } from "@/types/user";
+import { AuthContext } from "@/context/AuthContext";
 
-type Player = {
-  id: string;
-  name: string;
-  foto?: string;
-};
 
 type RootStackParamList = {
   QrResultScreen: { jugadoresSeleccionados: any };
@@ -20,11 +18,20 @@ const ConfirmGenerateQRScreen = () => {
   const route = useRoute();
   const colorScheme = useColorScheme();
   const { jugadoresSeleccionados } = route.params as { jugadoresSeleccionados: Player[] };
+  const { token } = useContext(AuthContext);
 
-  const handleGenerate = () => {
-    navigation.navigate("QrResultScreen", {
-      jugadoresSeleccionados: jugadoresSeleccionados,
-    });
+  if (!token) return
+
+  const handleGenerate = async () => {
+    try {
+      await sendNotification(token, jugadoresSeleccionados);
+      
+      navigation.navigate("QrResultScreen", {
+        jugadoresSeleccionados: jugadoresSeleccionados,
+      });
+    } catch (error) {
+      console.error("Error in handleGenerate:", error);
+    }
   };  
 
   return (
