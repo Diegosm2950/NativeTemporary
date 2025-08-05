@@ -3,7 +3,6 @@ import { View, Text, StyleSheet, Image } from 'react-native';
 import Colors from '@/constants/Colors';
 import useColorScheme from '@/hooks/useColorScheme';
 import Layout from '@/constants/Layout';
-import Animated, { FadeIn } from 'react-native-reanimated';
 
 type ProfileHeaderProps = {
   name: string;
@@ -23,15 +22,14 @@ export default function ProfileHeader({ name, email, imageUrl, showCheckmark = f
         </Text>
       </View>
       
-      <Animated.View 
+      <View 
         style={styles.profileImageContainer}
-        entering={FadeIn.duration(600)}
       >
         <Image
           source={{ uri: imageUrl }}
           style={styles.profileImage}
         />
-      </Animated.View>
+      </View>
       
       <Text style={[styles.name, { color: Colors[colorScheme].text }]}>
         {name}
