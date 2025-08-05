@@ -1,18 +1,79 @@
 import "dotenv/config";
 
-export default {
-  expo: {
-    name: "FMRU App",
-    slug: "tu-app",
-    version: "1.0.0",
-    android: {
-      package: "com.darkvenom.fmruapp"
+const config = {
+  name: "Rugby México",
+  slug: "tu-app",
+  owner: "lolasux",
+  version: "1.0.0",
+  orientation: "portrait",
+  userInterfaceStyle: "automatic",
+  scheme: "rugby-mexico",
+  icon: "./assets/images/FMRUU.png",
+  splash: {
+    image: "./assets/images/FMRUU.png",
+    resizeMode: "contain",
+    backgroundColor: "#ffffff",
+  },
+  assetBundlePatterns: ["**/*"],
+  android: {
+    package: "com.darkvenom.fmruapp",
+    googleServicesFile: "./google-services.json",
+    versionCode: 22,
+    adaptiveIcon: {
+      foregroundImage: "./assets/images/FMRUU.png",
+      backgroundColor: "#FFFFFF",
     },
-    extra: {
-      EXPO_PUBLIC_API_BASE_URL: process.env.EXPO_PUBLIC_API_BASE_URL,
-      eas: {
-        projectId: "d256492f-2efe-4e7f-9d8c-493a8df249d2"
-      }
+    permissions: [
+      "CAMERA",
+      "INTERNET",
+      "ACCESS_NETWORK_STATE",
+      "WRITE_EXTERNAL_STORAGE",
+      "READ_EXTERNAL_STORAGE"
+    ],
+    allowBackup: false,
+  },
+  ios: {
+    bundleIdentifier: "com.darkvenom.fmruapp",
+    supportsTablet: true,
+    infoPlist: {
+      NSCameraUsageDescription: "Esta app necesita acceso a la cámara para tomar fotos del usuario.",
+      ITSAppUsesNonExemptEncryption: false,
+      UIBackgroundModes: ["remote-notification"]
+    }
+  },
+  updates: {
+    enabled: false
+  },
+  runtimeVersion: "1.0.0",
+  extra: {
+    EXPO_PUBLIC_API_BASE_URL: process.env.EXPO_PUBLIC_API_BASE_URL,
+    eas: {
+      projectId: "2b279f3c-dc5a-4c08-9974-112504d19f3e"
     },
   },
+  plugins: [
+    "expo-camera",
+    "expo-splash-screen",
+    "expo-updates",
+    "expo-file-system",
+    "expo-font",
+    "expo-router",
+    "expo-web-browser",
+    "expo-notifications",
+    [
+      "expo-build-properties",
+      {
+        android: {
+          newArchEnabled: false,
+          fabricEnabled: false
+        },
+        ios: {
+          newArchEnabled: false,
+          fabricEnabled: false
+        }
+      }
+    ]
+  ]
 };
+
+export default config as any;

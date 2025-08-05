@@ -1,15 +1,45 @@
 {
   "cli": {
-    "version": "~16.9.0"
+    "version": ">=16.9.0",
+    "appVersionSource": "remote"
   },
   "build": {
     "preview": {
+      "distribution": "internal",
+      "developmentClient": true,
       "channel": "beta",
-      "distribution": "internal"
+      "env": {
+        "EXPO_PUBLIC_API_BASE_URL": "https://fmru-next-js.vercel.app",
+        "EXPO_USE_FABRIC": "0",
+        "RCT_NEW_ARCH_ENABLED": "0",
+        "RCT_FABRIC_ENABLED": "0",
+        "FLIPPER_DISABLE": "1",
+        "EXPO_METRO_REQUIRE_CONTEXT": "1"
+      }
     },
     "production": {
       "android": {
-        "buildType": "app-bundle"
+        "buildType": "app-bundle",
+        "autoIncrement": true,
+        "cache": {
+          "disabled": true
+        }
+      },
+      "ios": {
+        "autoIncrement": true
+      },
+      "env": {
+        "EXPO_PUBLIC_API_BASE_URL": "https://fmru-next-js.vercel.app"
+      }
+    }
+  },
+  "submit": {
+    "production": {
+      "android": {
+        "track": "internal"
+      },
+      "ios": {
+        "ascAppId": "6748364112"
       }
     }
   }

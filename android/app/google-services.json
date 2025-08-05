@@ -1,0 +1,29 @@
+{
+  "project_info": {
+    "project_number": "460250616904",
+    "project_id": "rugby-app-7ed32",
+    "storage_bucket": "rugby-app-7ed32.firebasestorage.app"
+  },
+  "client": [
+    {
+      "client_info": {
+        "mobilesdk_app_id": "1:460250616904:android:e3e2992a73a74041c1747d",
+        "android_client_info": {
+          "package_name": "com.darkvenom.fmruapp"
+        }
+      },
+      "oauth_client": [],
+      "api_key": [
+        {
+          "current_key": "AIzaSyCVnqUEcLBtASLT4sANkUer8YysYD-fCQA"
+        }
+      ],
+      "services": {
+        "appinvite_service": {
+          "other_platform_oauth_client": []
+        }
+      }
+    }
+  ],
+  "configuration_version": "1"
+}
