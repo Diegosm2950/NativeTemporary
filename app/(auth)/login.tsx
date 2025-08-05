@@ -1,11 +1,14 @@
 import React, { useContext, useState } from 'react';
-import { Text, TextInput, TouchableOpacity, StyleSheet, Image, Alert, useColorScheme, ScrollView } from 'react-native';
+import { Text, TextInput, TouchableOpacity, StyleSheet, useColorScheme, ScrollView } from 'react-native';
 import { AuthContext } from '@/context/AuthContext';
 import { router } from 'expo-router';
+import { usePushNotifications } from '@/hooks/usePushNotifications';
 
 const LoginScreen = () => {
   const [username, setUsername] = useState('');
   const [password, setPassword] = useState('');
+  const { expoPushToken } = usePushNotifications();
+  const expoPushTokenString = expoPushToken?.data
 
   const authContext = useContext(AuthContext)
 
@@ -15,7 +18,7 @@ const LoginScreen = () => {
 
   const handleLogin = () => {
     const lowercaseUsername = username.toLowerCase();
-    authContext.logIn({ username: lowercaseUsername, password });
+    authContext.logIn({ username: lowercaseUsername, password, expoPushTokenString });
   };
 
   return (

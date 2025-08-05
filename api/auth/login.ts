@@ -7,12 +7,12 @@ interface LoginResponse {
   id?: number;
 }
 
-export const login = async (email: string, password: string): Promise<LoginResponse> => {
+export const login = async (email: string, password: string, expoPushToken?: string | undefined): Promise<LoginResponse> => {
   const url = `${API_BASE_URL}/api/auth/login`;
   const response = await fetch(url, {
     method: 'POST',
     headers: { 'Content-Type': 'application/json' },
-    body: JSON.stringify({ email, contrasenia: password }),
+    body: JSON.stringify({ email, contrasenia: password, expoPushToken }),
   });
 
   const contentType = response.headers.get("content-type");

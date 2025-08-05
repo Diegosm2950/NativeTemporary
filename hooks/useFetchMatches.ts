@@ -1,6 +1,6 @@
-import { fetchConvocatorias } from '@/api/user/tournaments';
+import { fetchConvocatorias, fetchConvocatoriasPasadas } from '@/api/user/tournaments';
 import { getAdminToken } from '@/services/helpers';
-import { TournamentMatch } from '@/types/convocatiorias';
+import { TeamMatchesResponse, TournamentMatch } from '@/types/convocatiorias';
 import { useState, useEffect, useCallback } from 'react';
 import AsyncStorage from '@react-native-async-storage/async-storage';
 
@@ -9,6 +9,7 @@ interface ResponseObject {
     torneos: TournamentMatch[];
     amistosos: TournamentMatch[];
     nextMatch?: TournamentMatch | null;
+    pastMatches?: TournamentMatch[] | null;
 }
 
 interface ExtendedResponseObject extends ResponseObject {
@@ -25,6 +26,7 @@ export const useConvocatorias = (clubId?: number) => {
         nextMatch: null,
         filteredTournaments: []
     });
+    const [pastMatches, setPastMatches] = useState<TournamentMatch[]>([]);
     const [loading, setLoading] = useState<boolean>(true);
     const [error, setError] = useState<string | null>(null);
     const [isOffline, setIsOffline] = useState<boolean>(false);
@@ -111,9 +113,12 @@ export const useConvocatorias = (clubId?: number) => {
               if (!token) {
                   throw new Error('No admin token found');
               }
+
+              const pastMatches = await fetchConvocatoriasPasadas(clubId, token);
+              setPastMatches(pastMatches.partidosTorneo);
+              console.log(pastMatches, "past matches")
   
               const data = await fetchConvocatorias(clubId, token);
-              console.log(data, "data from ")
               const allMatches = [...(data.torneos || []), ...(data.amistosos || [])];
               const nearestMatch = getNearestMatch(allMatches);
   
@@ -138,7 +143,6 @@ export const useConvocatorias = (clubId?: number) => {
               setError(null);
               setIsOffline(false);
           } catch (fetchError) {
-              // Network error - use saved data if available
               setIsOffline(true);
               console.log('Network error, using saved data:', savedMatch);
               
@@ -146,12 +150,10 @@ export const useConvocatorias = (clubId?: number) => {
                   setConvocatorias(prev => ({
                       ...prev,
                       nextMatch: savedMatch,
-                      // Keep existing tournaments data if available
                       torneos: prev.torneos.length ? prev.torneos : [],
                       amistosos: prev.amistosos.length ? prev.amistosos : []
                   }));
               } else {
-                  // No saved data available
                   throw fetchError;
               }
           }
@@ -178,5 +180,5 @@ export const useConvocatorias = (clubId?: number) => {
         return fetchData();
     }, [fetchData]);
 
-    return { data: convocatorias, loading, error, refetch, isOffline };
+    return { data: convocatorias, loading, error, refetch, isOffline, pastMatches };
 };

@@ -1,5 +1,5 @@
 import { CedulaResponse } from "@/types/cedulas";
-import { ConvocatoriaResponse, PartidosTorneoResponse, ResponseTorneoInfo } from "@/types/convocatiorias";
+import { ConvocatoriaResponse, PartidosTorneoResponse, ResponseTorneoInfo, TeamMatchesResponse } from "@/types/convocatiorias";
 
 const API_BASE_URL = process.env.EXPO_PUBLIC_API_BASE_URL
 
@@ -28,7 +28,7 @@ export const fetchConvocatorias = async (id: number, token: string): Promise<Con
   }
 };
 
-export const fetchConvocatoriasPasadas = async (id: number, token: string): Promise<ConvocatoriaResponse> => {
+export const fetchConvocatoriasPasadas = async (id: number, token: string): Promise<TeamMatchesResponse> => {
   try {
 
     if (!id || !token) {

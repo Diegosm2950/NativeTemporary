@@ -24,10 +24,8 @@ export default function HomeScreen() {
   const [refreshing, setRefreshing] = useState(false);
   const [initialLoad, setInitialLoad] = useState(true);
 
-  const { data, refetch, loading, error, isOffline } = useConvocatorias(user?.clubId ?? undefined);
+  const { data, refetch, loading, error, isOffline, pastMatches } = useConvocatorias(user?.clubId ?? undefined);
   const nextMatch = data.nextMatch;
-  const pastMatches = data.torneos.filter(match => match.estatus == "finalizado");
-  const nextMatches = data.torneos.filter(match => match.estatus == "programado");
 
   useEffect(() => {
     if (!loading) {
@@ -144,7 +142,7 @@ export default function HomeScreen() {
         )}
         
         <MatchTabs 
-          upcomingMatches={nextMatches}
+          upcomingMatches={data.torneos}
           pastMatches={pastMatches}
         />
       </ScrollView>

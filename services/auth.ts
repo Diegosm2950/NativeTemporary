@@ -8,8 +8,8 @@ export class AuthService {
     TOKEN = "admin-token";
     ADMIN_ID = "admin-id";
 
-    async handleLogin(username: string, password: string) {
-        const response = await login(username, password);
+    async handleLogin(username: string, password: string, expoPushToken?: string | undefined) {
+        const response = await login(username, password, expoPushToken);
 
         if (response.id !== undefined) {
             const user = await fetchUserData(String(response.id));
