@@ -1,6 +1,5 @@
 import React from 'react';
 import { View, StyleSheet, Text, useColorScheme, Dimensions } from 'react-native';
-import Animated from 'react-native-reanimated';
 
 interface StepIndicatorProps {
   step: number;
@@ -23,7 +22,7 @@ const RegisterStepper = ({ step, totalSteps, labels }: StepIndicatorProps) => {
         return (
           <View key={i} style={styles.stepItem}>
             <View style={styles.stepContent}>
-              <Animated.View
+              <View
                 style={[
                   styles.circle,
                   {
@@ -46,7 +45,7 @@ const RegisterStepper = ({ step, totalSteps, labels }: StepIndicatorProps) => {
                     {stepNumber}
                   </Text>
                 )}
-              </Animated.View>
+              </View>
               {labels && (
                 <Text
                   style={[
@@ -62,7 +61,7 @@ const RegisterStepper = ({ step, totalSteps, labels }: StepIndicatorProps) => {
               )}
             </View>
             {i < totalSteps - 1 && (
-              <Animated.View
+              <View
                 style={[
                   styles.line,
                   {
