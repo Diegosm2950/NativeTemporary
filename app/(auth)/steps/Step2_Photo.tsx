@@ -56,25 +56,23 @@ const Step2_Photo = ({ onNext, onBack, formData, updateForm }: Props) => {
           <Text style={styles.requirement}>• No más de 30 días de antigüedad.</Text>
           <Text style={styles.requirement}>• Fondo blanco, cabeza descubierta y sin lentes u otros accesorios.</Text>
         </View>
-
-        {/* Botón Siguiente */}
-        <TouchableOpacity style={styles.nextButton} onPress={onNext}>
-          <Text style={styles.nextText}>Siguiente</Text>
-        </TouchableOpacity>
-
-        {/* Botones */}
-        {onBack && (
-          <TouchableOpacity style={styles.backButton} onPress={onBack}>
-            <Text style={styles.backText}>Volver</Text>
-          </TouchableOpacity>
-        )}
-
-        {/* Pie de página */}
-        <Text style={styles.terms}>
-          Al crear una cuenta, aceptas nuestros Términos y Condiciones.
-        </Text>
       </View>
-      <GoBackHomeButton />
+      {/* Botón Siguiente */}
+      <TouchableOpacity style={styles.nextButton} onPress={onNext}>
+        <Text style={styles.nextText}>Siguiente</Text>
+      </TouchableOpacity>
+
+      {/* Botones */}
+      {onBack && (
+        <TouchableOpacity style={styles.backButton} onPress={onBack}>
+          <Text style={styles.backText}>Volver</Text>
+        </TouchableOpacity>
+      )}
+
+      {/* Pie de página */}
+      <Text style={styles.terms}>
+        Al crear una cuenta, aceptas nuestros Términos y Condiciones.
+      </Text>
     </View>
   );
 };
@@ -139,17 +137,17 @@ const getStyles = (isDark: boolean) =>
       marginBottom: 6,
     },
     nextButton: {
-      backgroundColor: '#28a745',
-      borderRadius: 25,
-      paddingVertical: 14,
-      paddingHorizontal: 32,
-      alignItems: 'center',
-      marginBottom: 16,
+      backgroundColor: "#28a745",
+      borderRadius: 30,
+      paddingVertical: 16,
+      paddingHorizontal: 24,
+      alignItems: "center",
+      marginTop: 10,
     },
     nextText: {
-      color: '#fff',
-      fontSize: 16,
-      fontWeight: '600',
+      color: "#fff",
+      fontSize: 18,
+      fontWeight: "bold",
     },
     terms: {
       textAlign: 'center',

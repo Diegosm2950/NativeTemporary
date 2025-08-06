@@ -116,22 +116,19 @@ const Step5_Emergency = ({ onNext, onBack, formData, updateForm }: Props) => {
         )}
       </View>
 
+      <TouchableOpacity style={styles.nextButton} onPress={onNext}>
+        <Text style={styles.nextText}>Siguiente</Text>
+      </TouchableOpacity>
+
       {onBack && (
         <TouchableOpacity style={styles.backButton} onPress={onBack}>
           <Text style={styles.backText}>Volver</Text>
         </TouchableOpacity>
       )}
 
-      <TouchableOpacity style={styles.nextButton} onPress={onNext}>
-        <Text style={styles.nextText}>Siguiente</Text>
-      </TouchableOpacity>
-
       <Text style={styles.terms}>
         Al crear una cuenta, aceptas nuestros Términos y Condiciones.
       </Text>
-      <View>
-        <GoBackHomeButton />
-      </View>
     </ScrollView>
   );
 };
