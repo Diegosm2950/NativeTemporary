@@ -162,12 +162,6 @@ const Step6_Terms = ({ formData, onBack, resetForm, updateForm }: Props) => {
         onChangeText={(text) => handleInput('repetir_contrasenia', text)}
       />
 
-      {onBack && (
-        <TouchableOpacity style={styles.backButton} onPress={onBack}>
-          <Text style={styles.backText}>Volver</Text>
-        </TouchableOpacity>
-      )}
-
       <TouchableOpacity
         style={[styles.submitButton, (!allAccepted || loading) && { backgroundColor: '#ccc' }]}
         disabled={!allAccepted || loading}
@@ -175,13 +169,16 @@ const Step6_Terms = ({ formData, onBack, resetForm, updateForm }: Props) => {
       >
         <Text style={styles.submitText}>{loading ? 'Enviando...' : 'Enviar'}</Text>
       </TouchableOpacity>
+      
+      {onBack && (
+        <TouchableOpacity style={styles.backButton} onPress={onBack}>
+          <Text style={styles.backText}>Volver</Text>
+        </TouchableOpacity>
+      )}
 
       <Text style={styles.terms}>
         Al crear una cuenta, aceptas nuestros Términos y Condiciones.
       </Text>
-      <View>
-        <GoBackHomeButton />
-      </View>
     </ScrollView>
   );
 };

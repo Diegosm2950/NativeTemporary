@@ -138,9 +138,9 @@ const Step1_PersonalData = ({ onNext, onBack, formData, updateForm }: Props) => 
                 onValueChange={(value: any) => updateForm({ sexo: value })}
                 style={styles.picker}
               >
-                <Picker.Item label="Sexo*" value="" color="#A1A1A1" />
-                <Picker.Item label="Femenino" value="Femenino" />
-                <Picker.Item label="Masculino" value="Masculino" />
+                <Picker.Item label="Sexo*" value="" color="#000" />
+                <Picker.Item label="Femenino" value="Femenino" color="#000" />
+                <Picker.Item label="Masculino" value="Masculino" color="#000" />
               </Picker>
             )}
           </View>
@@ -184,9 +184,9 @@ const Step1_PersonalData = ({ onNext, onBack, formData, updateForm }: Props) => 
                 onValueChange={(value: any) => updateForm({ equipoUniversitario: value })}
                 style={styles.picker}
               >
-                <Picker.Item label="Equipo Universitario (Opcional)" value="" />
-                <Picker.Item label="Equipo 1" value="equipo1" />
-                <Picker.Item label="Equipo 2" value="equipo2" />
+                <Picker.Item label="Equipo Universitario (Opcional)" value="" color="#000" />
+                <Picker.Item label="Equipo 1" value="equipo1" color="#000" />
+                <Picker.Item label="Equipo 2" value="equipo2" color="#000" />
               </Picker>
             )}
           </View>
@@ -202,16 +202,11 @@ const Step1_PersonalData = ({ onNext, onBack, formData, updateForm }: Props) => 
           <TouchableOpacity style={styles.submitButton} onPress={onNext}>
             <Text style={styles.submitButtonText}>Siguiente</Text>
           </TouchableOpacity>
-          
-          <View>
-            <GoBackHomeButton />
-          </View>
 
           <Text style={styles.terms}>
             Al crear una cuenta, aceptas nuestros Términos y Condiciones
           </Text>
         </View>
-        <GoBackHomeButton />
       </View>
     </ScrollView>
   );

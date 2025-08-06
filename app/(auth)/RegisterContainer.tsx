@@ -36,6 +36,7 @@ const INITIAL_FORM: FormularioCompleto = {
   escolaridad: '',
   tipoSangre: '',
   alergiasEnfermedadesDesc: '',
+  rfc: "",
   direccion: {
     estadoMx: '',
     ciudad: '',

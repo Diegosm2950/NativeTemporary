@@ -37,6 +37,7 @@ const getStyles = (dark: boolean) =>
       backgroundColor: dark ? '#1A2C23' : '#B8E0C51F',
       borderWidth: dark ? 1 : 0,
       borderColor: dark ? '#B8E0C51F' : 'transparent',
+      marginBottom: 15
     },
     text: {
       fontSize: 16,

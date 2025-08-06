@@ -35,6 +35,7 @@ esExtranjero: boolean;
 escolaridad: string;
 tipoSangre: string;
 alergiasEnfermedadesDesc: string;
+rfc?: string;
 direccion: {
   estadoMx: string;
   ciudad: string;

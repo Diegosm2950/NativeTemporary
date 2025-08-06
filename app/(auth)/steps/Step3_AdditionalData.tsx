@@ -3,8 +3,6 @@ import { Text, TextInput, StyleSheet, ScrollView, TouchableOpacity, useColorSche
 import { Ionicons } from "@expo/vector-icons";
 import { Picker } from "@react-native-picker/picker";
 import { FormularioCompleto } from "@/types/navigation";
-import GoBackHomeButton from "@/components/GoBackHomeButton";
-
 
 interface Props {
   onNext: () => void;
@@ -25,6 +23,30 @@ const Step3_AdditionalData = ({ onNext, onBack, formData, updateForm }: Props) =
   ) => {
     updateForm({ [key]: value } as Partial<FormularioCompleto>);
   };
+
+const calculateAge = (birthDate: string | Date | null) => {
+  if (!birthDate) return 0;
+  
+  // Convert to Date object if it's a string
+  const birth = typeof birthDate === 'string' ? new Date(birthDate) : birthDate;
+  
+  // If we still don't have a valid date, return 0
+  if (isNaN(birth.getTime())) return 0;
+  
+  const today = new Date();
+  let age = today.getFullYear() - birth.getFullYear();
+  const monthDiff = today.getMonth() - birth.getMonth();
+  
+  if (monthDiff < 0 || (monthDiff === 0 && today.getDate() < birth.getDate())) {
+    age--;
+  }
+  
+  return age;
+};
+
+// Then use it like this:
+const shouldShowRFC = !formData.esExtranjero && calculateAge(formData.fechaNacimiento) >= 18;
+  const isRFCRequired = shouldShowRFC;
 
   return (
     <ScrollView style={styles.container}>
@@ -74,6 +96,18 @@ const Step3_AdditionalData = ({ onNext, onBack, formData, updateForm }: Props) =
         onChangeText={(text) => handleChange("curp", text)}
         autoCapitalize="characters"
       />
+
+      {/* Add RFC field conditionally */}
+      {shouldShowRFC && (
+        <TextInput
+          placeholder="RFC*"
+          placeholderTextColor={placeholderColor}
+          style={styles.input}
+          value={formData.rfc}
+          onChangeText={(text) => handleChange("rfc", text)}
+          autoCapitalize="characters"
+        />
+      )}
 
       <TextInput
         placeholder="Nacionalidad*"
@@ -177,16 +211,20 @@ const Step3_AdditionalData = ({ onNext, onBack, formData, updateForm }: Props) =
         />
       )}
 
-      <TouchableOpacity style={styles.nextButton} onPress={onNext}>
+      <TouchableOpacity 
+        style={styles.nextButton} 
+        onPress={onNext}
+        disabled={isRFCRequired && !formData.rfc} // Disable if RFC is required but not filled
+      >
         <Text style={styles.nextText}>Siguiente</Text>
       </TouchableOpacity>
 
       {/* Botones */}
-            {onBack && (
-              <TouchableOpacity style={styles.backButton} onPress={onBack}>
-                <Text style={styles.backText}>Volver</Text>
-              </TouchableOpacity>
-            )}
+      {onBack && (
+        <TouchableOpacity style={styles.backButton} onPress={onBack}>
+          <Text style={styles.backText}>Volver</Text>
+        </TouchableOpacity>
+      )}
 
       <Text style={styles.terms}>
         Al crear una cuenta, aceptas nuestros Términos y Condiciones.
@@ -269,7 +307,7 @@ const getStyles = (isDark: boolean) =>
     checkboxLabel: {
       flex: 1,
       fontSize: 14,
-      color: "#000",
+      color: "#ffff",
     },
     nextButton: {
       backgroundColor: "#28a745",

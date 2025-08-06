@@ -110,34 +110,29 @@ const Step4_AddressData = ({ onNext, onBack, formData, updateForm }: Props) => {
       />
 
       {/* Número y Código Postal */}
-      <View style={styles.row}>
-        <TextInput
-          placeholder="Código postal*"
-          placeholderTextColor={placeholderColor}
-          keyboardType="numeric"
-          style={[styles.input, styles.halfInput]}
-          value={formData.direccion.cp}
-          onChangeText={(text) => handleDireccionChange('cp', text)}
-        />
-      </View>
+      <TextInput
+        placeholder="Código postal*"
+        placeholderTextColor={placeholderColor}
+        keyboardType="numeric"
+        style={styles.input}
+        value={formData.direccion.cp}
+        onChangeText={(text) => handleDireccionChange('cp', text)}
+      />
 
       {/* Botones */}
+      <TouchableOpacity style={styles.nextButton} onPress={onNext}>
+        <Text style={styles.nextText}>Siguiente</Text>
+      </TouchableOpacity>
+
       {onBack && (
         <TouchableOpacity style={styles.backButton} onPress={onBack}>
           <Text style={styles.backText}>Volver</Text>
         </TouchableOpacity>
       )}
 
-      <TouchableOpacity style={styles.nextButton} onPress={onNext}>
-        <Text style={styles.nextText}>Siguiente</Text>
-      </TouchableOpacity>
-
       <Text style={styles.terms}>
         Al crear una cuenta, aceptas nuestros Términos y Condiciones.
       </Text>
-      <View>
-        <GoBackHomeButton />
-      </View>
     </ScrollView>
   );
 };
