@@ -2,15 +2,15 @@ import "dotenv/config";
 
 const config = {
   name: "Rugby México",
-  slug: "tu-app",
+  slug: "Ruby-Mexico",
   owner: "lolasux",
   version: "1.0.0",
   orientation: "portrait",
   userInterfaceStyle: "automatic",
   scheme: "rugby-mexico",
-  icon: "./assets/images/FMRUU.png",
+  icon: "./assets/images/FMRUUAPP.png",
   splash: {
-    image: "./assets/images/FMRUU.png",
+    image: "./assets/images/FMRUUAPP.png",
     resizeMode: "contain",
     backgroundColor: "#ffffff",
   },
@@ -20,7 +20,7 @@ const config = {
     googleServicesFile: "./google-services.json",
     versionCode: 22,
     adaptiveIcon: {
-      foregroundImage: "./assets/images/FMRUU.png",
+      foregroundImage: "./assets/images/FMRUUAPP.png",
       backgroundColor: "#FFFFFF",
     },
     permissions: [

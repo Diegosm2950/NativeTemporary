@@ -1,5 +1,5 @@
 import React, { useContext, useState } from 'react';
-import { StyleSheet, Text, View, ScrollView, KeyboardAvoidingView, Platform } from 'react-native';
+import { StyleSheet, Text, View, ScrollView, KeyboardAvoidingView, Platform, Alert, Linking } from 'react-native';
 import { useRouter } from 'expo-router';
 import { SafeAreaView } from 'react-native-safe-area-context';
 import Colors from '@/constants/Colors';
@@ -84,6 +84,26 @@ export default function EditProfileScreen() {
         text2: 'Ocurrió un error al guardar los cambios',
       });
     }
+  };
+
+  const handleDeleteProfile = () => {
+    Alert.alert(
+      'Eliminar Perfil',
+      '¿Estás seguro de que quieres eliminar tu perfil? Esta acción no se puede deshacer.',
+      [
+        {
+          text: 'Cancelar',
+          style: 'cancel',
+        },
+        {
+          text: 'Eliminar',
+          style: 'destructive',
+          onPress: () => {
+            Linking.openURL('https://fmru-next-js.vercel.app/login');
+          },
+        },
+      ]
+    );
   };
 
   return (
@@ -235,6 +255,21 @@ export default function EditProfileScreen() {
             />
           </View>
 
+          <View
+            style={styles.deleteSection}
+          >
+            <Text style={[styles.sectionTitle, { color: Colors[colorScheme].text }]}>
+              Zona de Peligro
+            </Text>
+            
+            <Button
+              title="Quiero eliminar mi perfil"
+              onPress={handleDeleteProfile}
+              variant="secondary"
+              style={styles.deleteButton}
+            />
+          </View>
+
           
           <View
             style={styles.buttonContainer}
@@ -272,6 +307,12 @@ const styles = StyleSheet.create({
   formSection: {
     marginBottom: Layout.spacing.l,
   },
+  deleteSection: {
+    marginBottom: Layout.spacing.l,
+    paddingTop: Layout.spacing.m,
+    borderTopWidth: 1,
+    borderTopColor: '#ff444440',
+  },
   sectionTitle: {
     fontSize: 18,
     fontFamily: 'Poppins-SemiBold',
@@ -288,6 +329,11 @@ const styles = StyleSheet.create({
     flexDirection: 'row',
     justifyContent: 'space-between',
     marginTop: Layout.spacing.l,
+  },
+  deleteButton: {
+    marginBottom: Layout.spacing.m,
+    backgroundColor: '#ff4444',
+    borderColor: '#ff4444',
   },
   cancelButton: {
     flex: 1,
