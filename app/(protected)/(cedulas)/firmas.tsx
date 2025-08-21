@@ -1,5 +1,5 @@
 import React, { useState, memo } from 'react';
-import { View, Text, StyleSheet, TextInput, TouchableOpacity, ScrollView, Platform, Image, Alert, Switch, KeyboardAvoidingView } from 'react-native';
+import { View, Text, StyleSheet, TextInput, TouchableOpacity, ScrollView, Platform, Image, Switch, KeyboardAvoidingView } from 'react-native';
 import { useRouter } from 'expo-router';
 import { StatusBar } from 'expo-status-bar';
 import { useCedula } from '@/context/CedulaContext';
@@ -137,6 +137,7 @@ export default function RecoleccionFirmas() {
     };
 
     console.log("📦 CedulaData actual:", cedulaData);
+    console.log("📦 PartidoId:", cedulaData.partidoId);
     console.log("📦 Payload a enviar (completo):", payload);
 
     try {
@@ -150,15 +151,69 @@ export default function RecoleccionFirmas() {
       console.log('📥 Respuesta del servidor:', data);
 
       if (!res.ok) {
-        Alert.alert('Error', 'No se pudo enviar la cédula.');
+        Toast.show({
+          type: 'error',
+          text1: 'Error',
+          text2: 'No se pudo enviar la cédula.',
+        });
         return;
       }
 
-      Alert.alert('✅ Éxito', 'Cédula enviada correctamente');
+      // Intentar enviar el reporte por correo usando el endpoint específico
+      try {
+        if (cedulaData.partidoId && cedulaData.partidoId > 0) {
+          console.log('📧 Enviando cédula por correo para partidoId:', cedulaData.partidoId);
+          
+          const emailRes = await fetch('https://fmru-next-js.vercel.app/api/app-native-api/cedulas/enviar-cedulas', {
+            method: 'POST',
+            headers: { 'Content-Type': 'application/json' },
+            body: JSON.stringify({ 
+              partidoId: cedulaData.partidoId
+            }),
+          });
+
+          const emailData = await emailRes.json();
+          console.log('📧 Respuesta envío correo:', emailData);
+
+          if (emailRes.ok) {
+            Toast.show({
+              type: 'success',
+              text1: '✅ Éxito',
+              text2: 'Cédula enviada y reporte por correo enviado correctamente',
+            });
+          } else {
+            console.error('❌ Error en envío de correo:', emailData);
+            Toast.show({
+              type: 'error',
+              text1: '⚠️ Parcial',
+              text2: `Cédula enviada correctamente, pero no se pudo enviar el reporte por correo: ${emailData.message || 'Error desconocido'}`,
+            });
+          }
+        } else {
+          console.warn('⚠️ No se encontró partidoId válido para enviar correo');
+          Toast.show({
+            type: 'success',
+            text1: '✅ Éxito',
+            text2: 'Cédula enviada correctamente. No se enviaron correos (partidoId no válido)',
+          });
+        }
+      } catch (emailError) {
+        console.error('❌ Error al enviar reporte por correo:', emailError);
+        Toast.show({
+          type: 'error',
+          text1: '⚠️ Parcial',
+          text2: 'Cédula enviada correctamente, pero no se pudo enviar el reporte por correo',
+        });
+      }
+
       router.replace('/(protected)/(cedulas)/resumen-final');
     } catch (error) {
       console.error('❌ Error al enviar la cédula:', error);
-      Alert.alert('Error', 'No se pudo enviar la cédula.');
+      Toast.show({
+        type: 'error',
+        text1: 'Error',
+        text2: 'No se pudo enviar la cédula.',
+      });
     }
   };
 
