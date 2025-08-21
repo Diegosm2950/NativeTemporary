@@ -1,5 +1,5 @@
 import React, { useState } from 'react';
-import { View, Text, StyleSheet, TouchableOpacity, Platform, Image, Alert, ScrollView } from 'react-native';
+import { View, Text, StyleSheet, TouchableOpacity, Platform, Image, Alert, ScrollView, KeyboardAvoidingView } from 'react-native';
 import { useRouter } from 'expo-router';
 import { StatusBar } from 'expo-status-bar';
 import { useCedula } from '@/context/CedulaContext';
@@ -54,147 +54,152 @@ export default function RegistrarCambio() {
   };
 
   return (
-    <ScrollView contentContainerStyle={[styles.container, { backgroundColor: Colors[colorScheme].background }]}>
-      <StatusBar style={colorScheme === 'dark' ? 'light' : 'dark'} />
-      <Text style={[styles.title, { color: Colors[colorScheme].text }]}>Registrar cambio de jugador</Text>
+    <KeyboardAvoidingView
+      behavior={Platform.OS === 'ios' ? 'padding' : 'height'}
+      style={{ flex: 1, backgroundColor: Colors[colorScheme].background, }}
+    >
+      <ScrollView contentContainerStyle={[styles.container]}>
+        <StatusBar style={colorScheme === 'dark' ? 'light' : 'dark'} />
+        <Text style={[styles.title, { color: Colors[colorScheme].text }]}>Registrar cambio de jugador</Text>
 
-      <View style={[styles.select, { backgroundColor: Colors[colorScheme].inputBackground }]}>
-        <Text style={{ marginBottom: 8, fontWeight: '500', color: Colors[colorScheme].text }}>Selecciona el equipo:</Text>
-        <View style={{ flexDirection: 'row', gap: 10 }}>
-          <TouchableOpacity 
-            onPress={() => setEquipo('A')}
-            style={[
-              styles.teamButton,
-              { 
-                backgroundColor: equipo === 'A' 
-                  ? Colors[colorScheme].buttonSecondary 
-                  : Colors[colorScheme].cardBackground,
-                borderColor: equipo === 'A' 
-                  ? Colors[colorScheme].tint 
-                  : Colors[colorScheme].border
-              }
-            ]}
-          >
-            <Text style={[
-              styles.teamButtonText, 
-              { 
-                color: equipo === 'A' 
-                  ? Colors[colorScheme].tint 
-                  : Colors[colorScheme].text 
-              }
-            ]}>
-              {cedulaData.equipoLocal?.nombre || 'Equipo A'}
-            </Text>
-          </TouchableOpacity>
-          <TouchableOpacity 
-            onPress={() => setEquipo('B')}
-            style={[
-              styles.teamButton,
-              { 
-                backgroundColor: equipo === 'B' 
-                  ? Colors[colorScheme].buttonSecondary 
-                  : Colors[colorScheme].cardBackground,
-                borderColor: equipo === 'B' 
-                  ? Colors[colorScheme].tint 
-                  : Colors[colorScheme].border
-              }
-            ]}
-          >
-            <Text style={[
-              styles.teamButtonText, 
-              { 
-                color: equipo === 'B' 
-                  ? Colors[colorScheme].tint 
-                  : Colors[colorScheme].text 
-              }
-            ]}>
-              {cedulaData.equipoVisitante?.nombre || 'Equipo B'}
-            </Text>
-          </TouchableOpacity>
+        <View style={[styles.select, { backgroundColor: Colors[colorScheme].inputBackground }]}>
+          <Text style={{ marginBottom: 8, fontWeight: '500', color: Colors[colorScheme].text }}>Selecciona el equipo:</Text>
+          <View style={{ flexDirection: 'row', gap: 10 }}>
+            <TouchableOpacity 
+              onPress={() => setEquipo('A')}
+              style={[
+                styles.teamButton,
+                { 
+                  backgroundColor: equipo === 'A' 
+                    ? Colors[colorScheme].buttonSecondary 
+                    : Colors[colorScheme].cardBackground,
+                  borderColor: equipo === 'A' 
+                    ? Colors[colorScheme].tint 
+                    : Colors[colorScheme].border
+                }
+              ]}
+            >
+              <Text style={[
+                styles.teamButtonText, 
+                { 
+                  color: equipo === 'A' 
+                    ? Colors[colorScheme].tint 
+                    : Colors[colorScheme].text 
+                }
+              ]}>
+                {cedulaData.equipoLocal?.nombre || 'Equipo A'}
+              </Text>
+            </TouchableOpacity>
+            <TouchableOpacity 
+              onPress={() => setEquipo('B')}
+              style={[
+                styles.teamButton,
+                { 
+                  backgroundColor: equipo === 'B' 
+                    ? Colors[colorScheme].buttonSecondary 
+                    : Colors[colorScheme].cardBackground,
+                  borderColor: equipo === 'B' 
+                    ? Colors[colorScheme].tint 
+                    : Colors[colorScheme].border
+                }
+              ]}
+            >
+              <Text style={[
+                styles.teamButtonText, 
+                { 
+                  color: equipo === 'B' 
+                    ? Colors[colorScheme].tint 
+                    : Colors[colorScheme].text 
+                }
+              ]}>
+                {cedulaData.equipoVisitante?.nombre || 'Equipo B'}
+              </Text>
+            </TouchableOpacity>
+          </View>
         </View>
-      </View>
 
-      <View style={[styles.select, { backgroundColor: Colors[colorScheme].inputBackground }]}>
-        <Text style={{ marginBottom: 8, color: Colors[colorScheme].text }}>Jugador que sale:</Text>
-        {jugadores.map(j => (
+        <View style={[styles.select, { backgroundColor: Colors[colorScheme].inputBackground }]}>
+          <Text style={{ marginBottom: 8, color: Colors[colorScheme].text }}>Jugador que sale:</Text>
+          {jugadores.map(j => (
+            <TouchableOpacity
+              key={`sale-${j.id}`}
+              onPress={() => setJugadorSale(j.nombre)}
+              style={{ flexDirection: 'row', alignItems: 'center', marginBottom: 6 }}
+            >
+              <Image source={{ uri: j.foto }} style={{ width: 32, height: 32, borderRadius: 16, marginRight: 8 }} />
+              <Text style={{ color: jugadorSale === j.nombre ? Colors[colorScheme].tint : Colors[colorScheme].text }}>
+                {j.nombre}
+              </Text>
+            </TouchableOpacity>
+          ))}
+          {!jugadores.length && <Text style={{ color: Colors[colorScheme].textSecondary }}>Selecciona primero un equipo</Text>}
+        </View>
+
+        <View style={[styles.select, { backgroundColor: Colors[colorScheme].inputBackground }]}>
+          <Text style={{ marginBottom: 8, color: Colors[colorScheme].text }}>Jugador que entra:</Text>
+          {jugadores.map(j => (
+            <TouchableOpacity
+              key={`entra-${j.id}`}
+              onPress={() => setJugadorEntra(j.nombre)}
+              style={{ flexDirection: 'row', alignItems: 'center', marginBottom: 6 }}
+            >
+              <Image source={{ uri: j.foto }} style={{ width: 32, height: 32, borderRadius: 16, marginRight: 8 }} />
+              <Text style={{ color: jugadorEntra === j.nombre ? Colors[colorScheme].tint : Colors[colorScheme].text }}>
+                {j.nombre}
+              </Text>
+            </TouchableOpacity>
+          ))}
+          {!jugadores.length && <Text style={{ color: Colors[colorScheme].textSecondary }}>Selecciona primero un equipo</Text>}
+        </View>
+
+        <Text style={{ 
+          textAlign: 'center', 
+          fontSize: 16, 
+          marginBottom: 10,
+          color: Colors[colorScheme].text 
+        }}>
+          Tiempo actual: <Text style={{ fontWeight: 'bold' }}>{tiempoActual}</Text>
+        </Text>
+
+        <Text style={[styles.subTitle, { color: Colors[colorScheme].text }]}>Seleccione una opción</Text>
+        <Text style={[styles.subText, { color: Colors[colorScheme].textSecondary }]}>Motivo del cambio (opcional)</Text>
+        {[
+          { label: 'Táctico', value: 'tactico' },
+          { label: 'Lesión', value: 'lesion' },
+          { label: 'Otro', value: 'otro' },
+        ].map(({ label, value }) => (
           <TouchableOpacity
-            key={`sale-${j.id}`}
-            onPress={() => setJugadorSale(j.nombre)}
-            style={{ flexDirection: 'row', alignItems: 'center', marginBottom: 6 }}
+            key={value}
+            style={[
+              styles.motivoOption,
+              { 
+                borderColor: Colors[colorScheme].border,
+                backgroundColor: Colors[colorScheme].cardBackground 
+              },
+              motivo === value && {
+                borderColor: Colors[colorScheme].tint,
+                backgroundColor: Colors[colorScheme].buttonSecondary
+              }
+            ]}
+            onPress={() => setMotivo(value as 'tactico' | 'lesion' | 'otro')}
           >
-            <Image source={{ uri: j.foto }} style={{ width: 32, height: 32, borderRadius: 16, marginRight: 8 }} />
-            <Text style={{ color: jugadorSale === j.nombre ? Colors[colorScheme].tint : Colors[colorScheme].text }}>
-              {j.nombre}
-            </Text>
+            <Text style={[styles.motivoText, { color: Colors[colorScheme].text }]}>{label}</Text>
           </TouchableOpacity>
         ))}
-        {!jugadores.length && <Text style={{ color: Colors[colorScheme].textSecondary }}>Selecciona primero un equipo</Text>}
-      </View>
 
-      <View style={[styles.select, { backgroundColor: Colors[colorScheme].inputBackground }]}>
-        <Text style={{ marginBottom: 8, color: Colors[colorScheme].text }}>Jugador que entra:</Text>
-        {jugadores.map(j => (
-          <TouchableOpacity
-            key={`entra-${j.id}`}
-            onPress={() => setJugadorEntra(j.nombre)}
-            style={{ flexDirection: 'row', alignItems: 'center', marginBottom: 6 }}
-          >
-            <Image source={{ uri: j.foto }} style={{ width: 32, height: 32, borderRadius: 16, marginRight: 8 }} />
-            <Text style={{ color: jugadorEntra === j.nombre ? Colors[colorScheme].tint : Colors[colorScheme].text }}>
-              {j.nombre}
-            </Text>
-          </TouchableOpacity>
-        ))}
-        {!jugadores.length && <Text style={{ color: Colors[colorScheme].textSecondary }}>Selecciona primero un equipo</Text>}
-      </View>
-
-      <Text style={{ 
-        textAlign: 'center', 
-        fontSize: 16, 
-        marginBottom: 10,
-        color: Colors[colorScheme].text 
-      }}>
-        Tiempo actual: <Text style={{ fontWeight: 'bold' }}>{tiempoActual}</Text>
-      </Text>
-
-      <Text style={[styles.subTitle, { color: Colors[colorScheme].text }]}>Seleccione una opción</Text>
-      <Text style={[styles.subText, { color: Colors[colorScheme].textSecondary }]}>Motivo del cambio (opcional)</Text>
-      {[
-        { label: 'Táctico', value: 'tactico' },
-        { label: 'Lesión', value: 'lesion' },
-        { label: 'Otro', value: 'otro' },
-      ].map(({ label, value }) => (
-        <TouchableOpacity
-          key={value}
+        <TouchableOpacity 
           style={[
-            styles.motivoOption,
-            { 
-              borderColor: Colors[colorScheme].border,
-              backgroundColor: Colors[colorScheme].cardBackground 
-            },
-            motivo === value && {
-              borderColor: Colors[colorScheme].tint,
-              backgroundColor: Colors[colorScheme].buttonSecondary
-            }
-          ]}
-          onPress={() => setMotivo(value as 'tactico' | 'lesion' | 'otro')}
+            styles.submitButton, 
+            { backgroundColor: Colors[colorScheme].buttonPrimary }
+          ]} 
+          onPress={handleGuardarCambio}
         >
-          <Text style={[styles.motivoText, { color: Colors[colorScheme].text }]}>{label}</Text>
+          <Text style={[styles.submitText, { color: Colors[colorScheme].buttonText }]}>Registrar Cambio</Text>
         </TouchableOpacity>
-      ))}
 
-      <TouchableOpacity 
-        style={[
-          styles.submitButton, 
-          { backgroundColor: Colors[colorScheme].buttonPrimary }
-        ]} 
-        onPress={handleGuardarCambio}
-      >
-        <Text style={[styles.submitText, { color: Colors[colorScheme].buttonText }]}>Registrar Cambio</Text>
-      </TouchableOpacity>
-
-      <VolverButton destination="/(protected)/(cedulas)/juego" />
-    </ScrollView>
+        <VolverButton destination="/(protected)/(cedulas)/juego" />
+      </ScrollView>
+    </KeyboardAvoidingView>
   );
 }
 

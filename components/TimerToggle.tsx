@@ -1,63 +1,64 @@
 import React from 'react';
-import { TouchableOpacity, Text, View, StyleSheet } from 'react-native';
+import { View, Text, TouchableOpacity, StyleSheet } from 'react-native';
 import Colors from '@/constants/Colors';
 import useColorScheme from '@/hooks/useColorScheme';
 
-interface TeamSelectorProps {
-  equipo: 'A' | 'B';
-  setEquipo: (team: 'A' | 'B') => void;
-  equipoLocalNombre?: string; 
-  equipoVisitanteNombre?: string; 
+interface TimeSelectorToggleProps {
+  useCustomTime: boolean;
+  onToggle: (useCustom: boolean) => void;
+  globalTimeLabel?: string;
+  customTimeLabel?: string;
 }
 
-const TeamSelector: React.FC<TeamSelectorProps> = ({
-  equipo,
-  setEquipo,
-  equipoLocalNombre = 'Equipo A',  
-  equipoVisitanteNombre = 'Equipo B',
+const TimeSelectorToggle: React.FC<TimeSelectorToggleProps> = ({
+  useCustomTime,
+  onToggle,
+  globalTimeLabel = "Tiempo Global",
+  customTimeLabel = "Tiempo Personalizado"
 }) => {
   const colorScheme = useColorScheme();
 
   return (
-    <View style={styles.teamSwitch}>
+    <View style={styles.container}>
       <TouchableOpacity
         style={[
-          styles.teamButton,
+          styles.optionButton,
           { backgroundColor: Colors[colorScheme].cardBackground },
-          equipo === 'A' && {
+          !useCustomTime && {
             backgroundColor: Colors[colorScheme].buttonSelected
           }
         ]}
-        onPress={() => setEquipo('A')}
+        onPress={() => onToggle(false)}
       >
         <Text style={[
-          styles.teamText,
+          styles.optionText,
           { color: Colors[colorScheme].text },
-          equipo === 'A' && {
+          !useCustomTime && {
             color: Colors[colorScheme].buttonText
           }
         ]}>
-          {equipoLocalNombre}
+          {globalTimeLabel}
         </Text>
       </TouchableOpacity>
+
       <TouchableOpacity
         style={[
-          styles.teamButton,
+          styles.optionButton,
           { backgroundColor: Colors[colorScheme].cardBackground },
-          equipo === 'B' && {
+          useCustomTime && {
             backgroundColor: Colors[colorScheme].buttonSelected
           }
         ]}
-        onPress={() => setEquipo('B')}
+        onPress={() => onToggle(true)}
       >
         <Text style={[
-          styles.teamText,
+          styles.optionText,
           { color: Colors[colorScheme].text },
-          equipo === 'B' && {
+          useCustomTime && {
             color: Colors[colorScheme].buttonText
           }
         ]}>
-          {equipoVisitanteNombre}
+          {customTimeLabel}
         </Text>
       </TouchableOpacity>
     </View>
@@ -65,22 +66,21 @@ const TeamSelector: React.FC<TeamSelectorProps> = ({
 };
 
 const styles = StyleSheet.create({
-  teamSwitch: {
+  container: {
     flexDirection: 'row',
     justifyContent: 'space-between',
-    marginBottom: 16,
+    marginBottom: 15,
   },
-  teamButton: {
-    flex: 1,
+  optionButton: {
     padding: 12,
-    borderRadius: 25,
+    borderRadius: 8,
+    minWidth: '48%',
     alignItems: 'center',
-    marginHorizontal: 6,
   },
-  teamText: {
+  optionText: {
+    fontSize: 14,
     fontWeight: '500',
-    textAlign: "center"
   },
 });
 
-export default TeamSelector;
+export default TimeSelectorToggle;

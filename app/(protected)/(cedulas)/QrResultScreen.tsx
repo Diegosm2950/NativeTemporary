@@ -8,13 +8,14 @@ import {
   ActivityIndicator,
   Alert,
 } from 'react-native';
-import { useRoute } from '@react-navigation/native';
+import { useRoute, useNavigation } from '@react-navigation/native'; // Add useNavigation
 import Constants from 'expo-constants';
 import Colors from '@/constants/Colors';
 import useColorScheme from '@/hooks/useColorScheme';
 
 const QrResultScreen = () => {
   const { params }: any = useRoute();
+  const navigation = useNavigation();
   const colorScheme = useColorScheme();
   const [qrBase64, setQrBase64] = useState('');
   const [loading, setLoading] = useState(true);
@@ -64,6 +65,13 @@ const QrResultScreen = () => {
     generateQR();
   }, [params]);
 
+  const handleScreenshotButton = () => {
+    navigation.reset({
+      index: 0,
+      routes: [{ name: '(tabs)' as never }],
+    });
+  };
+
   return (
     <View style={[styles.container, { backgroundColor: Colors[colorScheme].background }]}>
       {loading ? (
@@ -75,9 +83,15 @@ const QrResultScreen = () => {
       ) : qrBase64 ? (
         <>
           <Image source={{ uri: qrBase64 }} style={styles.qrImage} />
-          <TouchableOpacity style={[styles.downloadButton, { borderColor: Colors[colorScheme].border }]}>
+          <Text style={styles.qrtext}>
+            Toma screenshot del QR*
+          </Text>
+          <TouchableOpacity 
+            style={[styles.downloadButton, { borderColor: Colors[colorScheme].border }]}
+            onPress={handleScreenshotButton}
+          >
             <Text style={[styles.downloadText, { color: Colors[colorScheme].text }]}>
-              Toma una captura de pantalla
+              Ir al inicio
             </Text>
           </TouchableOpacity>
         </>
@@ -103,6 +117,10 @@ const styles = StyleSheet.create({
     height: 250,
     marginVertical: 40,
     borderRadius: 16,
+  },
+  qrtext: {
+    marginBottom: 10,
+
   },
   downloadButton: {
     borderWidth: 1,

@@ -16,6 +16,7 @@ export default function PartidosScreen() {
   const router = useRouter();
 
   const { loading, error, pastMatches } = useConvocatorias(user?.clubId ?? undefined);
+  console.log(pastMatches, "partidos pasados")
 
   if (loading) {
     return (

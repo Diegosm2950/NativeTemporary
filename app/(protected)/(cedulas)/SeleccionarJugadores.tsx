@@ -25,7 +25,6 @@ const SeleccionarJugadores = () => {
   const playersPerPage = 10;
   const totalPlayers = 50;
   const totalPages = Math.ceil(totalPlayers / playersPerPage);
-  const [activeFilter, setActiveFilter] = useState("Todos");
   const [searchTerm, setSearchTerm] = useState("");
   const [selectedPlayers, setSelectedPlayers] = useState<Player[]>([]);
   const [page, setPage] = useState(1);
@@ -68,7 +67,6 @@ const SeleccionarJugadores = () => {
         <View style={styles.matchContainer}>
           <MatchCard match={match}/>
         </View>
-        <FilterBar active={activeFilter} onChange={setActiveFilter} />
         <SearchBar value={searchTerm} onChangeText={setSearchTerm} />
         <PlayerList
           filter={searchTerm}

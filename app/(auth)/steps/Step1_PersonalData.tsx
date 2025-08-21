@@ -19,10 +19,9 @@ interface Props {
 }
 
 const Step1_PersonalData = ({ onNext, onBack, formData, updateForm }: Props) => {
-  const isDark = useColorScheme() === 'dark';
   const [showDatePicker, setShowDatePicker] = useState(false);
   const userTypes: UserType[] = ['Jugador', 'Entrenador', 'Árbitro', 'Médico'];
-  const styles = getStyles(isDark);
+  const styles = getStyles();
 
   const handleDateChange = (_: any, selectedDate?: Date) => {
     if (Platform.OS !== 'web') setShowDatePicker(false);
@@ -212,7 +211,7 @@ const Step1_PersonalData = ({ onNext, onBack, formData, updateForm }: Props) => 
   );
 };
 
-const getStyles = (isDark: boolean) =>
+const getStyles = () =>
   StyleSheet.create({
     container: {
       flex: 1,

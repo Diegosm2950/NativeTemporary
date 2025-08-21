@@ -6,27 +6,24 @@ import CancelButton from '@/components/cancelButton';
 import Colors from '@/constants/Colors';
 import useColorScheme from '@/hooks/useColorScheme';
 import TeamSelector from '@/components/TeamSelector';
+import TimeSelectorToggle from '@/components/TimerToggle';
+import CustomTimerInput from '@/components/CustomTimerInput';
+import TimeDisplay from '@/components/TimeDisplay';
+import { formatTiempo, validateTimeFormat } from '@/utils/timerUtils';
 
 export default function RegistroPuntos() {
   const router = useRouter();
-  const { cedulaData, setCedulaData, jugadoresLocal, jugadoresVisitante } =
+  const { cedulaData, setCedulaData, jugadoresLocal, jugadoresVisitante, cronometro } =
     useCedula();
 
   const [equipo, setEquipo] = useState<'A' | 'B'>('A');
-  const [jugador, setJugador] = useState<number | null>();
+  const [jugador, setJugador] = useState<number | 'no_registrado' | null>(null);
   const [accion, setAccion] = useState('');
   const [puntosTemporales, setPuntosTemporales] = useState<any[]>([]);
+  const [useCustomTime, setUseCustomTime] = useState(false);
+  const [customTime, setCustomTime] = useState('');
   const colorScheme = useColorScheme();
 
-  const { cronometro } = useCedula();
-
-
-  const formatTiempo = (milis: number) => {
-    const h = Math.floor(milis / 3600000).toString().padStart(2, '0');
-    const m = Math.floor((milis % 3600000) / 60000).toString().padStart(2, '0');
-    const s = Math.floor((milis % 60000) / 1000).toString().padStart(2, '0');
-    return `${h}:${m}:${s}`;
-  };
 
   const calcularPuntos = (equipo: 'A' | 'B') => {
     return cedulaData.marcador
@@ -76,32 +73,52 @@ export default function RegistroPuntos() {
   };
 
   const handleAgregarPunto = () => {
-    const tiempoActual = formatTiempo(cronometro);
-  
+    let tiempoActual;
+    
+    if (useCustomTime && customTime) {
+      if (!validateTimeFormat(customTime)) {
+        Alert.alert('Formato inválido', 'Por favor ingresa el tiempo en formato HH:MM:SS o MM:SS');
+        return;
+      }
+      tiempoActual = customTime;
+    } else {
+      tiempoActual = formatTiempo(cronometro);
+    }
+
     if (!equipo || !jugador || !accion) {
       Alert.alert('Faltan campos', 'Completa todos los datos del punto.');
       return;
     }
-  
-    const player = jugadores.find(j => j.id === jugador);
-    if (!player) {
-      Alert.alert('Error', 'Jugador no encontrado');
-      return;
+
+    let nombreJugador: string;
+    
+    if (jugador === 'no_registrado') {
+      nombreJugador = 'No registrado';
+    } else {
+      const player = jugadores.find(j => j.id === jugador);
+      if (!player) {
+        Alert.alert('Error', 'Jugador no encontrado');
+        return;
+      }
+      nombreJugador = player.nombre;
     }
-  
+
     const nuevoPunto = {
       equipo,
-      jugador: player.nombre,
+      jugador: nombreJugador,
       jugadorId: jugador,     
       accion,
       tiempo: tiempoActual,
       puntos: getPuntos(accion),
+      isCustomTime: useCustomTime, // Track if custom time was used
     };
-  
+
     setPuntosTemporales((prev) => [...prev, nuevoPunto]);
-  
+
     setJugador(null);  
     setAccion('');
+    setCustomTime('');
+    setUseCustomTime(false);
   };
 
   const handleCancelarPunto = (index: number) => {
@@ -129,7 +146,7 @@ export default function RegistroPuntos() {
         <View style={styles.actionContainer}>
           {[
             { label: 'Tries', puntos: 5, value: 'T' },
-            { label: 'Catch', puntos: 2, value: 'C' },
+            { label: 'Conversión', puntos: 2, value: 'C' },
             { label: 'Penalties', puntos: 3, value: 'P' },
             { label: 'Drops', puntos: 3, value: 'D' },
           ].map(({ label, puntos, value }) => (
@@ -165,15 +182,23 @@ export default function RegistroPuntos() {
           equipoVisitanteNombre={cedulaData.equipoVisitante?.nombre}
         />
 
-        {/* Tiempo */}
-        <TextInput
-          style={[styles.timerInput, { color: Colors[colorScheme].text, borderBottomColor: Colors[colorScheme].border }]}
-          value={formatTiempo(cronometro)}
-          editable={false}
-        />
+          <TimeSelectorToggle
+            useCustomTime={useCustomTime}
+            onToggle={setUseCustomTime}
+          />
+
+          {useCustomTime ? (
+            <CustomTimerInput
+              value={customTime}
+              onChange={setCustomTime}
+            />
+          ) : (
+            <TimeDisplay time={formatTiempo(cronometro)} />
+          )}
 
         {/* Jugador */}
         <View style={[styles.select, { backgroundColor: Colors[colorScheme].cardBackground }]}>
+          {/* Jugadores registrados */}
           {jugadores.map((j) => (
             <TouchableOpacity
               key={j.id}
@@ -185,24 +210,16 @@ export default function RegistroPuntos() {
                   flexDirection: 'row',
                   alignItems: 'center',
                 },
-                jugador === j.id && {  // Now comparing by ID
+                jugador === j.id && { 
                   backgroundColor: Colors[colorScheme].buttonSelected,
                 }
               ]}
               onPress={() => setJugador(j.id)}  
             >
-              <Image
-                source={{ uri: j.foto }}
-                style={{
-                  width: 32,
-                  height: 32,
-                  borderRadius: 16,
-                  marginRight: 8,
-                }}
-              />
               <Text style={[
+                styles.playerRow,
                 { color: Colors[colorScheme].text },
-                jugador === j.id && {  // Now comparing by ID
+                jugador === j.id && {
                   color: Colors[colorScheme].buttonText
                 }
               ]}>
@@ -210,6 +227,33 @@ export default function RegistroPuntos() {
               </Text>
             </TouchableOpacity>
           ))}
+          
+          <TouchableOpacity
+            style={[
+              {
+                paddingVertical: 8,
+                borderBottomWidth: 1,
+                borderBottomColor: Colors[colorScheme].border,
+                flexDirection: 'row',
+                alignItems: 'center',
+              },
+              jugador === 'no_registrado' && { 
+                backgroundColor: Colors[colorScheme].buttonSelected,
+              }
+            ]}
+            onPress={() => setJugador('no_registrado')}
+          >
+            <Text style={[
+               styles.playerRow,
+              { color: Colors[colorScheme].text },
+              jugador === 'no_registrado' && {
+                color: Colors[colorScheme].buttonText
+              }
+            ]}>
+              No registrado
+            </Text>
+          </TouchableOpacity>
+          
           {!jugadores.length && (
             <Text style={{ color: Colors[colorScheme].textSecondary }}>
               Sin jugadores escaneados para este equipo
@@ -232,7 +276,8 @@ export default function RegistroPuntos() {
             {puntosTemporales.map((punto, index) => (
               <View key={index} style={styles.pendingPointRow}>
                 <Text style={{ color: Colors[colorScheme].text }}>
-                  {punto.jugador} ({punto.accion}) - {punto.puntos} pts
+                  {punto.jugador} ({punto.accion}) - {punto.puntos} pts - {punto.tiempo}
+                  {punto.isCustomTime && ' *'}
                 </Text>
                 <TouchableOpacity onPress={() => handleCancelarPunto(index)}>
                   <Text style={{ color: Colors[colorScheme].error }}>Cancelar</Text>
@@ -282,6 +327,7 @@ export default function RegistroPuntos() {
   );
 }
 
+
 const styles = StyleSheet.create({
   container: {
     flex: 1,
@@ -301,6 +347,9 @@ const styles = StyleSheet.create({
     padding: 16,
     borderRadius: 12,
     marginBottom: 12,
+  },
+  playerRow: {
+    marginLeft: 10
   },
   timerInput: {
     fontSize: 22,
@@ -369,8 +418,9 @@ const styles = StyleSheet.create({
   },
   actionText: {
     fontWeight: '600',
-    fontSize: 12,
+    fontSize: 11,
     textAlign: 'center',
+
   },
   pendingPointsContainer: {
     marginTop: 10,
@@ -385,5 +435,36 @@ const styles = StyleSheet.create({
     flexDirection: 'row',
     justifyContent: 'space-between',
     marginBottom: 4,
+  },
+  timeSelectorContainer: {
+    flexDirection: 'row',
+    justifyContent: 'space-between',
+    marginBottom: 15,
+  },
+  timeOptionButton: {
+    padding: 12,
+    borderRadius: 8,
+    minWidth: '48%',
+    alignItems: 'center',
+  },
+  timeOptionText: {
+    fontSize: 14,
+    fontWeight: '500',
+  },
+  customTimeContainer: {
+    marginBottom: 20,
+  },
+  customTimeInput: {
+    fontSize: 18,
+    padding: 12,
+    borderRadius: 8,
+    textAlign: 'center',
+    borderWidth: 1,
+    marginBottom: 5,
+  },
+  timeFormatHint: {
+    fontSize: 12,
+    textAlign: 'center',
+    fontStyle: 'italic',
   },
 });

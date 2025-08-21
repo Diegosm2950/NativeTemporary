@@ -49,11 +49,10 @@ export default function RegistrarObservacion() {
   };
 
   return (
-    <KeyboardAvoidingView style={{ flex: 1 }} behavior="padding">
+    <KeyboardAvoidingView style={{ flex: 1, backgroundColor: Colors[colorScheme].background, }} behavior="padding">
       <ScrollView 
         contentContainerStyle={[
-          styles.container, 
-          { backgroundColor: Colors[colorScheme].background }
+          styles.container
         ]} 
         keyboardShouldPersistTaps="handled"
       >
