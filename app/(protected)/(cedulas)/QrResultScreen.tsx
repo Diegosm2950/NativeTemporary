@@ -8,7 +8,7 @@ import {
   ActivityIndicator,
   Alert,
 } from 'react-native';
-import { useRoute, useNavigation } from '@react-navigation/native'; // Add useNavigation
+import { useRoute, useNavigation } from '@react-navigation/native'; 
 import Constants from 'expo-constants';
 import Colors from '@/constants/Colors';
 import useColorScheme from '@/hooks/useColorScheme';

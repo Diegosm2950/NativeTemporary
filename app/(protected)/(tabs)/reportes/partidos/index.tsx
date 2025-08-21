@@ -1,4 +1,4 @@
-import { StyleSheet, View, ScrollView, Image, TouchableOpacity } from 'react-native';
+import { StyleSheet, View, ScrollView, Image, TouchableOpacity, Text } from 'react-native';
 import { SafeAreaView } from 'react-native-safe-area-context';
 import Colors from '@/constants/Colors';
 import useColorScheme from '@/hooks/useColorScheme';
@@ -9,6 +9,7 @@ import { AuthContext } from '@/context/AuthContext';
 import { useConvocatorias } from '@/hooks/useFetchMatches';
 import { useRouter } from 'expo-router';
 import { ErrorIndicator, LoadingIndicator } from '@/components/ui/Indicators';
+import { Ionicons } from '@expo/vector-icons';
 
 export default function PartidosScreen() {
   const colorScheme = useColorScheme();
@@ -26,6 +27,30 @@ export default function PartidosScreen() {
   if (error) {
     return (
       <ErrorIndicator error={error}/>
+    );
+  }
+
+  if (pastMatches.length === 0) {
+    return (
+      <SafeAreaView
+        style={[styles.container, { backgroundColor: Colors[colorScheme].background }]}
+        edges={['right', 'left']}
+      >
+        <View style={styles.emptyContainer}>
+          <Ionicons 
+            name="football-outline" 
+            size={64} 
+            color={Colors[colorScheme].tabIconDefault} 
+            style={styles.emptyIcon}
+          />
+          <Text style={[styles.emptyText, { color: Colors[colorScheme].text }]}>
+            No hay partidos finalizados
+          </Text>
+          <Text style={[styles.emptySubtext, { color: Colors[colorScheme].tabIconDefault }]}>
+            Cuando los partidos finalicen, podrás ver sus reportes aquí.
+          </Text>
+        </View>
+      </SafeAreaView>
     );
   }
 
@@ -63,6 +88,27 @@ const styles = StyleSheet.create({
   },
   contentContainer: {
     padding: Layout.spacing.l,
+  },
+  emptyContainer: {
+    flex: 1,
+    justifyContent: 'center',
+    alignItems: 'center',
+    paddingHorizontal: Layout.spacing.xl,
+  },
+  emptyIcon: {
+    marginBottom: Layout.spacing.l,
+    opacity: 0.5,
+  },
+  emptyText: {
+    fontSize: 20,
+    fontWeight: '600',
+    textAlign: 'center',
+    marginBottom: Layout.spacing.s,
+  },
+  emptySubtext: {
+    fontSize: 16,
+    textAlign: 'center',
+    lineHeight: 22,
   },
   header: {
     alignItems: 'center',
