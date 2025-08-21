@@ -138,7 +138,8 @@ export function AuthProvider({ children }: PropsWithChildren) {
       await authService.logOut();
       setUser(null);
       setToken(null);
-      router.push("/login");
+      
+      router.replace("/login");
     } finally {
       setIsLoading(false);
     }

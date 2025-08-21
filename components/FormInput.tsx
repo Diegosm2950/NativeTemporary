@@ -14,7 +14,7 @@ import Layout from '@/constants/Layout';
 
 type FormInputProps = {
   label?: string;
-  value: string;
+  value: string | undefined;
   onChangeText: (text: string) => void;
   placeholder?: string;
   keyboardType?: KeyboardTypeOptions;

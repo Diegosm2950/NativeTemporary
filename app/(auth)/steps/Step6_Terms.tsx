@@ -1,10 +1,10 @@
 import React, { useState } from 'react';
-import { View, Text, TouchableOpacity, StyleSheet, ScrollView, TextInput, useColorScheme, Image } from 'react-native';
+import { View, Text, TouchableOpacity, StyleSheet, ScrollView, useColorScheme, Image } from 'react-native';
 import Constants from 'expo-constants';
 import { useNavigation } from '@react-navigation/native';
 import Toast from 'react-native-toast-message';
 import { FormularioCompleto } from '@/types/navigation';
-import GoBackHomeButton from '@/components/GoBackHomeButton';
+import FormInput from '@/components/FormInput';
 
 interface Props {
   formData: FormularioCompleto;
@@ -95,7 +95,6 @@ const Step6_Terms = ({ formData, onBack, resetForm, updateForm }: Props) => {
   };
 
   const styles = getStyles(isDark);
-  const placeholderColor = '#A1A1A1';
 
   const validateForm = () => {
     const errors = [];
@@ -162,20 +161,16 @@ const Step6_Terms = ({ formData, onBack, resetForm, updateForm }: Props) => {
         </Text>
       </TouchableOpacity>
 
-      <TextInput
+      <FormInput
         placeholder="Contraseña*"
-        placeholderTextColor={placeholderColor}
         secureTextEntry
-        style={styles.input}
         value={formData.contrasenia}
         onChangeText={(text) => handleInput('contrasenia', text)}
       />
 
-      <TextInput
+      <FormInput
         placeholder="Repetir Contraseña*"
-        placeholderTextColor={placeholderColor}
         secureTextEntry
-        style={styles.input}
         value={formData.repetir_contrasenia}
         onChangeText={(text) => handleInput('repetir_contrasenia', text)}
       />
@@ -212,8 +207,8 @@ const getStyles = (isDark: boolean) =>
   StyleSheet.create({
     container: {
       flex: 1,
-      padding: 45,
-      backgroundColor: isDark ? '#020D06' : '#fff',
+      padding: 55,
+      backgroundColor: isDark ? '#121212' : '#F8F9FA',
     },
     header: {
       alignItems: 'center',
@@ -259,18 +254,6 @@ const getStyles = (isDark: boolean) =>
       flex: 1,
       fontSize: 14,
       color: isDark ? '#fff' : '#000',
-    },
-    input: {
-      backgroundColor: isDark ? '#1a1a1a' : '#F6F6F6',
-      borderRadius: 8,
-      padding: 16,
-      marginBottom: 15,
-      fontSize: 16,
-      color: isDark ? '#fff' : '#000',
-      minHeight: 50,
-      width: '100%',
-      maxWidth: 360,
-      alignSelf: 'center',
     },
     submitButton: {
       backgroundColor: '#28a745',

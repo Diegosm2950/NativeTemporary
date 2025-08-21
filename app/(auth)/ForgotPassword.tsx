@@ -94,7 +94,10 @@ const ForgotPassword = () => {
       <Text style={styles.instructions}>
         Se enviaron instrucciones a tu correo para continuar con la recuperación de la contraseña.
       </Text>
-    <TouchableOpacity style={styles.backButton} onPress={() => navigation.navigate('login' as never)}>
+      <TouchableOpacity 
+        style={styles.backButton} 
+        onPress={() => navigation.goBack()}
+      >
         <Text style={styles.backButtonText}>Volver al login</Text>
       </TouchableOpacity>
     </View>

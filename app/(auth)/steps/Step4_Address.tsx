@@ -1,7 +1,9 @@
-import GoBackHomeButton from '@/components/GoBackHomeButton';
+import FormInput from '@/components/FormInput';
+import SelectInput from '@/components/SelectInput';
 import { FormularioCompleto } from '@/types/navigation';
+import { estados } from '@/utils/register';
 import React from 'react';
-import { Text, TextInput, StyleSheet, ScrollView, TouchableOpacity, useColorScheme, View, Platform, Image } from 'react-native';
+import { Text, StyleSheet, ScrollView, TouchableOpacity, useColorScheme, View, Platform, Image } from 'react-native';
 
 interface Props {
   onNext: () => void;
@@ -10,21 +12,9 @@ interface Props {
   updateForm: (data: Partial<FormularioCompleto>) => void;
 }
 
-const estados = [
-  'Aguascalientes', 'Baja California', 'Baja California Sur', 'Campeche',
-  'CDMX', 'Chiapas', 'Chihuahua', 'Coahuila', 'Colima', 'Durango',
-  'Estado de México', 'Guanajuato', 'Guerrero', 'Hidalgo', 'Jalisco',
-  'Michoacán', 'Morelos', 'Nayarit', 'Nuevo León', 'Oaxaca',
-  'Puebla', 'Querétaro', 'Quintana Roo', 'San Luis Potosí', 'Sinaloa',
-  'Sonora', 'Tabasco', 'Tamaulipas', 'Tlaxcala', 'Veracruz',
-  'Yucatán', 'Zacatecas'
-];
-
 const Step4_AddressData = ({ onNext, onBack, formData, updateForm }: Props) => {
   const isDark = useColorScheme() === 'dark';
-  const isWeb = Platform.OS === 'web';
   const styles = getStyles(isDark);
-  const placeholderColor = '#A1A1A1';
 
 
   const handleDireccionChange = (key: keyof FormularioCompleto['direccion'], value: string) => {
@@ -66,88 +56,45 @@ const Step4_AddressData = ({ onNext, onBack, formData, updateForm }: Props) => {
           <Text style={styles.headerTitle}>Dirección</Text>
         </View>
 
-        {/* Estado */}
-        <View style={[styles.selectWrapper, { backgroundColor: isDark ? '#1a1a1a' : '#F6F6F6', borderRadius: 8 }]}> 
-          {isWeb ? (
-            <select
-              value={formData.direccion.estadoMx || ''}
-              onChange={(e) => handleDireccionChange('estadoMx', e.target.value)}
-              style={selectStyle(isDark)}
-            >
-              <option value="">Estado*</option>
-              {estados.map((estado) => (
-                <option key={estado} value={estado}>{estado}</option>
-              ))}
-            </select>
-          ) : (
-            <TextInput
-              placeholder="Estado*"
-              placeholderTextColor={placeholderColor}
-              style={[styles.input, { color: isDark ? '#fff' : '#000', backgroundColor: isDark ? '#1a1a1a' : '#F6F6F6' }]}
-              value={formData.direccion.estadoMx}
-              onChangeText={(text) => handleDireccionChange('estadoMx', text)}
-            />
-          )}
-        </View>
+        <SelectInput
+            options={estados}
+            placeholder="Estado*"
+            value={formData.direccion.estadoMx}
+            onSelect={(value) => handleDireccionChange('estadoMx', value)}
+        />
 
-        {/* Delegación o Municipio */}
-        <TextInput
+        <FormInput
           placeholder="Alcaldía o Municipio*"
-          placeholderTextColor={placeholderColor}
-          style={[styles.input, { color: isDark ? '#fff' : '#000', backgroundColor: isDark ? '#1a1a1a' : '#F6F6F6' }]}
           value={formData.direccion.delegacionMunicipio}
           onChangeText={(text) => handleDireccionChange('delegacionMunicipio', text)}
         />
 
         {/* Ciudad */}
-        <View style={[styles.selectWrapper, { backgroundColor: isDark ? '#1a1a1a' : '#F6F6F6', borderRadius: 8 }]}> 
-          {isWeb ? (
-            <select
-              value={formData.direccion.ciudad || ''}
-              onChange={(e) => handleDireccionChange('ciudad', e.target.value)}
-              style={selectStyle(isDark)}
-            >
-              <option value="">Ciudad*</option>
-              <option value="Ciudad de México">Ciudad de México</option>
-              <option value="Guadalajara">Guadalajara</option>
-              <option value="Monterrey">Monterrey</option>
-            </select>
-          ) : (
-            <TextInput
-              placeholder="Ciudad*"
-              placeholderTextColor={placeholderColor}
-              style={[styles.input, { color: isDark ? '#fff' : '#000', backgroundColor: isDark ? '#1a1a1a' : '#F6F6F6' }]}
-              value={formData.direccion.ciudad}
-              onChangeText={(text) => handleDireccionChange('ciudad', text)}
-            />
-          )}
-        </View>
+        <FormInput
+          placeholder="Ciudad*"
+          value={formData.direccion.ciudad}
+          onChangeText={(text) => handleDireccionChange('ciudad', text)}
+        />
 
 
         {/* Colonia */}
-        <TextInput
+        <FormInput
           placeholder="Colonia*"
-          placeholderTextColor={placeholderColor}
-          style={[styles.input, { color: isDark ? '#fff' : '#000', backgroundColor: isDark ? '#1a1a1a' : '#F6F6F6' }]}
           value={formData.direccion.colonia}
           onChangeText={(text) => handleDireccionChange('colonia', text)}
         />
 
         {/* Calle */}
-        <TextInput
+        <FormInput
           placeholder="Calle*"
-          placeholderTextColor={placeholderColor}
-          style={[styles.input, { color: isDark ? '#fff' : '#000', backgroundColor: isDark ? '#1a1a1a' : '#F6F6F6' }]}
           value={formData.direccion.calle}
           onChangeText={(text) => handleDireccionChange('calle', text)}
         />
 
         {/* Código Postal */}
-        <TextInput
+        <FormInput
           placeholder="Código postal*"
-          placeholderTextColor={placeholderColor}
-          keyboardType="numeric"
-          style={[styles.input, { color: isDark ? '#fff' : '#000', backgroundColor: isDark ? '#1a1a1a' : '#F6F6F6' }]}
+          keyboardType='numeric'
           value={formData.direccion.cp}
           onChangeText={(text) => handleDireccionChange('cp', text)}
         />
@@ -182,35 +129,20 @@ const Step4_AddressData = ({ onNext, onBack, formData, updateForm }: Props) => {
   );
 };
 
-const selectStyle = (isDark: boolean): React.CSSProperties => ({
-  backgroundColor: isDark ? '#1A2C23' : '#EDF3EE',
-  color: isDark ? '#fff' : '#000',
-  border: 'none',
-  borderRadius: 15,
-  padding: 14,
-  fontSize: 16,
-  width: '100%',
-  outline: 'none',
-  appearance: 'none',
-});
-
 const getStyles = (isDark: boolean) =>
   StyleSheet.create({
     container: {
       flex: 1,
-      backgroundColor: isDark ? '#020D06' : '#fff',
+      backgroundColor: isDark ? '#121212' : '#F8F9FA',
+      padding: 55
     },
     contentContainer: {
       flexGrow: 1,
       justifyContent: 'center',
       alignItems: 'center',
-      paddingVertical: 30,
     },
     centeredContent: {
       width: '100%',
-      maxWidth: 420,
-      alignSelf: 'center',
-      alignItems: 'center',
     },
     header: {
       alignItems: 'center',
@@ -226,44 +158,10 @@ const getStyles = (isDark: boolean) =>
       fontWeight: 'bold',
       color: isDark ? '#fff' : '#000',
     },
-    input: {
-      backgroundColor: isDark ? '#1a1a1a' : '#F6F6F6',
-      borderRadius: 8,
-      padding: 16,
-      marginBottom: 15,
-      fontSize: 16,
-      color: isDark ? '#fff' : '#000',
-      minHeight: 50,
-  width: '100%',
-      maxWidth: 360,
-      alignSelf: 'center',
-    },
     row: {
       flexDirection: 'row',
       justifyContent: 'space-between',
       gap: 10,
-    },
-    halfInput: {
-      width: '48%',
-    },
-    selectWrapper: {
-      marginBottom: 15,
-      width: '100%',
-      maxWidth: 360,
-      alignSelf: 'center',
-      alignItems: 'center',
-    },
-    selectText: {
-      fontSize: 16,
-      paddingVertical: 14,
-      paddingHorizontal: 10,
-      backgroundColor: isDark ? '#1a1a1a' : '#F6F6F6',
-      borderRadius: 8,
-      color: isDark ? '#fff' : '#333',
-      width: '100%',
-      maxWidth: 360,
-      alignSelf: 'center',
-      textAlign: 'center',
     },
     nextButton: {
       backgroundColor: '#28a745',

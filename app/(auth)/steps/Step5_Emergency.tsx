@@ -3,6 +3,8 @@ import { Text, TextInput, StyleSheet, TouchableOpacity, ScrollView, useColorSche
 import { Picker } from '@react-native-picker/picker';
 import { FormularioCompleto } from '@/types/navigation';
 import GoBackHomeButton from '@/components/GoBackHomeButton';
+import FormInput from '@/components/FormInput';
+import SelectInput from '@/components/SelectInput';
 
 interface Props {
   onNext: () => void;
@@ -13,7 +15,6 @@ interface Props {
 
 const Step5_Emergency = ({ onNext, onBack, formData, updateForm }: Props) => {
   const isDark = useColorScheme() === 'dark';
-  const isWeb = Platform.OS === 'web';
   const styles = getStyles(isDark);
   const placeholderColor = '#A1A1A1';
   const validateForm = () => {
@@ -67,75 +68,49 @@ const Step5_Emergency = ({ onNext, onBack, formData, updateForm }: Props) => {
         <Text style={styles.headerTitle}>Contacto de Emergencia</Text>
       </View>
 
-      <TextInput
+      <FormInput
         placeholder="Nombre*"
-        placeholderTextColor={placeholderColor}
-        style={styles.input}
         value={formData.contacto_emergencia.ceNombre}
         onChangeText={(text) => handleChange('ceNombre', text)}
       />
 
       <View style={styles.row}>
-        <TextInput
+        <FormInput
           placeholder="Apellido paterno*"
-          placeholderTextColor={placeholderColor}
-          style={[styles.input, styles.halfInput]}
           value={formData.contacto_emergencia.ceApellido1}
           onChangeText={(text) => handleChange('ceApellido1', text)}
+          containerStyle={styles.halfInput}
         />
-        <TextInput
+        <FormInput
           placeholder="Apellido materno*"
-          placeholderTextColor={placeholderColor}
-          style={[styles.input, styles.halfInput]}
           value={formData.contacto_emergencia.ceApellido2}
           onChangeText={(text) => handleChange('ceApellido2', text)}
+          containerStyle={styles.halfInput}
         />
       </View>
 
-      <TextInput
+      <FormInput
         placeholder="Celular*"
-        placeholderTextColor={placeholderColor}
         keyboardType="phone-pad"
-        style={styles.input}
         value={formData.contacto_emergencia.ceCel}
         onChangeText={(text) => handleChange('ceCel', text)}
       />
 
-      <TextInput
+      <FormInput
         placeholder="Teléfono*"
-        placeholderTextColor={placeholderColor}
         keyboardType="phone-pad"
-        style={styles.input}
         value={formData.contacto_emergencia.ceTel}
         onChangeText={(text) => handleChange('ceTel', text)}
       />
 
-      <View style={styles.selectWrapper}>
-        {isWeb ? (
-          <select
-            value={formData.contacto_emergencia.ceParentesco || ''}
-            onChange={(e) => handleChange('ceParentesco', e.target.value)}
-            style={selectStyle(isDark)}
-          >
-            <option value="">Parentesco*</option>
-            {parentescoOptions.map((option) => (
-              <option key={option} value={option}>{option}</option>
-            ))}
-          </select>
-        ) : (
-          <Picker
-            selectedValue={formData.contacto_emergencia.ceParentesco}
-            onValueChange={(value) => handleChange('ceParentesco', value)}
-            style={styles.picker}
-            dropdownIconColor={isDark ? '#fff' : '#000'}
-          >
-            <Picker.Item label="Parentesco*" value="" />
-            {parentescoOptions.map((option) => (
-              <Picker.Item key={option} label={option} value={option} />
-            ))}
-          </Picker>
-        )}
-      </View>
+      <SelectInput
+        label="Parentesco*"
+        value={formData.contacto_emergencia.ceParentesco}
+        onSelect={(value: string) => handleChange('ceParentesco', value)}
+        options={parentescoOptions}
+        placeholder="Parentesco*"
+        isRequired
+      />
 
       <TouchableOpacity
         style={styles.nextButton}
@@ -182,8 +157,8 @@ const getStyles = (isDark: boolean) =>
   StyleSheet.create({
     container: {
       flex: 1,
-      padding: 45,
-      backgroundColor: isDark ? '#020D06' : '#fff',
+      padding: 55,
+      backgroundColor: isDark ? '#121212' : '#F8F9FA',
     },
     header: {
       alignItems: 'center',
@@ -199,18 +174,6 @@ const getStyles = (isDark: boolean) =>
       fontWeight: 'bold',
       color: isDark ? '#fff' : '#000',
     },
-    input: {
-      backgroundColor: isDark ? '#1a1a1a' : '#F6F6F6',
-      borderRadius: 8,
-      padding: 16,
-      marginBottom: 15,
-      fontSize: 16,
-      color: isDark ? '#fff' : '#000',
-      minHeight: 50,
-      width: '100%',
-      maxWidth: 360,
-      alignSelf: 'center',
-    },
     row: {
       flexDirection: 'row',
       justifyContent: 'space-between',
@@ -218,21 +181,6 @@ const getStyles = (isDark: boolean) =>
     },
     halfInput: {
       width: '48%',
-    },
-    selectWrapper: {
-      marginBottom: 20,
-      width: '100%',
-      maxWidth: 360,
-      alignSelf: 'center',
-      alignItems: 'center',
-    },
-    picker: {
-      backgroundColor: isDark ? '#1a1a1a' : '#F6F6F6',
-      borderRadius: 8,
-      color: isDark ? '#fff' : '#000',
-      width: '100%',
-      maxWidth: 360,
-      alignSelf: 'center',
     },
     nextButton: {
       backgroundColor: '#28a745',

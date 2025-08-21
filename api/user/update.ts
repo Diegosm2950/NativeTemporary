@@ -2,30 +2,27 @@ import { User } from "@/types/user";
 
 const API_BASE_URL = process.env.EXPO_PUBLIC_API_BASE_URL
 
+// api/user/update.ts - Enhanced version
 export const updateUserProfile = async (userData: Partial<User>, token: string, refreshUser: () => Promise<void>) => {
     try {
-        // Clean undefined values
-        const updateData = Object.fromEntries(
-            Object.entries({
-                nombre: userData.nombre,
-                apellido1: userData.apellido1,
-                email: userData.email,
-                estadoMx: userData.estadoMx,
-                delegacionMunicipio: userData.delegacionMunicipio,
-                ciudad: userData.ciudad,
-                colonia: userData.colonia,
-                cel: userData.cel,
-                cp: userData.cp,
-                ceNombre: userData.ceNombre,
-                ceCel: userData.ceCel,
-                ceTel: userData.ceTel,
-                ceParentesco: userData.ceParentesco,
-            }).filter(([_, value]) => value !== undefined && value !== null && value !== '')
-        );
+        const updateData = {
+            nombre: userData.nombre,
+            apellido1: userData.apellido1, // ADD THIS
+            email: userData.email,
+            estadoMx: userData.estadoMx,
+            delegacionMunicipio: userData.delegacionMunicipio,
+            ciudad: userData.ciudad,
+            colonia: userData.colonia,
+            cel: userData.cel,
+            cp: userData.cp,
+            ceNombre: userData.ceNombre,
+            ceCel: userData.ceCel,
+            ceTel: userData.ceTel,
+            ceParentesco: userData.ceParentesco,
+        };
   
-        if (Object.keys(updateData).length === 0) {
-            throw new Error('No valid data to update');
-        }
+        console.log('Update payload:', updateData);
+        console.log('Token exists:', !!token);
   
         const response = await fetch(`${API_BASE_URL}/api/user/update`, {
             method: 'PUT',
@@ -36,16 +33,17 @@ export const updateUserProfile = async (userData: Partial<User>, token: string, 
             body: JSON.stringify(updateData)
         });
   
+        console.log('Response status:', response.status);
+        
         const data = await response.json();
+        console.log('Response data:', data);
   
         if (!response.ok) {
-            // More detailed error message
-            throw new Error(data.message || data.error || `HTTP error! status: ${response.status}`);
+            throw new Error(data.error || data.message || `HTTP error! status: ${response.status}`);
         }
   
         await refreshUser();
         return data;
-        
     } catch (error) {
         console.error('Error updating user profile:', error);
         throw error;

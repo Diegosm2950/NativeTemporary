@@ -94,9 +94,8 @@ const getStyles = (isDark: boolean) =>
   StyleSheet.create({
     container: {
       flex: 1,
-      backgroundColor: isDark ? '#020D06' : '#fff',
-      padding: 40,
-      alignItems: 'center',
+      backgroundColor: isDark ? '#121212' : '#F8F9FA',
+      padding: 55,
       justifyContent: 'center',
     },
     content: {
@@ -107,7 +106,6 @@ const getStyles = (isDark: boolean) =>
     contentContainer: {
       justifyContent: 'center',
       flexGrow: 1,
-      alignItems: 'center',
     },
     stepTitle: {
       fontSize: 20,

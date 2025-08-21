@@ -13,27 +13,8 @@ import { User } from '@/types/user';
 import { AuthContext } from '@/context/AuthContext';
 import Toast from 'react-native-toast-message';
 import { updateUserProfile } from '@/api/user/update';
+import { estados, parentescoOptions } from '@/utils/register';
 
-
-const estados = [
-  'Aguascalientes', 'Baja California', 'Baja California Sur', 'Campeche',
-  'CDMX', 'Chiapas', 'Chihuahua', 'Coahuila', 'Colima', 'Durango',
-  'Estado de México', 'Guanajuato', 'Guerrero', 'Hidalgo', 'Jalisco',
-  'Michoacán', 'Morelos', 'Nayarit', 'Nuevo León', 'Oaxaca',
-  'Puebla', 'Querétaro', 'Quintana Roo', 'San Luis Potosí', 'Sinaloa',
-  'Sonora', 'Tabasco', 'Tamaulipas', 'Tlaxcala', 'Veracruz',
-  'Yucatán', 'Zacatecas'
-];
-
-const parentescoOptions = [
-  'Padre',
-  'Madre',
-  'Hermano(a)',
-  'Tío(a)',
-  'Abuelo(a)',
-  'Tutor',
-  'Otro',
-];
 
 type UserField = keyof User;
 
@@ -66,8 +47,13 @@ export default function EditProfileScreen() {
   };
   
   const handleSave = async () => {
-    if (!userData || !token) return;    
+    if (!userData || !token) {
+      console.log('Missing userData or token');
+      return;
+    }    
+    
     try {
+      console.log('Starting update with:', userData);
       await updateUserProfile(userData, token, refreshUser);
 
       Toast.show({
@@ -76,12 +62,17 @@ export default function EditProfileScreen() {
         text2: 'Perfil actualizado correctamente',
       });
       
-      router.push("/(protected)/(tabs)/perfil");
-    } catch (error) {
+      setTimeout(() => {
+        router.push("/(protected)/(tabs)/perfil");
+      }, 1500);
+      
+    } catch (error: any) {
+      console.error('Save error:', error);
+      
       Toast.show({
         type: 'error',
         text1: 'Error',
-        text2: 'Ocurrió un error al guardar los cambios',
+        text2: error.message || 'Ocurrió un error al guardar los cambios',
       });
     }
   };
@@ -296,6 +287,7 @@ export default function EditProfileScreen() {
             />
           </View>
         </ScrollView>
+        <Toast />
       </KeyboardAvoidingView>
     </SafeAreaView>
   );

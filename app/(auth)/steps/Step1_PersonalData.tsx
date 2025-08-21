@@ -1,12 +1,14 @@
 import React, { useState, useEffect } from 'react';
-import { View, Text, TextInput, TouchableOpacity, ScrollView, StyleSheet, useColorScheme, Image, Platform } from 'react-native';
+import { View, Text, TextInput, TouchableOpacity, ScrollView, StyleSheet, Image, Platform } from 'react-native';
 import { Ionicons } from '@expo/vector-icons';
 import DateTimePicker from '@react-native-community/datetimepicker';
-import { Picker } from '@react-native-picker/picker';
 import Toast from 'react-native-toast-message';
 import Constants from 'expo-constants';
 import { FormularioCompleto } from '@/types/navigation';
-import GoBackHomeButton from '@/components/GoBackHomeButton';
+import FormInput from '@/components/FormInput';
+import SelectInput from '@/components/SelectInput';
+import Colors from '@/constants/Colors';
+import useColorScheme from '@/hooks/useColorScheme';
 
 type UserType = 'Jugador' | 'Entrenador' | 'Árbitro' | 'Médico';
 
@@ -20,15 +22,15 @@ interface Props {
   updateForm: (data: Partial<FormularioCompleto>) => void;
 }
 
-const Step1_PersonalData = ({ onNext, onBack, formData, updateForm }: Props) => {
-  const isDark = useColorScheme() === 'dark';
+const Step1_PersonalData = ({ onNext, formData, updateForm }: Props) => {
   const [showDatePicker, setShowDatePicker] = useState(false);
   const [clubs, setClubs] = useState<any[]>([]);
   const [searchClub, setSearchClub] = useState('');
   const [showClubPicker, setShowClubPicker] = useState(false);
   const [clubsToShow, setClubsToShow] = useState(10);
   const userTypes: UserType[] = ['Jugador', 'Entrenador', 'Árbitro', 'Médico'];
-  const styles = getStyles(isDark);
+  const colorScheme = useColorScheme();
+
 
   useEffect(() => {
     fetchClubs();
@@ -91,49 +93,44 @@ const Step1_PersonalData = ({ onNext, onBack, formData, updateForm }: Props) => 
   };
 
   return (
-    <ScrollView style={styles.container} contentContainerStyle={styles.contentContainer}>
+    <ScrollView style={[styles.container, {backgroundColor: Colors[colorScheme].background}]} contentContainerStyle={styles.contentContainer}>
       <View style={styles.header}>
-        <Text style={styles.headerTitle}>Crear cuenta</Text>
+        <Text style={[styles.headerTitle, { color: Colors[colorScheme].text}]}>Crear cuenta</Text>
         <Image source={require('@/assets/images/LogoSnake.png')} style={styles.logo} resizeMode="contain" />
-        <Text style={styles.title}>Únete a nuestra comunidad y explora posibilidades infinitas.</Text>
+        <Text style={[styles.title, { color: Colors[colorScheme].text}]}>Únete a nuestra comunidad y explora posibilidades infinitas.</Text>
       </View>
       <View style={styles.formContainerCentered}>
-        <Text style={styles.sectionTitle}>Datos personales</Text>
+        <Text style={[styles.sectionTitle, { color: Colors[colorScheme].text}]}>Datos personales</Text>
 
         <View style={styles.inputContainer}>
-          <TextInput
-            style={[styles.input, { color: isDark ? '#fff' : '#000' }]}
+          <FormInput
             placeholder="Nombre*"
-            placeholderTextColor="#A1A1A1"
             value={formData.nombre}
             onChangeText={(text) => updateForm({ nombre: text })}
           />
 
           <View style={styles.row}>
-            <TextInput
-              style={[styles.input, styles.halfInput, { color: isDark ? '#fff' : '#000' }]}
+            <FormInput
               placeholder="Apellido paterno*"
-              placeholderTextColor="#A1A1A1"
               value={formData.apellido1}
               onChangeText={(text) => updateForm({ apellido1: text })}
+              containerStyle={styles.halfInput}
+
             />
-            <TextInput
-              style={[styles.input, styles.halfInput, { color: isDark ? '#fff' : '#000' }]}
+            <FormInput
               placeholder="Apellido materno*"
-              placeholderTextColor="#A1A1A1"
               value={formData.apellido2}
               onChangeText={(text) => updateForm({ apellido2: text })}
+              containerStyle={styles.halfInput}
+
             />
           </View>
 
           <TouchableOpacity 
-            style={styles.input} 
+            style={[styles.input, { backgroundColor: Colors[colorScheme].inputBackground }]} 
             onPress={() => setShowDatePicker(true)}
           >
-            <Text style={[
-              styles.inputText,
-              formData.fechaNacimiento && { color: isDark ? '#fff' : '#000' }
-            ]}>
+            <Text style={[styles.inputText, { color: Colors[colorScheme].text}]}>
               {formData.fechaNacimiento 
                 ? formData.fechaNacimiento.toLocaleDateString('es-ES')
                 : 'Fecha de nacimiento*'
@@ -152,20 +149,16 @@ const Step1_PersonalData = ({ onNext, onBack, formData, updateForm }: Props) => 
             />
           )}
 
-          <View style={styles.input}>
-            <Picker
-              selectedValue={formData.sexo}
-              onValueChange={(value: any) => updateForm({ sexo: value })}
-              style={[styles.picker, { color: isDark ? '#fff' : '#000' }]}
-              dropdownIconColor="#A1A1A1"
-            >
-              <Picker.Item label="Sexo*" value="" color="#A1A1A1" />
-              <Picker.Item label="Femenino" value="Femenino" color="#000" />
-              <Picker.Item label="Masculino" value="Masculino" color="#000" />
-            </Picker>
-          </View>
+          <SelectInput
+            label=""
+            value={formData.sexo}
+            onSelect={(value: string) => updateForm({ sexo: value })}
+            options={["Femenino", "Masculino"]}
+            placeholder="Sexo*"
+            isRequired
+          />
 
-          <Text style={styles.fieldLabel}>Tipo de registro: *</Text>
+          <Text style={[styles.fieldLabel, { color: Colors[colorScheme].text}]}>Tipo de registro: *</Text>
           {userTypes.map((type) => (
             <TouchableOpacity 
               key={type} 
@@ -177,17 +170,18 @@ const Step1_PersonalData = ({ onNext, onBack, formData, updateForm }: Props) => 
                   <Ionicons name="checkmark" size={16} color="#fff" />
                 )}
               </View>
-              <Text style={styles.checkboxLabel}>{type}</Text>
+              <Text style={[styles.checkboxLabel, { color: Colors[colorScheme].text}]}>{type}</Text>
             </TouchableOpacity>
           ))}
 
           <TouchableOpacity 
-            style={styles.input}
+            style={[styles.input, { backgroundColor: Colors[colorScheme].inputBackground }]}
             onPress={() => setShowClubPicker(!showClubPicker)}
           >
             <Text style={[
               styles.inputText,
-              formData.equipoUniversitario && { color: isDark ? '#fff' : '#000', fontWeight: '600', fontSize: 16, flexShrink: 1 }
+              formData.equipoUniversitario && { fontWeight: '600', fontSize: 16, flexShrink: 1 },
+              { color: Colors[colorScheme].text}
             ]} numberOfLines={1}>
               {formData.equipoUniversitario || 'Seleccionar Club (Opcional)'}
             </Text>
@@ -197,7 +191,7 @@ const Step1_PersonalData = ({ onNext, onBack, formData, updateForm }: Props) => 
           {showClubPicker && (
             <View style={styles.clubPickerContainer}>
               <TextInput
-                style={styles.searchInput}
+                style={[styles.searchInput, { color: Colors[colorScheme].text, backgroundColor: Colors[colorScheme].inputBackground }]}
                 placeholder="Buscar club..."
                 value={searchClub}
                 onChangeText={setSearchClub}
@@ -223,7 +217,7 @@ const Step1_PersonalData = ({ onNext, onBack, formData, updateForm }: Props) => 
                   .map((club, index) => (
                     <TouchableOpacity
                       key={club.id || index}
-                      style={styles.clubItem}
+                      style={[styles.clubItem, { backgroundColor: Colors[colorScheme].inputBackground }]}
                       onPress={() => {
                         updateForm({ equipoUniversitario: club.nombre || club.club });
                         setShowClubPicker(false);
@@ -231,7 +225,7 @@ const Step1_PersonalData = ({ onNext, onBack, formData, updateForm }: Props) => 
                         setClubsToShow(10);
                       }}
                     >
-                      <Text style={styles.clubText}>{club.nombre || club.club}</Text>
+                      <Text style={[styles.clubText, { color: Colors[colorScheme].text}]}>{club.nombre || club.club}</Text>
                     </TouchableOpacity>
                   ))
                 }
@@ -239,10 +233,8 @@ const Step1_PersonalData = ({ onNext, onBack, formData, updateForm }: Props) => 
             </View>
           )}
 
-          <TextInput
-            style={[styles.input, { color: isDark ? '#fff' : '#000' }]}
+          <FormInput
             placeholder="Equipo Estatal (Opcional)"
-            placeholderTextColor="#A1A1A1"
             value={formData.equipoEstatal}
             onChangeText={(text) => updateForm({ equipoEstatal: text })}
           />
@@ -251,7 +243,7 @@ const Step1_PersonalData = ({ onNext, onBack, formData, updateForm }: Props) => 
             <Text style={styles.submitButtonText}>Siguiente</Text>
           </TouchableOpacity>
 
-          <Text style={styles.terms}>
+          <Text style={[styles.terms, { color: Colors[colorScheme].text}]}>
             Al crear una cuenta, aceptas nuestros Términos y Condiciones
           </Text>
         </View>
@@ -260,17 +252,16 @@ const Step1_PersonalData = ({ onNext, onBack, formData, updateForm }: Props) => 
   );
 };
 
-const getStyles = (isDark: boolean) =>
-  StyleSheet.create({
+const styles = StyleSheet.create({
     container: {
       flex: 1,
       padding: 20,
-      backgroundColor: isDark ? '#000' : '#fff',
     },
     contentContainer: {
       flexGrow: 1,
       justifyContent: 'center',
       alignItems: 'center',
+    
     },
     header: {
       alignItems: 'center',
@@ -281,7 +272,6 @@ const getStyles = (isDark: boolean) =>
       fontSize: 20,
       fontWeight: '600',
       marginBottom: 20,
-      color: isDark ? '#fff' : '#000',
     },
     logo: {
       width: 120,
@@ -294,7 +284,6 @@ const getStyles = (isDark: boolean) =>
       fontWeight: '600',
       marginBottom: 30,
       paddingHorizontal: 20,
-      color: isDark ? '#fff' : '#000',
     },
     formContainer: {
       flex: 1,
@@ -311,13 +300,11 @@ const getStyles = (isDark: boolean) =>
       fontSize: 20,
       fontWeight: '600',
       marginBottom: 20,
-      color: isDark ? '#fff' : '#000',
     },
     inputContainer: {
-      width: '100%',
+      width: '90%',
     },
     input: {
-      backgroundColor: isDark ? '#1a1a1a' : '#F6F6F6',
       borderRadius: 8,
       padding: 16,
       marginBottom: 15,
@@ -335,9 +322,7 @@ const getStyles = (isDark: boolean) =>
     row: {
       flexDirection: 'row',
       justifyContent: 'space-between',
-    },
-    halfInput: {
-      width: '48%',
+      maxWidth: "100%"
     },
     picker: {
       margin: -16,
@@ -348,10 +333,13 @@ const getStyles = (isDark: boolean) =>
       marginBottom: 15,
       fontWeight: '500',
     },
+    halfInput: {
+      width: '48%',
+    },
     checkboxContainer: {
       flexDirection: 'row',
       alignItems: 'center',
-      marginBottom: 12,
+      marginBottom: 15,
     },
     checkbox: {
       width: 22,
@@ -368,7 +356,6 @@ const getStyles = (isDark: boolean) =>
     },
     checkboxLabel: {
       fontSize: 16,
-      color: isDark ? '#fff' : '#222',
     },
     submitButton: {
       backgroundColor: '#28A745',
@@ -386,23 +373,19 @@ const getStyles = (isDark: boolean) =>
       textAlign: 'center',
       marginTop: 20,
       marginBottom: 40,
-      color: isDark ? '#aaa' : '#A1A1A1',
       fontSize: 14,
     },
     clubPickerContainer: {
-      backgroundColor: isDark ? '#1a1a1a' : '#F6F6F6',
       borderRadius: 8,
       padding: 10,
       marginBottom: 15,
       maxHeight: 200,
     },
     searchInput: {
-      backgroundColor: isDark ? '#333' : '#fff',
       borderRadius: 6,
       padding: 12,
       marginBottom: 10,
       fontSize: 16,
-      color: isDark ? '#fff' : '#000',
     },
     clubList: {
       maxHeight: 120,
@@ -410,11 +393,9 @@ const getStyles = (isDark: boolean) =>
     clubItem: {
       padding: 12,
       borderBottomWidth: 1,
-      borderBottomColor: isDark ? '#333' : '#eee',
     },
     clubText: {
       fontSize: 16,
-      color: isDark ? '#fff' : '#000',
     },
   });
 

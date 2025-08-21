@@ -4,6 +4,9 @@ import { Ionicons } from "@expo/vector-icons";
 import { Picker } from "@react-native-picker/picker";
 import Toast from 'react-native-toast-message';
 import { FormularioCompleto } from "@/types/navigation";
+import FormInput from "@/components/FormInput";
+import SelectInput from "@/components/SelectInput";
+import { ESCOLARIDAD_OPTIONS, TIPO_SANGRE_OPTIONS } from "@/utils/register";
 
 interface Props {
   onNext: () => void;
@@ -16,7 +19,6 @@ const Step3_AdditionalData = ({ onNext, onBack, formData, updateForm }: Props) =
   const isDark = useColorScheme() === "dark";
   const isWeb = Platform.OS === "web";
   const styles = getStyles(isDark);
-  const placeholderColor = "#A1A1A1";
 
   const handleChange = (
     key: keyof FormularioCompleto,
@@ -36,6 +38,7 @@ const Step3_AdditionalData = ({ onNext, onBack, formData, updateForm }: Props) =
     if (!formData.nacionalidad?.trim()) errors.push('Nacionalidad');
     if (!formData.escolaridad?.trim()) errors.push('Escolaridad');
     if (!formData.tipoSangre?.trim()) errors.push('Tipo de sangre');
+    if (!formData.alergiasEnfermedadesDesc?.trim()) errors.push('Alergias y/o enfermedades');
 
     // Validar RFC si es requerido
     const shouldShowRFC = !formData.esExtranjero && calculateAge(formData.fechaNacimiento) >= 18;
@@ -91,7 +94,6 @@ const calculateAge = (birthDate: string | Date | null) => {
 
 // Then use it like this:
 const shouldShowRFC = !formData.esExtranjero && calculateAge(formData.fechaNacimiento) >= 18;
-  const isRFCRequired = shouldShowRFC;
 
   return (
     <ScrollView style={styles.container} contentContainerStyle={styles.contentContainer}>
@@ -105,38 +107,32 @@ const shouldShowRFC = !formData.esExtranjero && calculateAge(formData.fechaNacim
       </View>
 
       <View style={styles.row}>
-        <TextInput
+        <FormInput
           placeholder="Teléfono*"
-          placeholderTextColor={placeholderColor}
-          style={[styles.input, styles.halfInput, { color: isDark ? '#fff' : '#000' }]}
           value={formData.tel}
           onChangeText={(text) => handleChange("tel", text)}
           keyboardType="phone-pad"
+          containerStyle={styles.halfInput}
         />
-        <TextInput
+        <FormInput
           placeholder="Celular*"
-          placeholderTextColor={placeholderColor}
-          style={[styles.input, styles.halfInput, { color: isDark ? '#fff' : '#000' }]}
           value={formData.cel}
           onChangeText={(text) => handleChange("cel", text)}
           keyboardType="phone-pad"
+          containerStyle={styles.halfInput}
         />
       </View>
 
-      <TextInput
+      <FormInput
         placeholder="Email*"
-        placeholderTextColor={placeholderColor}
-        style={[styles.input, { color: isDark ? '#fff' : '#000' }]}
         value={formData.email}
         onChangeText={(text) => handleChange("email", text)}
         keyboardType="email-address"
         autoCapitalize="none"
       />
 
-      <TextInput
+      <FormInput
         placeholder="CURP*"
-        placeholderTextColor={placeholderColor}
-        style={[styles.input, { color: isDark ? '#fff' : '#000' }]}
         value={formData.curp}
         onChangeText={(text) => handleChange("curp", text)}
         autoCapitalize="characters"
@@ -144,94 +140,44 @@ const shouldShowRFC = !formData.esExtranjero && calculateAge(formData.fechaNacim
 
       {/* Add RFC field conditionally */}
       {shouldShowRFC && (
-        <TextInput
+        <FormInput
           placeholder="RFC*"
-          placeholderTextColor={placeholderColor}
-          style={[styles.input, { color: isDark ? '#fff' : '#000' }]}
           value={formData.rfc}
           onChangeText={(text) => handleChange("rfc", text)}
           autoCapitalize="characters"
         />
       )}
 
-      <TextInput
+      <FormInput
         placeholder="Nacionalidad*"
-        placeholderTextColor={placeholderColor}
-        style={[styles.input, { color: isDark ? '#fff' : '#000' }]}
         value={formData.nacionalidad}
         onChangeText={(text) => handleChange("nacionalidad", text)}
       />
 
       {/* Escolaridad + Tipo de sangre */}
-      <View style={styles.row}>
-        <View style={styles.halfInput}>
-          {isWeb ? (
-            <select
-              value={formData.escolaridad || ""}
-              onChange={(e) => handleChange("escolaridad", e.target.value)}
-              style={selectStyle(isDark)}
-            >
-              <option value="">Escolaridad*</option>
-              <option value="Primaria">Primaria</option>
-              <option value="Secundaria">Secundaria</option>
-              <option value="Preparatoria">Preparatoria</option>
-              <option value="Licenciatura">Licenciatura</option>
-              <option value="Maestría">Maestría</option>
-              <option value="Doctorado">Doctorado</option>
-            </select>
-          ) : (
-            <Picker
-              selectedValue={formData.escolaridad}
-              onValueChange={(value) => handleChange("escolaridad", value)}
-              style={[styles.picker, { color: isDark ? '#fff' : '#000' }]}
-              dropdownIconColor="#A1A1A1"
-            >
-              <Picker.Item label="Escolaridad*" value="" />
-              <Picker.Item label="Primaria" value="Primaria" />
-              <Picker.Item label="Secundaria" value="Secundaria" />
-              <Picker.Item label="Preparatoria" value="Preparatoria" />
-              <Picker.Item label="Licenciatura" value="Licenciatura" />
-              <Picker.Item label="Maestría" value="Maestría" />
-              <Picker.Item label="Doctorado" value="Doctorado" />
-            </Picker>
-          )}
-        </View>
+      <SelectInput
+        value={formData.escolaridad}
+        onSelect={(value: string) => handleChange("escolaridad", value)}
+        options={ESCOLARIDAD_OPTIONS}
+        placeholder="Escolaridad*"
+        isRequired
+      />
 
-        <View style={styles.halfInput}>
-          {isWeb ? (
-            <select
-              value={formData.tipoSangre || ""}
-              onChange={(e) => handleChange("tipoSangre", e.target.value)}
-              style={selectStyle(isDark)}
-            >
-              <option value="">Tipo de sangre*</option>
-              {["A+", "A-", "B+", "B-", "AB+", "AB-", "O+", "O-"].map((tipo) => (
-                <option key={tipo} value={tipo}>{tipo}</option>
-              ))}
-            </select>
-          ) : (
-            <Picker
-              selectedValue={formData.tipoSangre}
-              onValueChange={(value) => handleChange("tipoSangre", value)}
-              style={[styles.picker, { color: isDark ? '#fff' : '#000' }]}
-              dropdownIconColor="#A1A1A1"
-            >
-              <Picker.Item label="Tipo de sangre*" value="" />
-              {["A+", "A-", "B+", "B-", "AB+", "AB-", "O+", "O-"].map((tipo) => (
-                <Picker.Item key={tipo} label={tipo} value={tipo} />
-              ))}
-            </Picker>
-          )}
-        </View>
-      </View>
+      <SelectInput
+        value={formData.tipoSangre}
+        onSelect={(value: string) => handleChange("tipoSangre", value)}
+        options={TIPO_SANGRE_OPTIONS}
+        placeholder="Tipo de sangre*"
+        isRequired
+      />
 
-      <TextInput
-        placeholder="Alergias y/o enfermedades"
-        placeholderTextColor={placeholderColor}
-        style={[styles.input, { minHeight: 80, textAlignVertical: "top", marginTop: 14 }, { color: isDark ? '#fff' : '#000' }]}
+      <FormInput
+        placeholder="Alergias y/o enfermedades*"
+        label="Si no tiene ponga (ninguna)"
         multiline
         value={formData.alergiasEnfermedadesDesc}
         onChangeText={(text) => handleChange("alergiasEnfermedadesDesc", text)}
+        isRequired
       />
 
       <TouchableOpacity
@@ -241,7 +187,6 @@ const shouldShowRFC = !formData.esExtranjero && calculateAge(formData.fechaNacim
         <View style={[styles.checkbox, formData.esExtranjero && styles.checkedBox]}>
           {formData.esExtranjero && (
             <>
-              <Ionicons name="checkmark" size={16} color="000000" />
               <Ionicons name="checkmark" size={16} color="#fff" />
             </>
           )}
@@ -252,10 +197,8 @@ const shouldShowRFC = !formData.esExtranjero && calculateAge(formData.fechaNacim
       </TouchableOpacity>
 
       {formData.esExtranjero && (
-        <TextInput
+        <FormInput
           placeholder="Pasaporte"
-          placeholderTextColor={placeholderColor}
-          style={[styles.input, { color: isDark ? '#fff' : '#000' }]}
           value={formData.pasaporte}
           onChangeText={(text) => handleChange("pasaporte", text)}
         />
@@ -282,24 +225,12 @@ const shouldShowRFC = !formData.esExtranjero && calculateAge(formData.fechaNacim
   );
 };
 
-const selectStyle = (isDark: boolean): React.CSSProperties => ({
-  backgroundColor: isDark ? "#1A2C23" : "#f0f0f0",
-  color: isDark ? "#fff" : "#000",
-  border: "none",
-  borderRadius: 15,
-  padding: 14,
-  fontSize: 16,
-  width: "100%",
-  outline: "none",
-  appearance: "none",
-});
-
 const getStyles = (isDark: boolean) =>
   StyleSheet.create({
     container: {
       flex: 1,
-      padding: 30,
-      backgroundColor: isDark ? "#020D06" : "#fff",
+      padding: 55,
+      backgroundColor: isDark ? '#121212' : '#F8F9FA',
     },
     contentContainer: {
       justifyContent: 'center',
@@ -346,11 +277,9 @@ const getStyles = (isDark: boolean) =>
       justifyContent: 'space-between',
       alignItems: 'stretch',
       gap: 10,
-      marginBottom: 15,
     },
     halfInput: {
-      flex: 1,
-      minWidth: 0,
+      width: "48%"
     },
     checkboxContainer: {
       flexDirection: "row",

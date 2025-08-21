@@ -30,7 +30,7 @@ export default function SelectInput({
   value,
   onSelect,
   options,
-  placeholder = 'Select an option',
+  placeholder = 'Selecciona una opcion',
   isRequired = false,
   error,
   containerStyle,
@@ -108,7 +108,7 @@ export default function SelectInput({
                   styles.modalTitle,
                   { color: Colors[colorScheme].text }
                 ]}>
-                  {label || 'Select an option'}
+                  {label || 'Selecciona una opcion'}
                 </Text>
                 <TouchableOpacity onPress={closeModal} style={styles.closeButton}>
                   <X size={24} color={Colors[colorScheme].text} />
