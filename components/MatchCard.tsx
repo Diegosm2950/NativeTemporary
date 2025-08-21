@@ -105,21 +105,25 @@ export default function MatchCard({ match, variant = 'small' }: MatchCardProps) 
 
       {isLarge && (
         <View style={styles.leagueContainer}>
-          <View style={styles.badgeContainer}>
-            <ImageBackground
-              source={require('@/assets/images/rugbyvg.png')}
-              blurRadius={50}
-              imageStyle={styles.badgeImageStyle}
-            >
-              <Text 
-                style={styles.badgeText} 
-                numberOfLines={1}
-                ellipsizeMode='tail'
+          {
+            match.torneo && (
+            <View style={styles.badgeContainer}>
+              <ImageBackground
+                source={require('@/assets/images/rugbyvg.png')}
+                blurRadius={50}
+                imageStyle={styles.badgeImageStyle}
               >
-                {match.torneo}
-              </Text>
-            </ImageBackground>
-          </View>
+                <Text 
+                  style={styles.badgeText} 
+                  numberOfLines={1}
+                  ellipsizeMode='tail'
+                >
+                  {match.torneo}
+                </Text>
+              </ImageBackground>
+            </View>
+            )
+          }
           <View style={styles.badgeContainer}>
             <ImageBackground
               source={require('@/assets/images/rugbyvg.png')}
