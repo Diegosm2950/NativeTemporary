@@ -77,14 +77,11 @@ const Step6_Terms = ({ formData, onBack, resetForm, updateForm }: Props) => {
       Toast.show({
         type: 'success',
         text1: 'Registro exitoso',
-        text2: data?.mensaje || 'Tu cuenta ha sido creada',
+        text2: 'Revisa tu correo electrónico para activar tu cuenta.',
       });
 
       resetForm();
-
-      setTimeout(() => {
-        navigation.navigate('LoginScreen' as never);
-      }, 2500);
+      navigation.navigate('LoginScreen' as never);
     } catch (err: any) {
       console.error('Error en registro:', err);
       Toast.show({
@@ -98,7 +95,28 @@ const Step6_Terms = ({ formData, onBack, resetForm, updateForm }: Props) => {
   };
 
   const styles = getStyles(isDark);
-  const placeholderColor = isDark ? '#aaa' : '#888';
+  const placeholderColor = '#A1A1A1';
+
+  const validateForm = () => {
+    const errors = [];
+    if (!formData.aceptaciones.responsabilidad) errors.push('Carta de Responsabilidad');
+    if (!formData.aceptaciones.privacidad) errors.push('Políticas de Privacidad');
+    if (!formData.aceptaciones.terminos) errors.push('Términos y Condiciones');
+    if (!formData.contrasenia?.trim()) errors.push('Contraseña');
+    if (!formData.repetir_contrasenia?.trim()) errors.push('Repetir Contraseña');
+    if (formData.contrasenia && formData.repetir_contrasenia && formData.contrasenia !== formData.repetir_contrasenia) errors.push('Las contraseñas no coinciden');
+    return errors;
+  };
+
+  const showErrorToast = (fields: string[]) => {
+    import('react-native-toast-message').then(({ default: Toast }) => {
+      Toast.show({
+        type: 'error',
+        text1: 'Campos requeridos',
+        text2: `Faltan: ${fields.join(', ')}`,
+      });
+    });
+  };
 
   return (
     <ScrollView style={styles.container}>
@@ -164,8 +182,15 @@ const Step6_Terms = ({ formData, onBack, resetForm, updateForm }: Props) => {
 
       <TouchableOpacity
         style={[styles.submitButton, (!allAccepted || loading) && { backgroundColor: '#ccc' }]}
-        disabled={!allAccepted || loading}
-        onPress={handleSubmitRegistro}
+        disabled={loading}
+        onPress={() => {
+          const missing = validateForm();
+          if (missing.length > 0) {
+            showErrorToast(missing);
+            return;
+          }
+          handleSubmitRegistro();
+        }}
       >
         <Text style={styles.submitText}>{loading ? 'Enviando...' : 'Enviar'}</Text>
       </TouchableOpacity>
@@ -236,12 +261,16 @@ const getStyles = (isDark: boolean) =>
       color: isDark ? '#fff' : '#000',
     },
     input: {
-      backgroundColor: '#EDF3EE',
-      borderRadius: 15,
-      padding: 14,
+      backgroundColor: isDark ? '#1a1a1a' : '#F6F6F6',
+      borderRadius: 8,
+      padding: 16,
       marginBottom: 15,
       fontSize: 16,
-      color: '#000',
+      color: isDark ? '#fff' : '#000',
+      minHeight: 50,
+      width: '100%',
+      maxWidth: 360,
+      alignSelf: 'center',
     },
     submitButton: {
       backgroundColor: '#28a745',

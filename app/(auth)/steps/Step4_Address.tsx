@@ -24,7 +24,8 @@ const Step4_AddressData = ({ onNext, onBack, formData, updateForm }: Props) => {
   const isDark = useColorScheme() === 'dark';
   const isWeb = Platform.OS === 'web';
   const styles = getStyles(isDark);
-  const placeholderColor = isDark ? '#aaa' : '#666';
+  const placeholderColor = '#A1A1A1';
+
 
   const handleDireccionChange = (key: keyof FormularioCompleto['direccion'], value: string) => {
     updateForm({
@@ -35,104 +36,148 @@ const Step4_AddressData = ({ onNext, onBack, formData, updateForm }: Props) => {
     });
   };
 
+  const validateForm = () => {
+    const errors = [];
+    if (!formData.direccion.estadoMx?.trim()) errors.push('Estado');
+    if (!formData.direccion.delegacionMunicipio?.trim()) errors.push('Alcaldía o Municipio');
+    if (!formData.direccion.ciudad?.trim()) errors.push('Ciudad');
+    if (!formData.direccion.colonia?.trim()) errors.push('Colonia');
+    if (!formData.direccion.calle?.trim()) errors.push('Calle');
+    if (!formData.direccion.cp?.trim()) errors.push('Código postal');
+    return errors;
+  };
+
+  const showErrorToast = (fields: string[]) => {
+    // @ts-ignore
+    import('react-native-toast-message').then(({ default: Toast }) => {
+      Toast.show({
+        type: 'error',
+        text1: 'Campos requeridos',
+        text2: `Faltan: ${fields.join(', ')}`,
+      });
+    });
+  };
+
   return (
-    <ScrollView style={styles.container}>
-      <View style={styles.header}>
-        <Image source={require('@/assets/images/LogoSnake.png')} style={styles.logo} resizeMode="contain" />
-        <Text style={styles.headerTitle}>Dirección</Text>
-      </View>
+    <ScrollView style={styles.container} contentContainerStyle={styles.contentContainer}>
+      <View style={styles.centeredContent}>
+        <View style={styles.header}>
+          <Image source={require('@/assets/images/LogoSnake.png')} style={styles.logo} resizeMode="contain" />
+          <Text style={styles.headerTitle}>Dirección</Text>
+        </View>
 
-      {/* Estado */}
-      <View style={styles.selectWrapper}>
-        {isWeb ? (
-          <select
-            value={formData.direccion.estadoMx || ''}
-            onChange={(e) => handleDireccionChange('estadoMx', e.target.value)}
-            style={selectStyle(isDark)}
-          >
-            <option value="">Estado*</option>
-            {estados.map((estado) => (
-              <option key={estado} value={estado}>{estado}</option>
-            ))}
-          </select>
-        ) : (
-          <Text style={styles.selectText}>
-            {formData.direccion.estadoMx || "Estado*"}
-          </Text>
-        )}
-      </View>
+        {/* Estado */}
+        <View style={[styles.selectWrapper, { backgroundColor: isDark ? '#1a1a1a' : '#F6F6F6', borderRadius: 8 }]}> 
+          {isWeb ? (
+            <select
+              value={formData.direccion.estadoMx || ''}
+              onChange={(e) => handleDireccionChange('estadoMx', e.target.value)}
+              style={selectStyle(isDark)}
+            >
+              <option value="">Estado*</option>
+              {estados.map((estado) => (
+                <option key={estado} value={estado}>{estado}</option>
+              ))}
+            </select>
+          ) : (
+            <TextInput
+              placeholder="Estado*"
+              placeholderTextColor={placeholderColor}
+              style={[styles.input, { color: isDark ? '#fff' : '#000', backgroundColor: isDark ? '#1a1a1a' : '#F6F6F6' }]}
+              value={formData.direccion.estadoMx}
+              onChangeText={(text) => handleDireccionChange('estadoMx', text)}
+            />
+          )}
+        </View>
 
-      {/* Delegación o Municipio */}
-      <TextInput
-        placeholder="Alcaldía o Municipio*"
-        placeholderTextColor={placeholderColor}
-        style={styles.input}
-        value={formData.direccion.delegacionMunicipio}
-        onChangeText={(text) => handleDireccionChange('delegacionMunicipio', text)}
-      />
+        {/* Delegación o Municipio */}
+        <TextInput
+          placeholder="Alcaldía o Municipio*"
+          placeholderTextColor={placeholderColor}
+          style={[styles.input, { color: isDark ? '#fff' : '#000', backgroundColor: isDark ? '#1a1a1a' : '#F6F6F6' }]}
+          value={formData.direccion.delegacionMunicipio}
+          onChangeText={(text) => handleDireccionChange('delegacionMunicipio', text)}
+        />
 
-      {/* Ciudad */}
-      <View style={styles.selectWrapper}>
-        {isWeb ? (
-          <select
-            value={formData.direccion.ciudad || ''}
-            onChange={(e) => handleDireccionChange('ciudad', e.target.value)}
-            style={selectStyle(isDark)}
-          >
-            <option value="">Ciudad*</option>
-            <option value="Ciudad de México">Ciudad de México</option>
-            <option value="Guadalajara">Guadalajara</option>
-            <option value="Monterrey">Monterrey</option>
-            {/* puedes agregar más ciudades si deseas */}
-          </select>
-        ) : (
-          <Text style={styles.selectText}>
-            {formData.direccion.ciudad || "Ciudad*"}
-          </Text>
-        )}
-      </View>
+        {/* Ciudad */}
+        <View style={[styles.selectWrapper, { backgroundColor: isDark ? '#1a1a1a' : '#F6F6F6', borderRadius: 8 }]}> 
+          {isWeb ? (
+            <select
+              value={formData.direccion.ciudad || ''}
+              onChange={(e) => handleDireccionChange('ciudad', e.target.value)}
+              style={selectStyle(isDark)}
+            >
+              <option value="">Ciudad*</option>
+              <option value="Ciudad de México">Ciudad de México</option>
+              <option value="Guadalajara">Guadalajara</option>
+              <option value="Monterrey">Monterrey</option>
+            </select>
+          ) : (
+            <TextInput
+              placeholder="Ciudad*"
+              placeholderTextColor={placeholderColor}
+              style={[styles.input, { color: isDark ? '#fff' : '#000', backgroundColor: isDark ? '#1a1a1a' : '#F6F6F6' }]}
+              value={formData.direccion.ciudad}
+              onChangeText={(text) => handleDireccionChange('ciudad', text)}
+            />
+          )}
+        </View>
 
-      {/* Colonia */}
-      <TextInput
-        placeholder="Colonia*"
-        placeholderTextColor={placeholderColor}
-        style={styles.input}
-        value={formData.direccion.colonia}
-        onChangeText={(text) => handleDireccionChange('colonia', text)}
-      />
 
-      <TextInput
-        placeholder="Calle*"
-        placeholderTextColor={placeholderColor}
-        style={styles.input}
-        value={formData.direccion.colonia}
-        onChangeText={(text) => handleDireccionChange('calle', text)}
-      />
+        {/* Colonia */}
+        <TextInput
+          placeholder="Colonia*"
+          placeholderTextColor={placeholderColor}
+          style={[styles.input, { color: isDark ? '#fff' : '#000', backgroundColor: isDark ? '#1a1a1a' : '#F6F6F6' }]}
+          value={formData.direccion.colonia}
+          onChangeText={(text) => handleDireccionChange('colonia', text)}
+        />
 
-      {/* Número y Código Postal */}
-      <TextInput
-        placeholder="Código postal*"
-        placeholderTextColor={placeholderColor}
-        keyboardType="numeric"
-        style={styles.input}
-        value={formData.direccion.cp}
-        onChangeText={(text) => handleDireccionChange('cp', text)}
-      />
+        {/* Calle */}
+        <TextInput
+          placeholder="Calle*"
+          placeholderTextColor={placeholderColor}
+          style={[styles.input, { color: isDark ? '#fff' : '#000', backgroundColor: isDark ? '#1a1a1a' : '#F6F6F6' }]}
+          value={formData.direccion.calle}
+          onChangeText={(text) => handleDireccionChange('calle', text)}
+        />
 
-      {/* Botones */}
-      <TouchableOpacity style={styles.nextButton} onPress={onNext}>
-        <Text style={styles.nextText}>Siguiente</Text>
-      </TouchableOpacity>
+        {/* Código Postal */}
+        <TextInput
+          placeholder="Código postal*"
+          placeholderTextColor={placeholderColor}
+          keyboardType="numeric"
+          style={[styles.input, { color: isDark ? '#fff' : '#000', backgroundColor: isDark ? '#1a1a1a' : '#F6F6F6' }]}
+          value={formData.direccion.cp}
+          onChangeText={(text) => handleDireccionChange('cp', text)}
+        />
 
-      {onBack && (
-        <TouchableOpacity style={styles.backButton} onPress={onBack}>
-          <Text style={styles.backText}>Volver</Text>
+        {/* Botones */}
+
+        <TouchableOpacity
+          style={styles.nextButton}
+          onPress={() => {
+            const missing = validateForm();
+            if (missing.length > 0) {
+              showErrorToast(missing);
+              return;
+            }
+            onNext();
+          }}
+        >
+          <Text style={styles.nextText}>Siguiente</Text>
         </TouchableOpacity>
-      )}
 
-      <Text style={styles.terms}>
-        Al crear una cuenta, aceptas nuestros Términos y Condiciones.
-      </Text>
+        {onBack && (
+          <TouchableOpacity style={styles.backButton} onPress={onBack}>
+            <Text style={styles.backText}>Volver</Text>
+          </TouchableOpacity>
+        )}
+
+        <Text style={styles.terms}>
+          Al crear una cuenta, aceptas nuestros Términos y Condiciones.
+        </Text>
+      </View>
     </ScrollView>
   );
 };
@@ -153,8 +198,19 @@ const getStyles = (isDark: boolean) =>
   StyleSheet.create({
     container: {
       flex: 1,
-      padding: 45,
       backgroundColor: isDark ? '#020D06' : '#fff',
+    },
+    contentContainer: {
+      flexGrow: 1,
+      justifyContent: 'center',
+      alignItems: 'center',
+      paddingVertical: 30,
+    },
+    centeredContent: {
+      width: '100%',
+      maxWidth: 420,
+      alignSelf: 'center',
+      alignItems: 'center',
     },
     header: {
       alignItems: 'center',
@@ -171,12 +227,16 @@ const getStyles = (isDark: boolean) =>
       color: isDark ? '#fff' : '#000',
     },
     input: {
-      backgroundColor: '#EDF3EE',
-      borderRadius: 15,
-      padding: 14,
+      backgroundColor: isDark ? '#1a1a1a' : '#F6F6F6',
+      borderRadius: 8,
+      padding: 16,
       marginBottom: 15,
       fontSize: 16,
-      color: '#000',
+      color: isDark ? '#fff' : '#000',
+      minHeight: 50,
+  width: '100%',
+      maxWidth: 360,
+      alignSelf: 'center',
     },
     row: {
       flexDirection: 'row',
@@ -188,14 +248,22 @@ const getStyles = (isDark: boolean) =>
     },
     selectWrapper: {
       marginBottom: 15,
+      width: '100%',
+      maxWidth: 360,
+      alignSelf: 'center',
+      alignItems: 'center',
     },
     selectText: {
       fontSize: 16,
       paddingVertical: 14,
       paddingHorizontal: 10,
-      backgroundColor: '#EDF3EE',
-      borderRadius: 15,
-      color: '#333',
+      backgroundColor: isDark ? '#1a1a1a' : '#F6F6F6',
+      borderRadius: 8,
+      color: isDark ? '#fff' : '#333',
+      width: '100%',
+      maxWidth: 360,
+      alignSelf: 'center',
+      textAlign: 'center',
     },
     nextButton: {
       backgroundColor: '#28a745',

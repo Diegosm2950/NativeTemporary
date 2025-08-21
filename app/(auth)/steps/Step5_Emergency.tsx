@@ -15,7 +15,28 @@ const Step5_Emergency = ({ onNext, onBack, formData, updateForm }: Props) => {
   const isDark = useColorScheme() === 'dark';
   const isWeb = Platform.OS === 'web';
   const styles = getStyles(isDark);
-  const placeholderColor = isDark ? '#aaa' : '#888';
+  const placeholderColor = '#A1A1A1';
+  const validateForm = () => {
+    const errors = [];
+    if (!formData.contacto_emergencia.ceNombre?.trim()) errors.push('Nombre');
+    if (!formData.contacto_emergencia.ceApellido1?.trim()) errors.push('Apellido paterno');
+    if (!formData.contacto_emergencia.ceApellido2?.trim()) errors.push('Apellido materno');
+    if (!formData.contacto_emergencia.ceCel?.trim()) errors.push('Celular');
+    if (!formData.contacto_emergencia.ceTel?.trim()) errors.push('Teléfono');
+    if (!formData.contacto_emergencia.ceParentesco?.trim()) errors.push('Parentesco');
+    return errors;
+  };
+
+  const showErrorToast = (fields: string[]) => {
+    // @ts-ignore
+    import('react-native-toast-message').then(({ default: Toast }) => {
+      Toast.show({
+        type: 'error',
+        text1: 'Campos requeridos',
+        text2: `Faltan: ${fields.join(', ')}`,
+      });
+    });
+  };
 
   const handleChange = (
     key: keyof FormularioCompleto['contacto_emergencia'],
@@ -116,7 +137,17 @@ const Step5_Emergency = ({ onNext, onBack, formData, updateForm }: Props) => {
         )}
       </View>
 
-      <TouchableOpacity style={styles.nextButton} onPress={onNext}>
+      <TouchableOpacity
+        style={styles.nextButton}
+        onPress={() => {
+          const missing = validateForm();
+          if (missing.length > 0) {
+            showErrorToast(missing);
+            return;
+          }
+          onNext();
+        }}
+      >
         <Text style={styles.nextText}>Siguiente</Text>
       </TouchableOpacity>
 
@@ -169,12 +200,16 @@ const getStyles = (isDark: boolean) =>
       color: isDark ? '#fff' : '#000',
     },
     input: {
-      backgroundColor: '#EDF3EE',
-      borderRadius: 15,
-      padding: 14,
+      backgroundColor: isDark ? '#1a1a1a' : '#F6F6F6',
+      borderRadius: 8,
+      padding: 16,
       marginBottom: 15,
       fontSize: 16,
-      color: '#000',
+      color: isDark ? '#fff' : '#000',
+      minHeight: 50,
+      width: '100%',
+      maxWidth: 360,
+      alignSelf: 'center',
     },
     row: {
       flexDirection: 'row',
@@ -186,11 +221,18 @@ const getStyles = (isDark: boolean) =>
     },
     selectWrapper: {
       marginBottom: 20,
+      width: '100%',
+      maxWidth: 360,
+      alignSelf: 'center',
+      alignItems: 'center',
     },
     picker: {
-      backgroundColor: '#EDF3EE',
-      borderRadius: 15,
+      backgroundColor: isDark ? '#1a1a1a' : '#F6F6F6',
+      borderRadius: 8,
       color: isDark ? '#fff' : '#000',
+      width: '100%',
+      maxWidth: 360,
+      alignSelf: 'center',
     },
     nextButton: {
       backgroundColor: '#28a745',

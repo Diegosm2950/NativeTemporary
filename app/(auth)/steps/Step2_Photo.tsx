@@ -1,7 +1,8 @@
 import React from 'react';
-import { View, Text, StyleSheet, Image, TouchableOpacity, useColorScheme, Platform } from 'react-native';
+import { View, Text, StyleSheet, Image, TouchableOpacity, useColorScheme, Platform, Alert } from 'react-native';
 import * as ImagePicker from 'expo-image-picker';
 import { Camera } from 'lucide-react-native';
+import Toast from 'react-native-toast-message';
 import { FormularioCompleto } from '@/types/navigation';
 import GoBackHomeButton from '@/components/GoBackHomeButton';
 
@@ -31,9 +32,21 @@ const Step2_Photo = ({ onNext, onBack, formData, updateForm }: Props) => {
     }
   };
 
+  const handleNext = () => {
+    if (!formData.foto) {
+      Toast.show({
+        type: 'error',
+        text1: 'Foto requerida',
+        text2: 'Debes subir una fotografía para continuar',
+      });
+      return;
+    }
+    onNext();
+  };
+
   return (
     <View style={styles.container}>
-      <View style={styles.content}>
+      <View style={[styles.content, styles.contentContainer]}>
         {/* Título */}
         <Text style={styles.stepTitle}>Fotografía *</Text>
 
@@ -58,7 +71,7 @@ const Step2_Photo = ({ onNext, onBack, formData, updateForm }: Props) => {
         </View>
       </View>
       {/* Botón Siguiente */}
-      <TouchableOpacity style={styles.nextButton} onPress={onNext}>
+      <TouchableOpacity style={styles.nextButton} onPress={handleNext}>
         <Text style={styles.nextText}>Siguiente</Text>
       </TouchableOpacity>
 
@@ -89,6 +102,11 @@ const getStyles = (isDark: boolean) =>
     content: {
       width: '100%',
       maxWidth: 400,
+      alignItems: 'center',
+    },
+    contentContainer: {
+      justifyContent: 'center',
+      flexGrow: 1,
       alignItems: 'center',
     },
     stepTitle: {
