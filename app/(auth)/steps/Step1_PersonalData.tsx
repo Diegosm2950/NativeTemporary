@@ -21,13 +21,14 @@ interface Props {
 }
 
 const Step1_PersonalData = ({ onNext, onBack, formData, updateForm }: Props) => {
+  const isDark = useColorScheme() === 'dark';
   const [showDatePicker, setShowDatePicker] = useState(false);
   const [clubs, setClubs] = useState<any[]>([]);
   const [searchClub, setSearchClub] = useState('');
   const [showClubPicker, setShowClubPicker] = useState(false);
   const [clubsToShow, setClubsToShow] = useState(10);
   const userTypes: UserType[] = ['Jugador', 'Entrenador', 'Árbitro', 'Médico'];
-  const styles = getStyles();
+  const styles = getStyles(isDark);
 
   useEffect(() => {
     fetchClubs();
@@ -259,7 +260,7 @@ const Step1_PersonalData = ({ onNext, onBack, formData, updateForm }: Props) => 
   );
 };
 
-const getStyles = () =>
+const getStyles = (isDark: boolean) =>
   StyleSheet.create({
     container: {
       flex: 1,
