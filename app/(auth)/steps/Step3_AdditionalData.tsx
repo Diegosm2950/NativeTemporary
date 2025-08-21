@@ -244,7 +244,10 @@ const shouldShowRFC = !formData.esExtranjero && calculateAge(formData.fechaNacim
       >
         <View style={[styles.checkbox, formData.esExtranjero && styles.checkedBox]}>
           {formData.esExtranjero && (
-            <Ionicons name="checkmark" size={16} color="#fff" />
+            <>
+              <Ionicons name="checkmark" size={16} color="000000" />
+              <Ionicons name="checkmark" size={16} color="#fff" />
+            </>
           )}
         </View>
         <Text style={[styles.checkboxLabel, { color: isDark ? '#fff' : '#000' }]}>
@@ -357,6 +360,7 @@ const getStyles = (isDark: boolean) =>
       flexDirection: "row",
       alignItems: "center",
       marginBottom: 20,
+      color: "black"
     },
     checkbox: {
       width: 22,

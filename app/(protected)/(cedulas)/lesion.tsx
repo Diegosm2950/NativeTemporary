@@ -17,10 +17,11 @@ import Colors from '@/constants/Colors';
 import useColorScheme from '@/hooks/useColorScheme';
 import { VolverButton } from '@/components/ui/BackButton';
 
+
 export default function RegistrarLesion() {
   const colorScheme = useColorScheme();
   const router = useRouter();
-  const { cedulaData, setCedulaData, jugadoresLocal, jugadoresVisitante } = useCedula();
+  const { cedulaData, setCedulaData, jugadoresLocal, jugadoresVisitante, cronometro } = useCedula();
 
   const [equipo, setEquipo] = useState<'A' | 'B' | null>(null);
   const [jugador, setJugador] = useState('');
@@ -28,6 +29,7 @@ export default function RegistrarLesion() {
   const [gravedad, setGravedad] = useState<'Leve' | 'Media' | 'Grave'>('Leve');
   const [ambulancia, setAmbulancia] = useState<boolean | null>(null);
   const [observacion, setObservacion] = useState('');
+  const [firma, setFirma] = useState('');
 
   const partesCuerpo = ['Cabeza', 'Hombro', 'Brazo', 'Pierna'];
 
@@ -64,17 +66,16 @@ export default function RegistrarLesion() {
   return (
     <KeyboardAvoidingView
       behavior={Platform.OS === 'ios' ? 'padding' : 'height'}
-      style={{ flex: 1 }}
+      style={{ flex: 1, backgroundColor: Colors[colorScheme].background, }}
     >
       <ScrollView 
         contentContainerStyle={[
           styles.container, 
           { 
-            backgroundColor: Colors[colorScheme].background,
-            paddingBottom: 40 // Add extra padding at the bottom
+            paddingBottom: 40
           }
         ]}
-        style={{ flex: 1 }} // Ensure ScrollView fills available space
+        style={{ flex: 1 }} 
       >
         <StatusBar style={colorScheme === 'dark' ? 'light' : 'dark'} />
         <Text style={[styles.title, { color: Colors[colorScheme].text }]}>Registrar Lesión</Text>
@@ -243,6 +244,22 @@ export default function RegistrarLesion() {
           placeholderTextColor={Colors[colorScheme].textSecondary}
           value={observacion}
           onChangeText={setObservacion}
+          multiline
+        />
+
+        <Text style={[styles.sectionTitle, { color: Colors[colorScheme].text }]}>Firma del representante del bienestar</Text>
+        <TextInput
+          style={[
+            styles.textarea, 
+            { 
+              backgroundColor: Colors[colorScheme].inputBackground,
+              color: Colors[colorScheme].text
+            }
+          ]}
+          placeholder="Firma"
+          placeholderTextColor={Colors[colorScheme].textSecondary}
+          value={firma}
+          onChangeText={setFirma}
           multiline
         />
 

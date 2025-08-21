@@ -3,9 +3,6 @@ import React, { createContext, useContext, useState, ReactNode } from 'react';
 type Player = {
   id: number;
   nombre: string;
-  dorsal: number;
-  posicion: number;
-  foto: string;
 };
 
 type CedulaData = {

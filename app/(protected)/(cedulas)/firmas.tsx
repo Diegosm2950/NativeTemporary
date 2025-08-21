@@ -91,12 +91,12 @@ export default function RecoleccionFirmas() {
     if (!capitanLocalFirma) missingFields.push("Firma del capitán local");
     if (!capitanVisitaNombre) missingFields.push("Nombre del capitán visitante");
     if (!capitanVisitaFirma) missingFields.push("Firma del capitán visitante");
-    if (!repLocalNombre) missingFields.push("Nombre del representante local");
-    if (!repLocalFirma) missingFields.push("Firma del representante local");
-    if (!repLocalTel) missingFields.push("Teléfono del representante local");
-    if (!repVisitaNombre) missingFields.push("Nombre del representante visitante");
-    if (!repVisitaFirma) missingFields.push("Firma del representante visitante");
-    if (!repVisitaTel) missingFields.push("Teléfono del representante visitante");
+    if (!repLocalNombre) missingFields.push("Nombre del representante del bienestar local");
+    if (!repLocalFirma) missingFields.push("Firma del representante del bienestar local");
+    if (!repLocalTel) missingFields.push("Teléfono del representante del bienestar local");
+    if (!repVisitaNombre) missingFields.push("Nombre del representante del bienestar visitante");
+    if (!repVisitaFirma) missingFields.push("Firma del representante del bienestar visitante");
+    if (!repVisitaTel) missingFields.push("Teléfono del representante del bienestar visitante");
   
     if (missingFields.length > 0) {
       Toast.show({
@@ -237,13 +237,13 @@ export default function RecoleccionFirmas() {
         <Input label="Capitán Visitante (Nombre)" value={form.capitanVisitaNombre} onChangeText={v => updateField('capitanVisitaNombre', v)} placeholder="Nombre" />
         <Input label="Capitán Visitante (Firma)" value={form.capitanVisitaFirma} onChangeText={v => updateField('capitanVisitaFirma', v)} placeholder="Firma" multiline />
 
-        <Input label="Representante Local (Nombre)" value={form.repLocalNombre} onChangeText={v => updateField('repLocalNombre', v)} placeholder="Nombre" />
-        <Input label="Representante Local (Firma)" value={form.repLocalFirma} onChangeText={v => updateField('repLocalFirma', v)} placeholder="Firma" multiline />
-        <Input label="Representante Local (Teléfono)" value={form.repLocalTel} onChangeText={v => updateField('repLocalTel', v)} placeholder="Teléfono" keyboardType="phone-pad" />
+        <Input label="Representante del bienestar Local (Nombre)" value={form.repLocalNombre} onChangeText={v => updateField('repLocalNombre', v)} placeholder="Nombre" />
+        <Input label="Representante del bienestar Local (Firma)" value={form.repLocalFirma} onChangeText={v => updateField('repLocalFirma', v)} placeholder="Firma" multiline />
+        <Input label="Representante del bienestar Local (Teléfono)" value={form.repLocalTel} onChangeText={v => updateField('repLocalTel', v)} placeholder="Teléfono" keyboardType="phone-pad" />
 
-        <Input label="Representante Visitante (Nombre)" value={form.repVisitaNombre} onChangeText={v => updateField('repVisitaNombre', v)} placeholder="Nombre" />
-        <Input label="Representante Visitante (Firma)" value={form.repVisitaFirma} onChangeText={v => updateField('repVisitaFirma', v)} placeholder="Firma" multiline />
-        <Input label="Representante Visitante (Teléfono)" value={form.repVisitaTel} onChangeText={v => updateField('repVisitaTel', v)} placeholder="Teléfono" keyboardType="phone-pad" />
+        <Input label="Representante del bienestar Visitante (Nombre)" value={form.repVisitaNombre} onChangeText={v => updateField('repVisitaNombre', v)} placeholder="Nombre" />
+        <Input label="Representante del bienestar Visitante (Firma)" value={form.repVisitaFirma} onChangeText={v => updateField('repVisitaFirma', v)} placeholder="Firma" multiline />
+        <Input label="Representante del bienestar Visitante (Teléfono)" value={form.repVisitaTel} onChangeText={v => updateField('repVisitaTel', v)} placeholder="Teléfono" keyboardType="phone-pad" />
 
         <View style={styles.switchRow}>
           <Text style={[styles.label, { color: Colors[colorScheme].text }]}>

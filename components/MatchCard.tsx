@@ -105,21 +105,25 @@ export default function MatchCard({ match, variant = 'small' }: MatchCardProps) 
 
       {isLarge && (
         <View style={styles.leagueContainer}>
-          <View style={styles.badgeContainer}>
-            <ImageBackground
-              source={require('@/assets/images/rugbyvg.png')}
-              blurRadius={50}
-              imageStyle={styles.badgeImageStyle}
-            >
-              <Text 
-                style={styles.badgeText} 
-                numberOfLines={1}
-                ellipsizeMode='tail'
+          {
+            match.torneo && (
+            <View style={styles.badgeContainer}>
+              <ImageBackground
+                source={require('@/assets/images/rugbyvg.png')}
+                blurRadius={50}
+                imageStyle={styles.badgeImageStyle}
               >
-                {match.torneo}
-              </Text>
-            </ImageBackground>
-          </View>
+                <Text 
+                  style={styles.badgeText} 
+                  numberOfLines={1}
+                  ellipsizeMode='tail'
+                >
+                  {match.torneo}
+                </Text>
+              </ImageBackground>
+            </View>
+            )
+          }
           <View style={styles.badgeContainer}>
             <ImageBackground
               source={require('@/assets/images/rugbyvg.png')}
@@ -219,6 +223,31 @@ export default function MatchCard({ match, variant = 'small' }: MatchCardProps) 
           </Text>
         </View>
       )}
+
+    <View style={[styles.fechaContainer]}>
+        <Text 
+          style={[
+            { color: Colors[colorScheme].text },
+          ]}
+        >
+          {match.fecha}
+        </Text>
+        <Text 
+          style={[
+            { color: Colors[colorScheme].text },
+          ]}
+        >
+          {match.horario}
+        </Text>
+        <Text 
+          style={[
+            styles.campo,
+            { color: Colors[colorScheme].text },
+          ]}
+        >
+          {match.campo}
+        </Text>
+      </View>
 
       {isLarge && !isFinished && (
         <>
@@ -391,6 +420,16 @@ const styles = StyleSheet.create({
   dateText: {
     fontSize: 14,
     fontFamily: 'Inter-Regular',
+  },
+  fechaContainer: {
+    marginTop: Layout.spacing.m,
+    borderRadius: Layout.borderRadius.large,
+    alignItems: 'center',
+    padding: 5,
+  },
+  campo : {
+    marginTop: 10,
+    fontWeight: 600
   },
   actionButton: {
     marginTop: Layout.spacing.m,

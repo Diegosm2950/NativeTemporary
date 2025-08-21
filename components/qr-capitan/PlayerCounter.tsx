@@ -17,9 +17,6 @@ const PlayerCounter: React.FC<PlayerCounterProps> = ({ selected, total }) => {
         </Text>
       </View>
 
-      <View style={[styles.badge, isDark && styles.badgeDark]}>
-        <Text style={[styles.text, isDark && styles.textDark]}>Posición</Text>
-      </View>
     </View>
   );
 };

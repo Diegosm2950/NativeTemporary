@@ -15,6 +15,7 @@ export default function JuegoScreen() {
   const [corriendo, setCorriendo] = useState(false);
   const [startTime, setStartTime] = useState<number | null>(null);
   const [pausedTime, setPausedTime] = useState(0);
+  const intervalRef = useRef<NodeJS.Timeout | null>(null);
   
   const calcularPuntos = (equipo: 'A' | 'B') => {
     return cedulaData.marcador
@@ -37,36 +38,37 @@ export default function JuegoScreen() {
   const marcadorB = cedulaData.marcador.filter(p => p.equipo === 'B');
 
   useEffect(() => {
-    let interval: NodeJS.Timeout;
-    
     if (corriendo) {
-      const start = Date.now() - (pausedTime || 0);
+      const start = Date.now() - cronometro;
       setStartTime(start);
       
-      interval = setInterval(() => {
+      intervalRef.current = setInterval(() => {
         const elapsed = Date.now() - start;
         setCronometro(elapsed);
-      }, 100); 
+      }, 100);
+    } else {
+      if (intervalRef.current) {
+        clearInterval(intervalRef.current);
+      }
     }
   
     return () => {
-      if (interval) clearInterval(interval);
+      if (intervalRef.current) {
+        clearInterval(intervalRef.current);
+      }
     };
-  }, [corriendo, pausedTime]);
+  }, [corriendo]);
 
   const iniciar = () => {
-    setStartTime(Date.now());
+    setCronometro(0);
     setCorriendo(true);
   };
   
   const pausar = () => {
-    setPausedTime(cronometro);
     setCorriendo(false);
   };
   
   const reanudar = () => {
-    setStartTime(Date.now() - pausedTime);
-    setPausedTime(0);
     setCorriendo(true);
   };
 

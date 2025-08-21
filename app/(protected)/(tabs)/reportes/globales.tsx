@@ -9,6 +9,11 @@ import { AuthContext } from '@/context/AuthContext';
 import { fetchPlayerSummary, fetchTeamSummary } from '@/api/user/stats';
 import { LoadingIndicator } from '@/components/ui/Indicators';
 
+interface TarjetasStats {
+  amarillas: number;
+  rojas: number;
+}
+
 interface PlayerStatsResponse {
   id: number;
   nombreCompleto: string;
@@ -17,7 +22,7 @@ interface PlayerStatsResponse {
   tries: number;
   conversiones: number;
   lesiones: number;
-  tarjetas: number;
+  tarjetas: TarjetasStats;
   victorias: number;
   empates: number;
   derrotas: number;
@@ -56,11 +61,14 @@ export default function GlobalesScreen() {
                 setLoading(true);
                 
                 const playerData = await fetchPlayerSummary(user?.id ?? undefined) as PlayerStatsResponse;
+                console.log(playerData, "response");
+                
                 const formattedPlayerStats: StatItem[] = [
                     { label: 'Partidos', value: playerData.totalPartidos || 0 },
                     { label: 'Tries', value: playerData.tries || 0 },
                     { label: 'Conversiones', value: playerData.conversiones || 0 },
-                    { label: 'Tarjetas', value: playerData.tarjetas || 0 },
+                    { label: 'Tarjetas Amarillas', value: playerData.tarjetas?.amarillas || 0 },
+                    { label: 'Tarjetas Rojas', value: playerData.tarjetas?.rojas || 0 },
                     { label: 'Lesiones', value: playerData.lesiones || 0 },
                     { label: 'Victorias', value: playerData.victorias || 0 },
                     { label: 'Empates', value: playerData.empates || 0 },

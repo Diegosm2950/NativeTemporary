@@ -4,7 +4,6 @@ import {
   Text,
   StyleSheet,
   TouchableOpacity,
-  Image,
   Platform,
   ScrollView,
   FlatList,
@@ -20,9 +19,15 @@ import Colors from '@/constants/Colors';
 type Player = {
   id: number;
   nombre: string;
-  dorsal: number;
-  posicion: number;
-  foto: string;
+  apellido_paterno: string;
+  apellido_materno: string;
+};
+
+type ProcessedPlayer = {
+  id: number;
+  nombre: string;
+  apellido_paterno: string;
+  apellido_materno: string;
 };
 
 export default function QRScanner() {
@@ -37,8 +42,8 @@ export default function QRScanner() {
   const [permission, requestPermission] = useCameraPermissions();
 
   const [scanningTeam, setScanningTeam] = useState<'local' | 'visitante' | null>(null);
-  const [localPlayers, setLocalPlayers] = useState<Player[]>([]);
-  const [visitorPlayers, setVisitorPlayers] = useState<Player[]>([]);
+  const [localPlayers, setLocalPlayers] = useState<ProcessedPlayer[]>([]);
+  const [visitorPlayers, setVisitorPlayers] = useState<ProcessedPlayer[]>([]);
 
   useEffect(() => {
     if (matchData) {
@@ -55,25 +60,36 @@ export default function QRScanner() {
     }
   }, [matchData]);
 
+  const processPlayers = (players: Player[]): ProcessedPlayer[] => {
+    return players.map(player => ({
+      ...player,
+      nombre: `${player.nombre} ${player.apellido_paterno}`.trim()
+    }));
+  };
+
   const handleBarCodeScanned = ({ data }: { data: string }) => {
     try {
       const players = JSON.parse(data);
 
+
       if (!Array.isArray(players)) throw new Error();
 
+      // Process players to combine nombre and apellido_paterno
+      const processedPlayers = processPlayers(players);
+
       if (scanningTeam === 'local') {
-        setLocalPlayers(players);
-        setJugadoresLocal(players);
+        setLocalPlayers(processedPlayers);
+        setJugadoresLocal(processedPlayers);
         setCedulaData(prev => ({
           ...prev,
-          participantesLocal: players,
+          participantesLocal: processedPlayers,
         }));
       } else if (scanningTeam === 'visitante') {
-        setVisitorPlayers(players);
-        setJugadoresVisitante(players);
+        setVisitorPlayers(processedPlayers);
+        setJugadoresVisitante(processedPlayers);
         setCedulaData(prev => ({
           ...prev,
-          participantesVisitante: players,
+          participantesVisitante: processedPlayers,
         }));
       }
     } catch (error) {
@@ -83,29 +99,23 @@ export default function QRScanner() {
     }
   };
 
-  const renderPlayerList = (players: Player[], label: string) => (
+
+  const renderPlayerList = (players: ProcessedPlayer[], label: string) => (
     <View style={styles.playerListContainer}>
       <View style={styles.teamHeader}>
         <Text style={styles.teamHeaderText}>{label}</Text>
       </View>
-      <View style={styles.tableHeader}>
-        <Text style={[styles.tableCell, { flex: 0.5, fontWeight: 'bold', color: Colors[colorScheme].text }]}>#</Text>
-        <Text style={[styles.tableCell, { flex: 2, fontWeight: 'bold', color: Colors[colorScheme].text }]}>Nombre</Text>
+      <View style={[styles.tableHeader, { backgroundColor: Colors[colorScheme].buttonPrimary}]}>
+        <Text style={[styles.tableCell, { flex: 3, fontWeight: 'bold', color: Colors[colorScheme].text }]}>Nombre</Text>
         <Text style={[styles.tableCell, { flex: 1, fontWeight: 'bold', color: Colors[colorScheme].text }]}>ID</Text>
-        <Text style={[styles.tableCell, { flex: 1, fontWeight: 'bold', color: Colors[colorScheme].text }]}>Posición</Text>
       </View>
       <FlatList
         data={players}
         keyExtractor={(item) => item.id.toString()}
         renderItem={({ item: p }) => (
           <View style={styles.tableRow}>
-            <Text style={[styles.tableCell, { flex: 0.5 }]}>{p.dorsal}</Text>
-            <View style={{ flex: 2, flexDirection: 'row', alignItems: 'center' }}>
-              <Image source={{ uri: p.foto }} style={styles.avatar} />
-              <Text style={[styles.tableCell, { marginLeft: 6, color: Colors[colorScheme].text }]}>{p.nombre}</Text>
-            </View>
+            <Text style={[styles.tableCell, { flex: 3, color: Colors[colorScheme].text }]}>{p.nombre}</Text>
             <Text style={[styles.tableCell, { flex: 1, color: Colors[colorScheme].text }]}>{p.id}</Text>
-            <Text style={[styles.tableCell, { flex: 1, color: Colors[colorScheme].text }]}>{p.posicion}</Text>
           </View>
         )}
         scrollEnabled={false}
@@ -282,12 +292,6 @@ const styles = StyleSheet.create({
   },
   tableCell: {
     fontSize: 14,
-    color: '#333',
-  },
-  avatar: {
-    width: 32,
-    height: 32,
-    borderRadius: 16,
-    marginRight: 8,
-  },
+    paddingHorizontal: 4,
+  }
 });
