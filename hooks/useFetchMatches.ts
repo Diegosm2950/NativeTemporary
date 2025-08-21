@@ -1,8 +1,9 @@
-import { fetchConvocatorias, fetchConvocatoriasPasadas } from '@/api/user/tournaments';
+import { fetchConvocatorias, fetchConvocatoriasPasadas, fetchConvocatoriasArbitro } from '@/api/user/tournaments';
 import { getAdminToken } from '@/services/helpers';
-import { TeamMatchesResponse, TournamentMatch } from '@/types/convocatiorias';
-import { useState, useEffect, useCallback } from 'react';
+import { TournamentMatch } from '@/types/convocatiorias';
+import { useState, useEffect, useCallback, useContext } from 'react';
 import AsyncStorage from '@react-native-async-storage/async-storage';
+import { AuthContext } from '@/context/AuthContext';
 
 interface ResponseObject {
     convocado: boolean;
@@ -30,6 +31,7 @@ export const useConvocatorias = (clubId?: number) => {
     const [loading, setLoading] = useState<boolean>(true);
     const [error, setError] = useState<string | null>(null);
     const [isOffline, setIsOffline] = useState<boolean>(false);
+    const { user } = useContext(AuthContext);
 
     const getNearestMatch = (matches: TournamentMatch[]): TournamentMatch | null => {
         if (!matches.length) return null;
@@ -116,17 +118,20 @@ export const useConvocatorias = (clubId?: number) => {
 
               const pastMatches = await fetchConvocatoriasPasadas(clubId, token);
               setPastMatches(pastMatches.partidosTorneo);
-              console.log(pastMatches, "past matches")
-  
-              const data = await fetchConvocatorias(clubId, token);
+              
+              let data;
+              if (user?.tipoRegistro_3 === 1) {
+                  data = await fetchConvocatoriasArbitro(clubId, token);
+              } else {
+                  data = await fetchConvocatorias(clubId, token);
+              }
+              
               const allMatches = [...(data.torneos || []), ...(data.amistosos || [])];
               const nearestMatch = getNearestMatch(allMatches);
   
-              // Always save the nearest match if we got one
               if (nearestMatch) {
                   await saveNextMatch(nearestMatch);
               } else {
-                  // Clear storage if no matches found
                   await AsyncStorage.removeItem(NEXT_MATCH_STORAGE_KEY);
               }
   
@@ -170,7 +175,7 @@ export const useConvocatorias = (clubId?: number) => {
       } finally {
           setLoading(false);
       }
-  }, [clubId]);
+  }, [clubId, user?.tipoRegistro_3]); // Added user.tipoRegistro_3 to dependency array
 
     useEffect(() => {
         fetchData();
