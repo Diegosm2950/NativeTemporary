@@ -140,6 +140,14 @@ export default function EditProfileScreen() {
               placeholder="Nombre completo"
               isRequired
             />
+
+            <FormInput
+              label="Apellido"
+              value={userData.apellido1}
+              onChangeText={(text) => handleChange('apellido1', text)}
+              placeholder="Apellido"
+              isRequired
+            />
             
             <FormInput
               label="Correo Electrónico"
