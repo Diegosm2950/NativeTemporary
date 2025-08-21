@@ -2,6 +2,7 @@ import React from "react";
 import { Text, TextInput, StyleSheet, ScrollView, TouchableOpacity, useColorScheme, View, Platform, Image } from "react-native";
 import { Ionicons } from "@expo/vector-icons";
 import { Picker } from "@react-native-picker/picker";
+import Toast from 'react-native-toast-message';
 import { FormularioCompleto } from "@/types/navigation";
 
 interface Props {
@@ -15,13 +16,61 @@ const Step3_AdditionalData = ({ onNext, onBack, formData, updateForm }: Props) =
   const isDark = useColorScheme() === "dark";
   const isWeb = Platform.OS === "web";
   const styles = getStyles(isDark);
-  const placeholderColor = isDark ? "#aaa" : "#666";
+  const placeholderColor = "#A1A1A1";
 
   const handleChange = (
     key: keyof FormularioCompleto,
     value: string | boolean
   ) => {
     updateForm({ [key]: value } as Partial<FormularioCompleto>);
+    const inputBgColor = isDark ? "#1A2C23" : "#EDF3EE";
+    const inputTextColor = isDark ? "#fff" : "#000";
+    const pickerBgColor = isDark ? "#1A2C23" : "#EDF3EE";
+    const pickerTextColor = isDark ? "#fff" : "#000";
+  };
+
+  const validateForm = () => {
+    const errors = [];
+    
+    if (!formData.tel?.trim()) errors.push('Teléfono');
+    if (!formData.cel?.trim()) errors.push('Celular');
+    if (!formData.email?.trim()) errors.push('Email');
+    if (!formData.curp?.trim() && !formData.esExtranjero) errors.push('CURP');
+    if (!formData.pasaporte?.trim() && formData.esExtranjero) errors.push('Pasaporte');
+    if (!formData.nacionalidad?.trim()) errors.push('Nacionalidad');
+    if (!formData.escolaridad?.trim()) errors.push('Escolaridad');
+    if (!formData.tipoSangre?.trim()) errors.push('Tipo de sangre');
+
+    // Validar RFC si es requerido
+    const shouldShowRFC = !formData.esExtranjero && calculateAge(formData.fechaNacimiento) >= 18;
+    if (shouldShowRFC && !formData.rfc?.trim()) errors.push('RFC');
+
+    // Validar formato de email
+    const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
+    if (formData.email && !emailRegex.test(formData.email)) {
+      Toast.show({
+        type: 'error',
+        text1: 'Email inválido',
+        text2: 'Por favor ingresa un email válido',
+      });
+      return false;
+    }
+
+    if (errors.length > 0) {
+      Toast.show({
+        type: 'error',
+        text1: 'Campos requeridos',
+        text2: `Faltan: ${errors.join(', ')}`,
+      });
+      return false;
+    }
+    return true;
+  };
+
+  const handleNext = () => {
+    if (validateForm()) {
+      onNext();
+    }
   };
 
 const calculateAge = (birthDate: string | Date | null) => {
@@ -49,7 +98,7 @@ const shouldShowRFC = !formData.esExtranjero && calculateAge(formData.fechaNacim
   const isRFCRequired = shouldShowRFC;
 
   return (
-    <ScrollView style={styles.container}>
+    <ScrollView style={styles.container} contentContainerStyle={styles.contentContainer}>
       <View style={styles.header}>
         <Image
           source={require('@/assets/images/LogoSnake.png')}
@@ -63,7 +112,7 @@ const shouldShowRFC = !formData.esExtranjero && calculateAge(formData.fechaNacim
         <TextInput
           placeholder="Teléfono*"
           placeholderTextColor={placeholderColor}
-          style={[styles.input, styles.halfInput]}
+          style={[styles.input, styles.halfInput, { color: isDark ? '#fff' : '#000' }]}
           value={formData.tel}
           onChangeText={(text) => handleChange("tel", text)}
           keyboardType="phone-pad"
@@ -71,7 +120,7 @@ const shouldShowRFC = !formData.esExtranjero && calculateAge(formData.fechaNacim
         <TextInput
           placeholder="Celular*"
           placeholderTextColor={placeholderColor}
-          style={[styles.input, styles.halfInput]}
+          style={[styles.input, styles.halfInput, { color: isDark ? '#fff' : '#000' }]}
           value={formData.cel}
           onChangeText={(text) => handleChange("cel", text)}
           keyboardType="phone-pad"
@@ -81,7 +130,7 @@ const shouldShowRFC = !formData.esExtranjero && calculateAge(formData.fechaNacim
       <TextInput
         placeholder="Email*"
         placeholderTextColor={placeholderColor}
-        style={styles.input}
+        style={[styles.input, { color: isDark ? '#fff' : '#000' }]}
         value={formData.email}
         onChangeText={(text) => handleChange("email", text)}
         keyboardType="email-address"
@@ -91,7 +140,7 @@ const shouldShowRFC = !formData.esExtranjero && calculateAge(formData.fechaNacim
       <TextInput
         placeholder="CURP*"
         placeholderTextColor={placeholderColor}
-        style={styles.input}
+        style={[styles.input, { color: isDark ? '#fff' : '#000' }]}
         value={formData.curp}
         onChangeText={(text) => handleChange("curp", text)}
         autoCapitalize="characters"
@@ -102,7 +151,7 @@ const shouldShowRFC = !formData.esExtranjero && calculateAge(formData.fechaNacim
         <TextInput
           placeholder="RFC*"
           placeholderTextColor={placeholderColor}
-          style={styles.input}
+          style={[styles.input, { color: isDark ? '#fff' : '#000' }]}
           value={formData.rfc}
           onChangeText={(text) => handleChange("rfc", text)}
           autoCapitalize="characters"
@@ -112,7 +161,7 @@ const shouldShowRFC = !formData.esExtranjero && calculateAge(formData.fechaNacim
       <TextInput
         placeholder="Nacionalidad*"
         placeholderTextColor={placeholderColor}
-        style={styles.input}
+        style={[styles.input, { color: isDark ? '#fff' : '#000' }]}
         value={formData.nacionalidad}
         onChangeText={(text) => handleChange("nacionalidad", text)}
       />
@@ -138,7 +187,8 @@ const shouldShowRFC = !formData.esExtranjero && calculateAge(formData.fechaNacim
             <Picker
               selectedValue={formData.escolaridad}
               onValueChange={(value) => handleChange("escolaridad", value)}
-              style={styles.picker}
+              style={[styles.picker, { color: isDark ? '#fff' : '#000' }]}
+              dropdownIconColor="#A1A1A1"
             >
               <Picker.Item label="Escolaridad*" value="" />
               <Picker.Item label="Primaria" value="Primaria" />
@@ -167,7 +217,8 @@ const shouldShowRFC = !formData.esExtranjero && calculateAge(formData.fechaNacim
             <Picker
               selectedValue={formData.tipoSangre}
               onValueChange={(value) => handleChange("tipoSangre", value)}
-              style={styles.picker}
+              style={[styles.picker, { color: isDark ? '#fff' : '#000' }]}
+              dropdownIconColor="#A1A1A1"
             >
               <Picker.Item label="Tipo de sangre*" value="" />
               {["A+", "A-", "B+", "B-", "AB+", "AB-", "O+", "O-"].map((tipo) => (
@@ -181,7 +232,7 @@ const shouldShowRFC = !formData.esExtranjero && calculateAge(formData.fechaNacim
       <TextInput
         placeholder="Alergias y/o enfermedades"
         placeholderTextColor={placeholderColor}
-        style={[styles.input, { minHeight: 80, textAlignVertical: "top", marginTop: 14 }]}
+        style={[styles.input, { minHeight: 80, textAlignVertical: "top", marginTop: 14 }, { color: isDark ? '#fff' : '#000' }]}
         multiline
         value={formData.alergiasEnfermedadesDesc}
         onChangeText={(text) => handleChange("alergiasEnfermedadesDesc", text)}
@@ -191,12 +242,12 @@ const shouldShowRFC = !formData.esExtranjero && calculateAge(formData.fechaNacim
         style={styles.checkboxContainer}
         onPress={() => handleChange("esExtranjero", !formData.esExtranjero)}
       >
-        <View style={styles.checkbox}>
+        <View style={[styles.checkbox, formData.esExtranjero && styles.checkedBox]}>
           {formData.esExtranjero && (
-            <Ionicons name="checkmark" size={16} color="#28a745" />
+            <Ionicons name="checkmark" size={16} color="#fff" />
           )}
         </View>
-        <Text style={styles.checkboxLabel}>
+        <Text style={[styles.checkboxLabel, { color: isDark ? '#fff' : '#000' }]}>
           Si no tienes CURP y eres extranjero, selecciona esta opción e ingresa tu número de pasaporte
         </Text>
       </TouchableOpacity>
@@ -205,7 +256,7 @@ const shouldShowRFC = !formData.esExtranjero && calculateAge(formData.fechaNacim
         <TextInput
           placeholder="Pasaporte"
           placeholderTextColor={placeholderColor}
-          style={styles.input}
+          style={[styles.input, { color: isDark ? '#fff' : '#000' }]}
           value={formData.pasaporte}
           onChangeText={(text) => handleChange("pasaporte", text)}
         />
@@ -213,8 +264,7 @@ const shouldShowRFC = !formData.esExtranjero && calculateAge(formData.fechaNacim
 
       <TouchableOpacity 
         style={styles.nextButton} 
-        onPress={onNext}
-        disabled={isRFCRequired && !formData.rfc} // Disable if RFC is required but not filled
+        onPress={handleNext}
       >
         <Text style={styles.nextText}>Siguiente</Text>
       </TouchableOpacity>
@@ -249,8 +299,12 @@ const getStyles = (isDark: boolean) =>
   StyleSheet.create({
     container: {
       flex: 1,
-      padding: 45,
+      padding: 30,
       backgroundColor: isDark ? "#020D06" : "#fff",
+    },
+    contentContainer: {
+      justifyContent: 'center',
+      flexGrow: 1,
     },
     header: {
       alignItems: "center",
@@ -268,26 +322,36 @@ const getStyles = (isDark: boolean) =>
       color: isDark ? "#fff" : "#000",
     },
     input: {
-      backgroundColor: "#EDF3EE",
-      borderRadius: 15,
-      padding: 14,
+      backgroundColor: isDark ? '#1a1a1a' : '#F6F6F6',
+      borderRadius: 8,
+      padding: 16,
       marginBottom: 15,
       fontSize: 16,
-      color: "#000",
+      color: isDark ? '#fff' : '#000',
+      flexDirection: 'row',
+      alignItems: 'center',
+      justifyContent: 'space-between',
+      minHeight: 50,
     },
     picker: {
-      color: isDark ? "#fff" : "#000",
-      backgroundColor: "#EDF3EE",
-      borderRadius: 15,
-      marginBottom: 15,
+      color: isDark ? '#fff' : '#000',
+      backgroundColor: isDark ? '#1a1a1a' : '#F6F6F6',
+      borderRadius: 8,
+      marginBottom: 0,
+      width: '100%',
+      flex: 1,
+      minWidth: 0,
     },
     row: {
-      flexDirection: "row",
-      justifyContent: "space-between",
+      flexDirection: 'row',
+      justifyContent: 'space-between',
+      alignItems: 'stretch',
       gap: 10,
+      marginBottom: 15,
     },
     halfInput: {
-      width: "48%",
+      flex: 1,
+      minWidth: 0,
     },
     checkboxContainer: {
       flexDirection: "row",
@@ -304,10 +368,13 @@ const getStyles = (isDark: boolean) =>
       justifyContent: "center",
       alignItems: "center",
     },
+    checkedBox: {
+      backgroundColor: "#28a745",
+    },
     checkboxLabel: {
       flex: 1,
       fontSize: 14,
-      color: "#ffff",
+      color: isDark ? '#fff' : '#000',
     },
     nextButton: {
       backgroundColor: "#28a745",
