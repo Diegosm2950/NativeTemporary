@@ -52,7 +52,7 @@ const LoginScreen = () => {
 
       <TouchableOpacity
         style={styles.linkButton}
-        onPress={() => router.push("/(auth)/login")}
+        onPress={() => router.push("/(auth)/ForgotPassword")}
       >
         <Text style={styles.linkText}>Olvidé mi contraseña</Text>
       </TouchableOpacity>
