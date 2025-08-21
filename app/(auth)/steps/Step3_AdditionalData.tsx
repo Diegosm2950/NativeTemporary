@@ -23,10 +23,6 @@ const Step3_AdditionalData = ({ onNext, onBack, formData, updateForm }: Props) =
     value: string | boolean
   ) => {
     updateForm({ [key]: value } as Partial<FormularioCompleto>);
-    const inputBgColor = isDark ? "#1A2C23" : "#EDF3EE";
-    const inputTextColor = isDark ? "#fff" : "#000";
-    const pickerBgColor = isDark ? "#1A2C23" : "#EDF3EE";
-    const pickerTextColor = isDark ? "#fff" : "#000";
   };
 
   const validateForm = () => {
