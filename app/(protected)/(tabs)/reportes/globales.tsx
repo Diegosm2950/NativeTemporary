@@ -61,7 +61,6 @@ export default function GlobalesScreen() {
                 setLoading(true);
                 
                 const playerData = await fetchPlayerSummary(user?.id ?? undefined) as PlayerStatsResponse;
-                console.log(playerData, "response");
                 
                 const formattedPlayerStats: StatItem[] = [
                     { label: 'Partidos', value: playerData.totalPartidos || 0 },

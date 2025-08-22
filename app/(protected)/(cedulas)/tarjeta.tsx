@@ -66,7 +66,7 @@ export default function RegistrarTarjeta() {
       tarjetas: [...prev.tarjetas, ...tarjetasTemporales],
     }));
     setTarjetasTemporales([]);
-    router.replace('/(protected)/(cedulas)/juego' as any);
+    router.back();
   };
 
   const jugadores = equipo === 'A' ? jugadoresLocal : equipo === 'B' ? jugadoresVisitante : [];
@@ -109,8 +109,13 @@ export default function RegistrarTarjeta() {
           <TouchableOpacity 
             key={j.id} 
             style={[
-              styles.select,
-              { backgroundColor: Colors[colorScheme].inputBackground }
+              styles.playerOption,
+              { 
+                backgroundColor: jugador === j.nombre 
+                  ? Colors[colorScheme].buttonSelected 
+                  : 'transparent',
+                borderColor: Colors[colorScheme].border,
+              }
             ]} 
             onPress={() => setJugador(j.nombre)}
           >
@@ -218,7 +223,7 @@ export default function RegistrarTarjeta() {
           </Text>
         </TouchableOpacity>
 
-        <VolverButton destination="/(protected)/(cedulas)/juego" />
+        <VolverButton/>
       </ScrollView>
     </KeyboardAvoidingView>
   );
@@ -287,5 +292,11 @@ const styles = StyleSheet.create({
   submitText: {
     fontWeight: '600',
     fontSize: 16,
+  },
+  playerOption: {
+    padding: 16,
+    borderRadius: 12,
+    marginBottom: 8,
+    borderWidth: 1,
   },
 });

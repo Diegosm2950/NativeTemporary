@@ -2,7 +2,6 @@ import React, { useState } from 'react';
 import { View, Text, StyleSheet, TouchableOpacity, TextInput, Platform, ScrollView, Image, Alert } from 'react-native';
 import { useRouter } from 'expo-router';
 import { useCedula } from '@/context/CedulaContext';
-import CancelButton from '@/components/cancelButton';
 import Colors from '@/constants/Colors';
 import useColorScheme from '@/hooks/useColorScheme';
 import TeamSelector from '@/components/TeamSelector';
@@ -10,6 +9,7 @@ import TimeSelectorToggle from '@/components/TimerToggle';
 import CustomTimerInput from '@/components/CustomTimerInput';
 import TimeDisplay from '@/components/TimeDisplay';
 import { formatTiempo, validateTimeFormat } from '@/utils/timerUtils';
+import { VolverButton } from '@/components/ui/BackButton';
 
 export default function RegistroPuntos() {
   const router = useRouter();
@@ -321,7 +321,7 @@ export default function RegistroPuntos() {
             Guardar marcador y continuar
           </Text>
         </TouchableOpacity>
-        <CancelButton />
+        <VolverButton />
       </ScrollView>
     </View>
   );

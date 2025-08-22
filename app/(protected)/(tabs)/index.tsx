@@ -62,7 +62,6 @@ export default function HomeScreen() {
     );
   }
 
-  // Only show error state if we don't have any data at all (including cached)
   if (error && !nextMatch && !data.torneos.length && !data.amistosos.length) {
     return (
       <SafeAreaView style={[styles.container, { backgroundColor: Colors[colorScheme].background }]}>

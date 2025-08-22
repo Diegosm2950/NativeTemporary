@@ -1,5 +1,5 @@
 import React from 'react';
-import { View, Text, StyleSheet, ScrollView, TouchableOpacity, Platform, Image } from 'react-native';
+import { View, Text, StyleSheet, ScrollView, TouchableOpacity, Platform } from 'react-native';
 import { useRouter } from 'expo-router';
 import { useCedula } from '@/context/CedulaContext';
 import Colors from '@/constants/Colors';
@@ -15,6 +15,10 @@ export default function ResumenFinalScreen() {
     const m = Math.floor((milis % 3600000) / 60000).toString().padStart(2, '0');
     const s = Math.floor((milis % 60000) / 1000).toString().padStart(2, '0');
     return `${h}:${m}:${s}`;
+  };
+
+  const handleAccept = () => {
+    router.dismissTo("/");
   };
 
   return (
@@ -60,7 +64,7 @@ export default function ResumenFinalScreen() {
           styles.button, 
           { backgroundColor: Colors[colorScheme].buttonPrimary }
         ]} 
-        onPress={() => router.replace('/')}
+        onPress={handleAccept}
       >
         <Text style={[styles.buttonText, { color: Colors[colorScheme].buttonText }]}>
           Aceptar y volver al inicio

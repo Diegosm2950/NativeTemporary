@@ -8,6 +8,7 @@ import Colors from '@/constants/Colors';
 import useColorScheme from '@/hooks/useColorScheme';
 import MatchCard from '@/components/MatchCard';
 import { MatchStatsCard } from '@/components/TeamStats';
+import { ErrorIndicator, LoadingIndicator } from '@/components/ui/Indicators';
 
 export default function MatchReportScreen() {
   const colorScheme = useColorScheme();
@@ -37,7 +38,17 @@ export default function MatchReportScreen() {
     }
   }, [matchId]);
 
-  console.log(matchData)
+  if (loading) {
+    return (
+      <LoadingIndicator/>
+    );
+  }
+
+  if (error) {
+    return (
+      <ErrorIndicator error={error}/>
+    );
+  }
 
 
   return (
@@ -47,8 +58,6 @@ export default function MatchReportScreen() {
     >
       <ScrollView style={styles.scrollView}>
         <View>
-          {loading && <Text>Loading...</Text>}
-          {error && <Text style={styles.error}>Error: {error}</Text>}
           
           {matchData?.resultados?.[0] && (
             <View>

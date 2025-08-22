@@ -41,7 +41,7 @@ export default function RegistrarObservacion() {
       }));
 
       console.log('✅ Observación guardada. Redirigiendo a juego...');
-      router.push('/(protected)/(cedulas)/juego');
+      router.back();
     } catch (error) {
       console.error('❌ Error al guardar observación o redirigir:', error);
       Alert.alert('Error', 'Ocurrió un problema al continuar.');
@@ -126,7 +126,7 @@ export default function RegistrarObservacion() {
           </Text>
         </TouchableOpacity>
 
-        <VolverButton destination="/(protected)/(cedulas)/juego" />
+        <VolverButton />
       </ScrollView>
     </KeyboardAvoidingView>
   );

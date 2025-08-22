@@ -18,6 +18,14 @@ export default function MatchTabs({ upcomingMatches, pastMatches, initialTab = '
   const colorScheme = useColorScheme();
   const [activeTab, setActiveTab] = React.useState<TabType>(initialTab);
   
+  const renderNoMatchesMessage = () => (
+    <View style={styles.noMatchesContainer}>
+      <Text style={[styles.noMatchesText, { color: Colors[colorScheme].textSecondary }]}>
+        {activeTab === 'upcoming' ? 'No hay próximos partidos' : 'No hay partidos pasados'}
+      </Text>
+    </View>
+  );
+  
   return (
     <View style={styles.container}>
       <View style={styles.tabsContainer}>
@@ -60,13 +68,21 @@ export default function MatchTabs({ upcomingMatches, pastMatches, initialTab = '
       
       <View style={styles.matchesContainer}>
         {activeTab === 'upcoming' ? (
-          upcomingMatches.map(match => (
-            <MatchCard key={match.id} match={match} />
-          ))
+          upcomingMatches.length > 0 ? (
+            upcomingMatches.map(match => (
+              <MatchCard key={match.id} match={match} />
+            ))
+          ) : (
+            renderNoMatchesMessage()
+          )
         ) : (
-          pastMatches.map(match => (
-            <MatchCard key={match.id} match={match} />
-          ))
+          pastMatches.length > 0 ? (
+            pastMatches.map(match => (
+              <MatchCard key={match.id} match={match} />
+            ))
+          ) : (
+            renderNoMatchesMessage()
+          )
         )}
       </View>
     </View>
@@ -100,5 +116,17 @@ const styles = StyleSheet.create({
   matchesContainer: {
     paddingHorizontal: Layout.spacing.l,
     paddingBottom: Layout.spacing.xxl,
+    flex: 1,
+  },
+  noMatchesContainer: {
+    flex: 1,
+    justifyContent: 'center',
+    alignItems: 'center',
+    paddingVertical: Layout.spacing.xxl,
+  },
+  noMatchesText: {
+    fontSize: 16,
+    fontFamily: 'Inter-Regular',
+    textAlign: 'center',
   },
 });

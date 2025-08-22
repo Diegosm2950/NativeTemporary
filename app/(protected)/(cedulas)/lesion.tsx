@@ -21,7 +21,7 @@ import { VolverButton } from '@/components/ui/BackButton';
 export default function RegistrarLesion() {
   const colorScheme = useColorScheme();
   const router = useRouter();
-  const { cedulaData, setCedulaData, jugadoresLocal, jugadoresVisitante, cronometro } = useCedula();
+  const { cedulaData, setCedulaData, jugadoresLocal, jugadoresVisitante } = useCedula();
 
   const [equipo, setEquipo] = useState<'A' | 'B' | null>(null);
   const [jugador, setJugador] = useState('');
@@ -60,7 +60,7 @@ export default function RegistrarLesion() {
       lesiones: [...prev.lesiones, nuevaLesion],
     }));
 
-    router.replace('/(protected)/(cedulas)/juego' as any);
+    router.back();
   };
 
   return (
@@ -278,7 +278,7 @@ export default function RegistrarLesion() {
           </Text>
         </TouchableOpacity>
 
-        <VolverButton destination="/(protected)/(cedulas)/juego" />
+        <VolverButton />
       </ScrollView>
     </KeyboardAvoidingView>
   );

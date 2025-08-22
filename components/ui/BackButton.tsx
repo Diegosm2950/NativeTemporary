@@ -7,7 +7,6 @@ import useColorScheme from '@/hooks/useColorScheme';
 export const VolverButton = ({
   style = {},
   textStyle = {},
-  destination = '/(protected)/(cedulas)/juego',
   marginTop = 20,
   marginBottom = 40
 }: {
@@ -31,7 +30,7 @@ export const VolverButton = ({
         },
         style
       ]}
-      onPress={() => router.replace(destination as any)}
+      onPress={() => router.back()}
     >
       <Text style={[
         styles.backText,

@@ -3,10 +3,10 @@ import { View, Text, StyleSheet, TextInput, TouchableOpacity, ScrollView, Platfo
 import { useRouter } from 'expo-router';
 import { StatusBar } from 'expo-status-bar';
 import { useCedula } from '@/context/CedulaContext';
-import CancelButton from '@/components/cancelButton';
 import Colors from '@/constants/Colors';
 import useColorScheme from '@/hooks/useColorScheme';
 import Toast from 'react-native-toast-message';
+import { VolverButton } from '@/components/ui/BackButton';
 
 const Input = memo(({
   label,
@@ -206,7 +206,13 @@ export default function RecoleccionFirmas() {
         });
       }
 
-      router.replace('/(protected)/(cedulas)/resumen-final');
+      router.replace({
+        pathname: '/(protected)/(cedulas)/resumen-final',
+        params: { 
+          resetNavigation: 'true' 
+        }
+      });
+      
     } catch (error) {
       console.error('❌ Error al enviar la cédula:', error);
       Toast.show({
@@ -275,7 +281,7 @@ export default function RecoleccionFirmas() {
           </Text>
         </TouchableOpacity>
         
-        <CancelButton />
+        <VolverButton />
       </ScrollView>
     </KeyboardAvoidingView>
   );

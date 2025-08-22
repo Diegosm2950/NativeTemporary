@@ -50,7 +50,7 @@ export default function RegistrarCambio() {
       cambios: Array.isArray(prev.cambios) ? [...prev.cambios, nuevoCambio] : [nuevoCambio],
     }));
 
-    router.replace('/(protected)/(cedulas)/juego');
+    router.back();
   };
 
   return (
@@ -126,7 +126,6 @@ export default function RegistrarCambio() {
               onPress={() => setJugadorSale(j.nombre)}
               style={{ flexDirection: 'row', alignItems: 'center', marginBottom: 6 }}
             >
-              <Image source={{ uri: j.foto }} style={{ width: 32, height: 32, borderRadius: 16, marginRight: 8 }} />
               <Text style={{ color: jugadorSale === j.nombre ? Colors[colorScheme].tint : Colors[colorScheme].text }}>
                 {j.nombre}
               </Text>
@@ -143,7 +142,6 @@ export default function RegistrarCambio() {
               onPress={() => setJugadorEntra(j.nombre)}
               style={{ flexDirection: 'row', alignItems: 'center', marginBottom: 6 }}
             >
-              <Image source={{ uri: j.foto }} style={{ width: 32, height: 32, borderRadius: 16, marginRight: 8 }} />
               <Text style={{ color: jugadorEntra === j.nombre ? Colors[colorScheme].tint : Colors[colorScheme].text }}>
                 {j.nombre}
               </Text>
@@ -197,7 +195,7 @@ export default function RegistrarCambio() {
           <Text style={[styles.submitText, { color: Colors[colorScheme].buttonText }]}>Registrar Cambio</Text>
         </TouchableOpacity>
 
-        <VolverButton destination="/(protected)/(cedulas)/juego" />
+        <VolverButton/>
       </ScrollView>
     </KeyboardAvoidingView>
   );

@@ -4,18 +4,14 @@ import { Flag, Repeat, Pencil, Bandage } from 'lucide-react-native';
 import { useRouter } from 'expo-router';
 import { StatusBar } from 'expo-status-bar';
 import { useCedula } from '@/context/CedulaContext';
-import { useEffect, useRef, useState } from 'react';
 import Colors from '@/constants/Colors';
 import useColorScheme from '@/hooks/useColorScheme';
+import Stopwatch from '@/components/stopWatch';
 
 export default function JuegoScreen() {
   const router = useRouter();
-  const { cedulaData, cronometro, setCronometro } = useCedula();
+  const { cedulaData } = useCedula();
   const colorScheme = useColorScheme();
-  const [corriendo, setCorriendo] = useState(false);
-  const [startTime, setStartTime] = useState<number | null>(null);
-  const [pausedTime, setPausedTime] = useState(0);
-  const intervalRef = useRef<NodeJS.Timeout | null>(null);
   
   const calcularPuntos = (equipo: 'A' | 'B') => {
     return cedulaData.marcador
@@ -36,55 +32,6 @@ export default function JuegoScreen() {
 
   const marcadorA = cedulaData.marcador.filter(p => p.equipo === 'A');
   const marcadorB = cedulaData.marcador.filter(p => p.equipo === 'B');
-
-  useEffect(() => {
-    if (corriendo) {
-      const start = Date.now() - cronometro;
-      setStartTime(start);
-      
-      intervalRef.current = setInterval(() => {
-        const elapsed = Date.now() - start;
-        setCronometro(elapsed);
-      }, 100);
-    } else {
-      if (intervalRef.current) {
-        clearInterval(intervalRef.current);
-      }
-    }
-  
-    return () => {
-      if (intervalRef.current) {
-        clearInterval(intervalRef.current);
-      }
-    };
-  }, [corriendo]);
-
-  const iniciar = () => {
-    setCronometro(0);
-    setCorriendo(true);
-  };
-  
-  const pausar = () => {
-    setCorriendo(false);
-  };
-  
-  const reanudar = () => {
-    setCorriendo(true);
-  };
-
-  const formatTiempo = (milisegundos: number) => {
-    const horas = Math.floor(milisegundos / 3600000)
-      .toString()
-      .padStart(2, '0');
-    const minutos = Math.floor((milisegundos % 3600000) / 60000)
-      .toString()
-      .padStart(2, '0');
-    const segundos = Math.floor((milisegundos % 60000) / 1000)
-      .toString()
-      .padStart(2, '0');
-  
-    return `${horas}:${minutos}:${segundos}`;
-  };
 
   return (
     <View style={[styles.container, { backgroundColor: Colors[colorScheme].background }]}>
@@ -144,27 +91,7 @@ export default function JuegoScreen() {
       </View>
 
       {/* Cronómetro */}
-      <View style={[styles.cronometroContainer, { backgroundColor: Colors[colorScheme].cardBackground }]}>
-        <Text style={[styles.cronometroTiempo, { color: Colors[colorScheme].text }]}>{formatTiempo(cronometro)}</Text>
-
-        <View style={styles.cronoButtonGroup}>
-          {!corriendo && cronometro === 0 && (
-            <TouchableOpacity onPress={iniciar} style={[styles.cronoButton, { backgroundColor: Colors[colorScheme].buttonPrimary }]}>
-              <Text style={[styles.cronoButtonText, { color: Colors[colorScheme].buttonText }]}>Iniciar</Text>
-            </TouchableOpacity>
-          )}
-          {corriendo && (
-            <TouchableOpacity onPress={pausar} style={[styles.cronoButton, { backgroundColor: Colors[colorScheme].buttonPrimary }]}>
-              <Text style={[styles.cronoButtonText, { color: Colors[colorScheme].buttonText }]}>Pausar</Text>
-            </TouchableOpacity>
-          )}
-          {!corriendo && cronometro > 0 && (
-            <TouchableOpacity onPress={reanudar} style={[styles.cronoButton, { backgroundColor: Colors[colorScheme].buttonPrimary }]}>
-              <Text style={[styles.cronoButtonText, { color: Colors[colorScheme].buttonText }]}>Reanudar</Text>
-            </TouchableOpacity>
-          )}
-        </View>
-      </View>
+      <Stopwatch />
 
       {/* Botones */}
       <TouchableOpacity

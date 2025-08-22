@@ -81,7 +81,7 @@ const Step6_Terms = ({ formData, onBack, resetForm, updateForm }: Props) => {
       });
 
       resetForm();
-      navigation.navigate('LoginScreen' as never);
+      navigation.navigate('login' as never);
     } catch (err: any) {
       console.error('Error en registro:', err);
       Toast.show({
