@@ -63,7 +63,7 @@ export default function EditProfileScreen() {
       });
       
       setTimeout(() => {
-        router.push("/(protected)/(tabs)/perfil");
+        router.back();
       }, 1500);
       
     } catch (error: any) {

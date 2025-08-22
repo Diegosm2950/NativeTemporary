@@ -79,7 +79,7 @@ export interface User {
   club?: string;
   equipoUniversitario?: string;
   equipoEstatal?: string;
-  rol?: 'usuario' | 'Capitán' | 'representante';
+  rol?: 'usuario' | 'capitan' | 'admin' | 'arbitro';
   createdAt?: Date;
   updatedAt?: Date;
 }
